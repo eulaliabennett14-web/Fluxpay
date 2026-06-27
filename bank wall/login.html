@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Wallet - Log In</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px 20px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 8px 30px rgba(22, 163, 74, 0.25);
+        }
+
+        .icon-box svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        .brand-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+
+        .form-label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #111827;
+            background: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-input:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+            animation: shake 0.5s ease;
+        }
+
+        .form-input.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Password visibility toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-password:hover {
+            color: #6b7280;
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Remember & Forgot */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.5s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #16a34a;
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            font-size: 14px;
+            color: #6b7280;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            font-size: 14px;
+            color: #16a34a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+            animation: fadeInUp 0.5s ease-out 0.4s forwards;
+            opacity: 0;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
+        }
+
+        .cta-button:active {
+            transform: scale(0.98);
+        }
+
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cta-button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .cta-button.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spinner 0.8s linear infinite;
+        }
+
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Signup link */
+        .signup-link {
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out 0.5s forwards;
+            opacity: 0;
+        }
+
+        .signup-link p {
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .signup-link a {
+            color: #16a34a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            animation: fadeInUp 0.5s ease-out 0.45s forwards;
+            opacity: 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            padding: 0 16px;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        /* Social login */
+        .social-login {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.5s ease-out 0.48s forwards;
+            opacity: 0;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+
+        .social-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Error message */
+        .error-banner {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .error-banner.show {
+            display: flex;
+        }
+
+        .error-banner svg {
+            width: 20px;
+            height: 20px;
+            fill: #ef4444;
+            flex-shrink: 0;
+        }
+
+        .error-banner span {
+            font-size: 14px;
+            color: #ef4444;
+        }
+
+        /* Steps */
+        .steps-container {
+            margin-top: auto;
+            padding-top: 40px;
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: #16a34a;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+    
+        /* Country Restriction Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 32px 28px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease;
+        }
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            background: #fef3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .modal-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: #f59e0b;
+        }
+
+        .modal-title {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            font-size: 15px;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .modal-cancel {
+            width: 100%;
+            padding: 14px 24px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-cancel:active {
+            transform: scale(0.98);
+        }
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7v2h20V7L12 2zm0 2.5L18.5 7H5.5L12 4.5zM4 10v10h3V10H4zm6 0v10h3V10h-3zm6 0v10h3V10h-3zM2 22v2h20v-2H2z"/>
+                </svg>
+            </div>
+            <div class="brand-name">Bank Wallet</div>
+            <div class="welcome-text">Welcome back! Log in to continue</div>
+        </div>
+
+        <!-- Error Banner -->
+        <div class="error-banner" id="errorBanner">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span id="errorText">Invalid phone number or password</span>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <!-- Phone / Email -->
+            <div class="form-group">
+                <label class="form-label">Phone number or Email</label>
+                <input 
+                    type="text" 
+                    class="form-input" 
+                    id="loginId" 
+                    placeholder="Enter phone number or email"
+                    oninput="clearError()"
+                >
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="loginPassword" 
+                        placeholder="Enter your password"
+                        oninput="clearError()"
+                    >
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" checked>
+                    <label for="remember">Remember me</label>
+                </div>
+                <a href="#" class="forgot-password" onclick="forgotPassword()">Forgot password?</a>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="cta-button" id="loginBtn">Log In</button>
+        </form>
+
+        <!-- Divider -->
+        <div class="divider">
+            <span>or continue with</span>
+        </div>
+
+        <!-- Social Login -->
+        <div class="social-login">
+            <button class="social-btn" onclick="showCountryModal('Google')">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+            </button>
+            <button class="social-btn" onclick="showCountryModal('Apple')">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#000" d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.22 7.13-.57 1.5-1.31 2.99-2.27 4.08zm-5.85-15.1c.07-2.04 1.76-3.79 3.75-3.94.29 2.32-1.93 4.48-3.75 3.94z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Country Restriction Modal -->
+        <div class="modal-overlay" id="countryModal">
+            <div class="modal-box">
+                <div class="modal-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                </div>
+                <div class="modal-title">Not Available</div>
+                <div class="modal-text" id="modalText">Google login is not available in your country.</div>
+                <button class="modal-cancel" onclick="closeCountryModal()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Signup Link -->
+        <div class="signup-link">
+            <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+        </div>
+
+        <!-- Steps -->
+        <div class="steps-container">
+            <div class="steps">
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot active"></div>
+            </div>
+            <div class="step-label">Step 3 of 3</div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('loginPassword');
+            const icon = document.getElementById('eyeIcon');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                input.type = 'password';
+                icon.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+        }
+
+        function clearError() {
+            document.getElementById('errorBanner').classList.remove('show');
+            document.getElementById('loginId').classList.remove('error');
+            document.getElementById('loginPassword').classList.remove('error');
+        }
+
+        function showError(message) {
+            const banner = document.getElementById('errorBanner');
+            document.getElementById('errorText').textContent = message;
+            banner.classList.add('show');
+            document.getElementById('loginId').classList.add('error');
+            document.getElementById('loginPassword').classList.add('error');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+
+            const loginId = document.getElementById('loginId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+
+            if (!loginId) {
+                showError('Please enter your phone number or email');
+                return;
+            }
+
+            if (!password) {
+                showError('Please enter your password');
+                return;
+            }
+
+            // Check if account exists (try phone number first, then email)
+            let userKey = `bankWallet_user_${loginId}`;
+            let userData = localStorage.getItem(userKey);
+            
+            // If not found and it looks like a phone number, try as-is
+            if (!userData) {
+                // Try to find user by phone in any stored key
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('bankWallet_user_')) {
+                        const storedData = JSON.parse(localStorage.getItem(key) || '{}');
+                        if (storedData.phone === loginId || storedData.email === loginId) {
+                            userData = localStorage.getItem(key);
+                            userKey = key;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!userData) {
+                showError('Account not found. Please sign up first.');
+                return;
+            }
+
+            // Verify password
+            try {
+                const user = JSON.parse(userData);
+                if (user.password !== password) {
+                    showError('Incorrect password. Please try again.');
+                    return;
+                }
+                // Extract phone number from user data
+                const phoneNumber = user.phone || loginId;
+                
+                // Show loading state on button
+                btn.classList.add('loading');
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    // Save current logged in user (phone number)
+                    localStorage.setItem('bankWallet_currentUser', phoneNumber);
+                    
+                    // Save login state
+                    const loginData = {
+                        loginId: phoneNumber,
+                        isLoggedIn: true,
+                        loginTime: new Date().toISOString(),
+                        rememberMe: document.getElementById('remember').checked
+                    };
+                    localStorage.setItem('bankWalletUser', JSON.stringify(loginData));
+                    
+                    // Save to remember me if checked
+                    if (document.getElementById('remember').checked) {
+                        localStorage.setItem('bankWallet_rememberedUser', phoneNumber);
+                    } else {
+                        localStorage.removeItem('bankWallet_rememberedUser');
+                    }
+
+                    // Go to loading screen
+                    window.location.href = 'dashboard2.html';
+                }, 1500);
+                
+            } catch (e) {
+                showError('Error loading account. Please try again.');
+            }
+        }
+
+        function forgotPassword() {
+            alert('Password reset link sent to your phone number/email.');
+        }
+
+        function showCountryModal(provider) {
+            document.getElementById('modalText').textContent = 
+                provider + ' login is not available in your country.';
+            document.getElementById('countryModal').classList.add('show');
+        }
+
+        function closeCountryModal() {
+            document.getElementById('countryModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('countryModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCountryModal();
+            }
+        });
+
+        // Auto-fill remembered phone number if exists
+        window.addEventListener('DOMContentLoaded', function() {
+            const rememberedUser = localStorage.getItem('bankWallet_rememberedUser');
+            if (rememberedUser) {
+                document.getElementById('loginId').value = rememberedUser;
+                document.getElementById('remember').checked = true;
+            }
+        });
+    </script>
+</body>
+</html>

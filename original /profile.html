@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profile - FairMonie Pay</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+            background: #0f1a0f; 
+            color: white; 
+            overflow-x: hidden; 
+            min-height: 100vh; 
+            padding-bottom: 30px;
+            font-weight: 600;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .header { 
+            position: relative; 
+            z-index: 2; 
+            display: flex; 
+            align-items: center; 
+            padding: 16px 20px 12px; 
+        }
+        .back-btn { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 12px; 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(34, 197, 94, 0.15); 
+            color: #22c55e; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            text-decoration: none; 
+            font-size: 20px; 
+            margin-right: 16px; 
+            font-weight: 700;
+        }
+        .back-btn:hover { 
+            background: rgba(34, 197, 94, 0.1); 
+            transform: translateX(-2px);
+        }
+        .header-text { flex: 1; }
+        .header h1 { 
+            font-size: 26px; 
+            font-weight: 900; 
+            color: white; 
+            letter-spacing: -0.5px; 
+        }
+        .header-sub { 
+            font-size: 14px; 
+            color: rgba(255,255,255,0.5); 
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .container { 
+            position: relative; 
+            z-index: 2; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            padding: 0 16px; 
+        }
+
+        .profile-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px;
+            padding: 32px 20px;
+            margin-bottom: 16px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        .profile-card:hover {
+            border-color: rgba(34, 197, 94, 0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #1a5c1a, #0d3d0d);
+            border: 3px solid rgba(34, 197, 94, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 900;
+            color: #22c55e;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.15);
+            position: relative;
+            z-index: 2;
+        }
+        .avatar-ring {
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #22c55e;
+            border-right-color: rgba(34, 197, 94, 0.3);
+            animation: spin 4s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .camera-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: 3px solid #0f1a0f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 3;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            transition: all 0.3s;
+        }
+        .camera-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .verified-badge {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+        .profile-email {
+            font-size: 15px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .kyc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(34, 197, 94, 0.1); }
+        }
+        .kyc-badge:hover {
+            background: rgba(34, 197, 94, 0.12);
+            transform: scale(1.05);
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .info-card:hover {
+            background: rgba(34, 197, 94, 0.04);
+            border-color: rgba(34, 197, 94, 0.15);
+            transform: translateX(4px);
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #22c55e;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .info-card:hover .info-icon {
+            background: rgba(34, 197, 94, 0.12);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+        }
+
+        .info-content { flex: 1; min-width: 0; }
+        .info-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .info-value {
+            font-size: 17px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .info-badge {
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .edit-btn:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: white;
+            margin: 24px 0 12px 4px;
+        }
+
+        .security-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            font-size: 13px;
+            font-weight: 800;
+            transition: all 0.3s;
+        }
+        .security-badge:hover {
+            background: rgba(34, 197, 94, 0.12);
+            transform: scale(1.05);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .toggle-switch.active {
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .toggle-switch.active::after {
+            left: 27px;
+        }
+
+        .lang-select {
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .lang-select:hover {
+            background: rgba(34, 197, 94, 0.12);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast.show { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="header">
+        <a href="more.html" class="back-btn">&#8592;</a>
+        <div class="header-text">
+            <h1>Profile</h1>
+            <p class="header-sub">Manage your account</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- PROFILE CARD -->
+        <div class="profile-card">
+            <div class="avatar-wrapper">
+                <div class="avatar-ring"></div>
+                <div class="avatar" id="userAvatar">U</div>
+                <div class="camera-btn" onclick="changePhoto()">&#128247;</div>
+            </div>
+            <div class="profile-name">
+                <span id="userName">User</span>
+                <div class="verified-badge">&#10004;</div>
+            </div>
+            <div class="profile-email" id="userEmail">Loading...</div>
+            <div class="kyc-badge" onclick="showKYC()">
+                <span>&#128274;</span> KYC Verified
+            </div>
+        </div>
+
+        <!-- INFO CARDS -->
+        <div class="info-card">
+            <div class="info-icon">&#128100;</div>
+            <div class="info-content">
+                <div class="info-label">Full Name</div>
+                <div class="info-value" id="fullName">Loading...</div>
+            </div>
+            <div class="edit-btn" onclick="editField('name')">&#9998;</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">&#9993;</div>
+            <div class="info-content">
+                <div class="info-label">Email Address</div>
+                <div class="info-value" id="emailValue">Loading...</div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">&#128179;</div>
+            <div class="info-content">
+                <div class="info-label">Account Balance</div>
+                <div class="info-value" id="balanceValue" style="color:#22c55e;">₦0</div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">&#128197;</div>
+            <div class="info-content">
+                <div class="info-label">Member Since</div>
+                <div class="info-value" id="memberSince">Loading...</div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">&#128274;</div>
+            <div class="info-content">
+                <div class="info-label">Account Status</div>
+                <div class="info-value">Active</div>
+            </div>
+            <div class="info-badge">Active</div>
+        </div>
+
+        <!-- FAIRCODE STATUS CARD -->
+        <div class="info-card">
+            <div class="info-icon">&#127381;</div>
+            <div class="info-content">
+                <div class="info-label">Fair Code Status</div>
+                <div class="info-value" id="faircodeStatus">Checking...</div>
+            </div>
+            <div class="info-badge" id="faircodeBadge" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.2);color:#f59e0b;">Checking</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">&#127381;</div>
+            <div class="info-content">
+                <div class="info-label">Referral Code</div>
+                <div class="info-value" id="referralCodeValue" style="font-family: 'Courier New', monospace; letter-spacing: 1px;">------</div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">&#128276;</div>
+            <div class="info-content">
+                <div class="info-label">Push Notifications</div>
+                <div class="info-value" id="notifStatus">Disabled</div>
+            </div>
+            <div class="toggle-switch" id="notifToggle" onclick="toggleNotif()"></div>
+        </div>
+
+        <!-- SECURITY SECTION -->
+        <div class="section-title">Security</div>
+        <div class="security-badges">
+            <div class="security-badge">
+                <span>&#128274;</span> 2FA Enabled
+            </div>
+            <div class="security-badge">
+                <span>&#9993;</span> Email Verified
+            </div>
+            <div class="security-badge">
+                <span>&#128179;</span> Balance Protected
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span>&#9989;</span> <span id="toastMsg">Done!</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // FLOATING PARTICLES
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#22c55e" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.3, "random": true },
+                "size": { "value": 2, "random": true },
+                "line_linked": { "enable": false },
+                "move": {
+                    "enable": true,
+                    "speed": 0.8,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "bubble" },
+                    "onclick": { "enable": false },
+                    "resize": true
+                }
+            },
+            "retina_detect": true
+        });
+
+        // ========== STORAGE HELPERS ==========
+        function getEmailKey(baseKey) {
+            var email = localStorage.getItem('fairmonie_user_email') || 'default';
+            return 'fairmonie_' + email + '_' + baseKey;
+        }
+        function loadData(key, fallback) {
+            var val = localStorage.getItem(getEmailKey(key));
+            return val !== null ? val : fallback;
+        }
+        function saveData(key, value) {
+            localStorage.setItem(getEmailKey(key), value);
+        }
+
+        // ========== LOAD USER DATA ==========
+        var userEmail = localStorage.getItem('fairmonie_user_email') || 'Not set';
+        var username = loadData('username', localStorage.getItem('fairmonie_username') || 'User');
+        var balance = parseInt(loadData('balance', '0')) || 0;
+        var joinDate = loadData('signup_date', '');
+        var referralCode = loadData('referral_code', '');
+        var notifEnabled = loadData('notifications_enabled', 'false') === 'true';
+
+        if (!joinDate) {
+            joinDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            saveData('signup_date', joinDate);
+        }
+
+        // ========== CHECK FAIRCODE STATUS ==========
+        function checkFaircodeStatus() {
+            var savedCodes = JSON.parse(localStorage.getItem('fairmonie_faircodes') || '{}');
+            var userCode = savedCodes[userEmail];
+            var statusEl = document.getElementById('faircodeStatus');
+            var badgeEl = document.getElementById('faircodeBadge');
+            
+            if (userCode && userCode.code && Date.now() < userCode.expires) {
+                // Active Faircode
+                statusEl.textContent = userCode.code;
+                statusEl.style.color = '#22c55e';
+                statusEl.style.fontFamily = "'Courier New', monospace";
+                statusEl.style.letterSpacing = '1px';
+                statusEl.style.fontSize = '13px';
+                badgeEl.textContent = 'Active';
+                badgeEl.style.background = 'rgba(34,197,94,0.1)';
+                badgeEl.style.borderColor = 'rgba(34,197,94,0.2)';
+                badgeEl.style.color = '#22c55e';
+                badgeEl.style.cursor = 'default';
+                badgeEl.onclick = null;
+            } else if (userCode && userCode.code && Date.now() > userCode.expires) {
+                // Expired Faircode
+                statusEl.textContent = 'Expired';
+                statusEl.style.color = '#ef4444';
+                statusEl.style.fontFamily = 'inherit';
+                statusEl.style.fontSize = '17px';
+                badgeEl.textContent = 'Expired';
+                badgeEl.style.background = 'rgba(239,68,68,0.1)';
+                badgeEl.style.borderColor = 'rgba(239,68,68,0.2)';
+                badgeEl.style.color = '#ef4444';
+                badgeEl.style.cursor = 'pointer';
+                badgeEl.onclick = function() { window.location.href = 'buy_faircode.html'; };
+            } else {
+                // Not Purchased
+                statusEl.textContent = 'Not Purchased';
+                statusEl.style.color = '#f59e0b';
+                statusEl.style.fontFamily = 'inherit';
+                statusEl.style.fontSize = '17px';
+                badgeEl.textContent = 'Buy Now';
+                badgeEl.style.background = 'rgba(245,158,11,0.1)';
+                badgeEl.style.borderColor = 'rgba(245,158,11,0.2)';
+                badgeEl.style.color = '#f59e0b';
+                badgeEl.style.cursor = 'pointer';
+                badgeEl.onclick = function() { window.location.href = 'buy_faircode.html'; };
+            }
+        }
+
+        // ========== INITIALIZE UI ==========
+        function init() {
+            document.getElementById('userName').textContent = username;
+            document.getElementById('userEmail').textContent = userEmail;
+            document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+            document.getElementById('fullName').textContent = username;
+            document.getElementById('emailValue').textContent = userEmail;
+            document.getElementById('balanceValue').textContent = '₦' + balance.toLocaleString();
+            document.getElementById('memberSince').textContent = joinDate;
+            document.getElementById('referralCodeValue').textContent = referralCode || 'Generate on Invite page';
+            
+            if (notifEnabled) {
+                document.getElementById('notifToggle').classList.add('active');
+                document.getElementById('notifStatus').textContent = 'Enabled';
+                document.getElementById('notifStatus').style.color = '#22c55e';
+            }
+            
+            checkFaircodeStatus();
+        }
+
+        // ========== TOGGLE NOTIFICATIONS ==========
+        function toggleNotif() {
+            notifEnabled = !notifEnabled;
+            var toggle = document.getElementById('notifToggle');
+            var status = document.getElementById('notifStatus');
+            if (notifEnabled) {
+                toggle.classList.add('active');
+                status.textContent = 'Enabled';
+                status.style.color = '#22c55e';
+            } else {
+                toggle.classList.remove('active');
+                status.textContent = 'Disabled';
+                status.style.color = 'white';
+            }
+            saveData('notifications_enabled', notifEnabled.toString());
+            showToast(notifEnabled ? 'Notifications enabled!' : 'Notifications disabled!');
+        }
+
+        // ========== EDIT NAME ==========
+        function editField(field) {
+            if (field === 'name') {
+                var newName = prompt('Enter your full name:', username);
+                if (newName && newName.trim() !== '') {
+                    username = newName.trim();
+                    saveData('username', username);
+                    localStorage.setItem('fairmonie_username', username);
+                    
+                    document.getElementById('fullName').textContent = username;
+                    document.getElementById('userName').textContent = username;
+                    document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+                    
+                    showToast('Name updated successfully!');
+                }
+            }
+        }
+
+        function changePhoto() { showToast('Photo upload coming soon!'); }
+        function showKYC() { showToast('KYC verification completed!'); }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

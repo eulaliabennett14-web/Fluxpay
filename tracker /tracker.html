@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Flux Track — Secure Your Phone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="manifest" href="data:application/json,{}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --accent-green: #00d4aa;
+            --accent-green-dark: #00a884; --accent-red: #ef4444; --text-white: #ffffff;
+            --text-muted: rgba(255,255,255,0.55); --border-subtle: rgba(255,255,255,0.06);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary); color: var(--text-white);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+            background-image:
+                radial-gradient(ellipse at 30% 20%, rgba(0,212,170,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(59,130,246,0.04) 0%, transparent 50%);
+        }
+        .card {
+            background: linear-gradient(145deg, rgba(10,18,40,0.9), rgba(6,13,26,0.95));
+            border: 1px solid var(--border-subtle); border-radius: 24px;
+            padding: 40px 24px; max-width: 380px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .icon-wrap {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,168,132,0.08));
+            border: 2px solid rgba(0,212,170,0.2);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px; font-size: 36px;
+        }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,170,0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(0,212,170,0); }
+        }
+        h2 { font-family: 'Amaranth', sans-serif; font-size: 22px; margin-bottom: 8px; }
+        p { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+        .status { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent-green); }
+        .dot.active { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .dot.error { background: var(--accent-red); animation: none; }
+        .info-row {
+            display: flex; justify-content: space-between; padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle); font-size: 13px;
+        }
+        .info-row span:last-child { color: var(--text-muted); }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 14px;
+            font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px;
+            transition: all 0.3s; color: #fff; font-family: 'Inter', sans-serif;
+        }
+        .btn-start { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,170,0.3); }
+        .btn-stop { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); }
+        .hidden { display: none !important; }
+        .battery { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon-wrap pulse">📍</div>
+        <h2>Flux Phone Tracker</h2>
+        <p>Keep this page open. If your phone is lost or stolen, track it from any device.</p>
+        
+        <div class="status">
+            <div class="dot active" id="statusDot"></div>
+            <span id="statusText">Tracking Active</span>
+        </div>
+
+        <div class="info-row"><span>Location</span><span id="locText">Acquiring...</span></div>
+        <div class="info-row"><span>Accuracy</span><span id="accText">--</span></div>
+        <div class="info-row"><span>Battery</span><span id="battText">--</span></div>
+        <div class="info-row"><span>Last Sent</span><span id="lastSent">--</span></div>
+
+        <button class="btn btn-start" id="startBtn" onclick="startTracking()">▶ Start Tracking</button>
+        <button class="btn btn-stop hidden" id="stopBtn" onclick="stopTracking()">⏹ Stop Tracking</button>
+        
+        <p class="battery">Minimize this page — it works in background</p>
+    </div>
+
+    <script>
+        // ===== SUPABASE CONFIG =====
+        const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let trackingInterval = null;
+        let deviceId = localStorage.getItem('flux_device_id') || 'device_' + Math.random().toString(36).substring(2, 10);
+        localStorage.setItem('flux_device_id', deviceId);
+
+        // ===== DOM =====
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const locText = document.getElementById('locText');
+        const accText = document.getElementById('accText');
+        const battText = document.getElementById('battText');
+        const lastSent = document.getElementById('lastSent');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+
+        // ===== GET BATTERY LEVEL =====
+        async function getBattery() {
+            try {
+                const battery = await navigator.getBattery();
+                return Math.round(battery.level * 100) + '%';
+            } catch(e) {
+                return 'N/A';
+            }
+        }
+
+        // ===== SEND LOCATION TO SUPABASE =====
+        async function sendLocation(position) {
+            const { latitude, longitude, accuracy } = position.coords;
+            
+            const battery = await getBattery();
+            const now = new Date();
+
+            const { error } = await supabase
+                .from('phone_locations')
+                .upsert({
+                    device_id: deviceId,
+                    latitude: latitude,
+                    longitude: longitude,
+                    accuracy: Math.round(accuracy),
+                    battery: battery,
+                    updated_at: now.toISOString()
+                }, { onConflict: 'device_id' });
+
+            if (!error) {
+                locText.textContent = latitude.toFixed(6) + ', ' + longitude.toFixed(6);
+                accText.textContent = '±' + Math.round(accuracy) + 'm';
+                battText.textContent = battery;
+                lastSent.textContent = now.toLocaleTimeString();
+                setStatus(true);
+            } else {
+                setStatus(false);
+                console.error('Send error:', error);
+            }
+        }
+
+        function setStatus(ok) {
+            if (ok) {
+                statusDot.className = 'dot active';
+                statusText.textContent = 'Tracking Active';
+            } else {
+                statusDot.className = 'dot error';
+                statusText.textContent = 'Error Sending';
+            }
+        }
+
+        function locationError(err) {
+            setStatus(false);
+            statusText.textContent = 'Location Denied';
+            locText.textContent = 'Permission needed';
+            console.error('Location error:', err);
+        }
+
+        // ===== START / STOP =====
+        function startTracking() {
+            if (!navigator.geolocation) {
+                alert('Geolocation not supported on this device');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(sendLocation, locationError, {
+                enableHighAccuracy: true
+            });
+
+            trackingInterval = setInterval(() => {
+                navigator.geolocation.getCurrentPosition(sendLocation, locationError, {
+                    enableHighAccuracy: true,
+                    maximumAge: 30000
+                });
+            }, 30000); // Every 30 seconds
+
+            startBtn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+            setStatus(true);
+        }
+
+        function stopTracking() {
+            if (trackingInterval) {
+                clearInterval(trackingInterval);
+                trackingInterval = null;
+            }
+            startBtn.classList.remove('hidden');
+            stopBtn.classList.add('hidden');
+            statusDot.className = 'dot error';
+            statusText.textContent = 'Tracking Stopped';
+        }
+
+        // ===== AUTO-START =====
+        window.addEventListener('load', () => {
+            console.log('🟢 Flux Tracker Ready | Device:', deviceId);
+            startTracking();
+        });
+
+        // ===== SAVE BATTERY — slow down when tab hidden =====
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Slow down to 60 seconds when tab hidden
+                if (trackingInterval) {
+                    clearInterval(trackingInterval);
+                    trackingInterval = setInterval(() => {
+                        navigator.geolocation.getCurrentPosition(sendLocation, locationError, {
+                            enableHighAccuracy: true, maximumAge: 60000
+                        });
+                    }, 60000);
+                }
+            } else {
+                // Back to 30 seconds when visible
+                if (trackingInterval) {
+                    clearInterval(trackingInterval);
+                    trackingInterval = setInterval(() => {
+                        navigator.geolocation.getCurrentPosition(sendLocation, locationError, {
+                            enableHighAccuracy: true, maximumAge: 30000
+                        });
+                    }, 30000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

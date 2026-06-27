@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fund Wallet - FairMonie Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #050505;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .header {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #22c55e;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .back-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .header-title h1 {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .header-title p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .amount-card {
+            position: relative;
+            z-index: 2;
+            margin: 0 16px 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, #0d3d0d 0%, #1a5c1a 50%, #0d3d0d 100%);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.15);
+        }
+
+        .amount-card-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .amount-card-icon svg {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
+        .amount-label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+        }
+
+        .amount-value {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .quick-amounts-title {
+            position: relative;
+            z-index: 2;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            padding: 0 16px;
+            margin-bottom: 12px;
+        }
+
+        .quick-amounts {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .amount-btn {
+            padding: 16px 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            text-align: center;
+        }
+
+        .amount-btn:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .amount-btn.selected {
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border-color: #22c55e;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .custom-section {
+            position: relative;
+            z-index: 2;
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .custom-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .custom-input-wrap {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 0 16px;
+            transition: all 0.3s;
+        }
+
+        .custom-input-wrap:focus-within {
+            border-color: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+        }
+
+        .custom-prefix {
+            font-size: 18px;
+            font-weight: 700;
+            color: #22c55e;
+            margin-right: 8px;
+        }
+
+        .custom-input {
+            flex: 1;
+            padding: 16px 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .custom-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .proceed-btn {
+            position: relative;
+            z-index: 2;
+            display: block;
+            width: calc(100% - 32px);
+            margin: 0 16px 20px;
+            padding: 18px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .proceed-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .proceed-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-screen.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top-color: #22c55e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            border-top-color: #4ade80;
+            animation-direction: reverse;
+            animation-duration: 0.8s;
+        }
+
+        .spinner-ring:nth-child(3) {
+            width: 40%;
+            height: 40%;
+            top: 30%;
+            left: 30%;
+            border-top-color: #16a34a;
+            animation-duration: 1.2s;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-message {
+            font-size: 15px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            max-width: 280px;
+            min-height: 24px;
+            transition: opacity 0.3s;
+        }
+
+        .payment-page {
+            display: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        .payment-page.active {
+            display: block;
+        }
+
+        .payment-header {
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .payment-header h2 {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .payment-header p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .bank-card {
+            margin: 0 16px 20px;
+            padding: 24px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+        }
+
+        .bank-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .bank-row:last-child {
+            border-bottom: none;
+        }
+
+        .bank-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .bank-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #22c55e;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .copy-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .warning-box {
+            margin: 0 16px 20px;
+            padding: 16px;
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .warning-box svg {
+            width: 20px;
+            height: 20px;
+            color: #fbbf24;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .warning-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+
+        .upload-section {
+            margin: 0 16px 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+        }
+
+        .upload-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .upload-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px dashed rgba(255,255,255,0.15);
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .upload-input::-webkit-file-upload-button {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #22c55e;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+
+        .paid-btn {
+            display: block;
+            width: calc(100% - 32px);
+            margin: 0 16px 20px;
+            padding: 18px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .paid-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .paid-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .credit-alert-page {
+            display: none;
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 16px;
+        }
+
+        .credit-alert-page.active {
+            display: flex;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4);
+            animation: successPulse 2s infinite;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 8px 40px rgba(34, 197, 94, 0.6); }
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+
+        .credit-title {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #22c55e;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .credit-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .receipt-card {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .receipt-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            text-align: right;
+        }
+
+        .receipt-value.amount {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        .receipt-value.status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #22c55e;
+        }
+
+        .receipt-value.status svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .share-btn, .home-btn {
+            width: 100%;
+            max-width: 400px;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .share-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .share-btn:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .home-btn {
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .review-page {
+            display: none;
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 16px;
+        }
+
+        .review-page.active {
+            display: flex;
+        }
+
+        .review-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .review-icon svg {
+            width: 40px;
+            height: 40px;
+            color: #fbbf24;
+        }
+
+        .review-title {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .review-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .amount-card, .bank-card, .warning-box, .upload-section, .receipt-card {
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .quick-amounts, .custom-section, .payment-header {
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .proceed-btn, .paid-btn, .share-btn, .home-btn {
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- ========== FUND WALLET PAGE ========== -->
+    <div id="fundWalletPage">
+        <header class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="goBack()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <div class="header-title">
+                    <h1>Fund Wallet</h1>
+                    <p>Top up your FairMonie balance</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="amount-card">
+            <div class="amount-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                    <line x1="2" y1="10" x2="22" y2="10"/>
+                </svg>
+            </div>
+            <div class="amount-label">Selected Amount</div>
+            <div class="amount-value" id="selectedAmount">₦0</div>
+        </div>
+
+        <div class="quick-amounts-title">Quick Amounts</div>
+        <div class="quick-amounts">
+            <button class="amount-btn" onclick="selectAmount(5000)">₦5,000</button>
+            <button class="amount-btn" onclick="selectAmount(10000)">₦10,000</button>
+            <button class="amount-btn" onclick="selectAmount(25000)">₦25,000</button>
+            <button class="amount-btn" onclick="selectAmount(50000)">₦50,000</button>
+            <button class="amount-btn" onclick="selectAmount(100000)">₦100,000</button>
+            <button class="amount-btn" onclick="selectAmount(250000)">₦250,000</button>
+        </div>
+
+        <div class="custom-section">
+            <div class="custom-label">Or Enter Custom Amount (NGN)</div>
+            <div class="custom-input-wrap">
+                <span class="custom-prefix">₦</span>
+                <input type="number" class="custom-input" id="customAmount" placeholder="Enter amount" value="" oninput="updateCustomAmount(this.value)">
+            </div>
+        </div>
+
+        <button class="proceed-btn" id="proceedBtn" onclick="proceedToPayment()">Proceed to Payment</button>
+    </div>
+
+    <!-- ========== LOADING SCREEN ========== -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-message" id="loadingMessage">Preparing your payment account...</div>
+    </div>
+
+    <!-- ========== PAYMENT PAGE ========== -->
+    <div class="payment-page" id="paymentPage">
+        <header class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="showFundWallet()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <div class="header-title">
+                    <h1 id="paymentTitle">Pay ₦0</h1>
+                    <p>Bank Transfer • Smartcash PSB</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="bank-card">
+            <div class="bank-row">
+                <span class="bank-label">Amount</span>
+                <span class="bank-value" id="paymentAmount" style="color: #22c55e; font-family: 'Amaranth', sans-serif; font-size: 20px;">₦0</span>
+            </div>
+            <div class="bank-row">
+                <span class="bank-label">Bank Name</span>
+                <span class="bank-value">Smartcash PSB</span>
+            </div>
+            <div class="bank-row">
+                <span class="bank-label">Account Name</span>
+                <span class="bank-value" style="font-weight: 700; letter-spacing: 0.5px;">OLUWAKEMI FOLOWOSELE</span>
+            </div>
+            <div class="bank-row">
+                <span class="bank-label">Account Number</span>
+                <span class="bank-value">
+                    <span id="accountNumber" style="font-weight: 700; letter-spacing: 2px;">194 974 0138</span>
+                    <button class="copy-btn" onclick="copyAccount()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                    </button>
+                </span>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div class="warning-text">Transfer the EXACT amount. After payment upload your receipt below — admin will verify and credit your wallet.</div>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-label">Upload Payment Receipt</div>
+            <input type="file" class="upload-input" id="receiptUpload" accept="image/*">
+        </div>
+
+        <button class="paid-btn" onclick="iHavePaid()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            I Have Paid
+        </button>
+    </div>
+
+    <!-- ========== CREDIT ALERT PAGE ========== -->
+    <div class="credit-alert-page" id="creditAlertPage">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+        <div class="credit-title">Credit Alert</div>
+        <div class="credit-subtitle">Your wallet has been credited successfully</div>
+
+        <div class="receipt-card">
+            <div class="receipt-row">
+                <span class="receipt-label">Reference ID</span>
+                <span class="receipt-value" id="refId">XLKYYE5668</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Date</span>
+                <span class="receipt-value" id="transDate">05 June 2026</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Time</span>
+                <span class="receipt-value" id="transTime">13:45 PM</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Amount</span>
+                <span class="receipt-value amount" id="transAmount">₦0</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Balance Before</span>
+                <span class="receipt-value" id="balanceBefore">₦0</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Balance After</span>
+                <span class="receipt-value" id="balanceAfter" style="color: #22c55e;">₦0</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Status</span>
+                <span class="receipt-value status">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Successful
+                </span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Description</span>
+                <span class="receipt-value">Wallet Top Up</span>
+            </div>
+        </div>
+
+        <button class="share-btn" onclick="shareReceipt()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Share Receipt
+        </button>
+        <button class="home-btn" onclick="goToDashboard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Back to Dashboard
+        </button>
+    </div>
+
+    <!-- ========== REVIEW PAGE ========== -->
+    <div class="review-page" id="reviewPage">
+        <div class="review-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <div class="review-title">Payment Under Review</div>
+        <div class="review-text">Your payment is being reviewed by our admin team. You will be notified once your wallet has been credited. Thank you for your patience.</div>
+        <button class="home-btn" onclick="goToDashboard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Back to Dashboard
+        </button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * 0.4 + 0.1;
+                this.speedX = (Math.random() - 0.5) * 0.15;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                this.glow = Math.random() * 15 + 10;
+                this.pulseSpeed = Math.random() * 0.02 + 0.01;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128';
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                this.pulsePhase += this.pulseSpeed;
+                if (this.y < -50) this.reset();
+            }
+            draw() {
+                const pulse = Math.sin(this.pulsePhase) * 0.3 + 0.7;
+                const currentGlow = this.glow * pulse;
+                const currentOpacity = this.opacity * pulse;
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color}, ${currentOpacity * 0.1})`;
+                ctx.shadowBlur = currentGlow;
+                ctx.shadowColor = `rgba(${this.color}, 0.5)`;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color}, ${currentOpacity})`;
+                ctx.shadowBlur = currentGlow * 0.3;
+                ctx.shadowColor = `rgba(${this.color}, 0.8)`;
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        for (let i = 0; i < 50; i++) {
+            const p = new Particle();
+            p.y = Math.random() * canvas.height;
+            particles.push(p);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function getEmailKey(baseKey) {
+            const email = localStorage.getItem('fairmonie_user_email') || 'default';
+            return 'fairmonie_' + email + '_' + baseKey;
+        }
+
+        function loadData(key, fallback) {
+            const val = localStorage.getItem(getEmailKey(key));
+            return val !== null ? val : fallback;
+        }
+
+        function saveData(key, value) {
+            localStorage.setItem(getEmailKey(key), value);
+        }
+
+        const allowedEmails = [
+            'folowoseleiyanu344@gmail.com',
+            'folowoseleiyanu19@gmail.com',
+            'eulaliabennett14@gmail.com',
+            'b2@gmail.com',
+            'drex@gmail.com',
+            'g3@gmail.com'
+        ];
+
+        let selectedAmount = 0;
+        const quickAmounts = [5000, 10000, 25000, 50000, 100000, 250000];
+
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            document.getElementById('selectedAmount').textContent = '₦' + amount.toLocaleString();
+            document.getElementById('customAmount').value = amount;
+            
+            document.querySelectorAll('.amount-btn').forEach((btn, idx) => {
+                if (quickAmounts[idx] === amount) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        function updateCustomAmount(value) {
+            const amount = parseInt(value) || 0;
+            selectedAmount = amount;
+            document.getElementById('selectedAmount').textContent = '₦' + amount.toLocaleString();
+            
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+
+        function proceedToPayment() {
+            if (selectedAmount < 100) {
+                alert('Please select or enter an amount first');
+                return;
+            }
+            
+            document.getElementById('fundWalletPage').style.display = 'none';
+            document.getElementById('loadingScreen').classList.add('active');
+            
+            const messages = [
+                'Preparing your payment account...',
+                'Generating your reference ID...',
+                'Securing your transaction...',
+                'Connecting to bank...',
+                'Verifying account details...',
+                'Finalizing payment gateway...',
+                'Almost ready...'
+            ];
+            
+            let msgIndex = 0;
+            const msgElement = document.getElementById('loadingMessage');
+            
+            const msgInterval = setInterval(() => {
+                msgElement.style.opacity = '0';
+                setTimeout(() => {
+                    msgElement.textContent = messages[msgIndex % messages.length];
+                    msgElement.style.opacity = '1';
+                    msgIndex++;
+                }, 300);
+            }, 2000);
+            
+            setTimeout(() => {
+                clearInterval(msgInterval);
+                document.getElementById('loadingScreen').classList.remove('active');
+                showPaymentPage();
+            }, 6000);
+        }
+
+        function showPaymentPage() {
+            document.getElementById('paymentPage').classList.add('active');
+            document.getElementById('paymentTitle').textContent = 'Pay ₦' + selectedAmount.toLocaleString();
+            document.getElementById('paymentAmount').textContent = '₦' + selectedAmount.toLocaleString();
+        }
+
+        function showFundWallet() {
+            document.getElementById('paymentPage').classList.remove('active');
+            document.getElementById('fundWalletPage').style.display = 'block';
+        }
+
+        function copyAccount() {
+            const accountNum = '1949740138';
+            navigator.clipboard.writeText(accountNum).then(() => {
+                alert('Account number copied!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = accountNum;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Account number copied!');
+            });
+        }
+
+        function iHavePaid() {
+            const upload = document.getElementById('receiptUpload');
+            if (!upload.files || upload.files.length === 0) {
+                alert('Please upload your payment receipt first');
+                return;
+            }
+            
+            let userEmail = localStorage.getItem('fairmonie_user_email') || '';
+            userEmail = userEmail.trim().toLowerCase();
+            const isAllowed = allowedEmails.includes(userEmail);
+
+            
+            if (isAllowed) {
+                document.getElementById('paymentPage').classList.remove('active');
+                document.getElementById('loadingScreen').classList.add('active');
+                
+                const processMessages = [
+                    'Processing your payment...',
+                    'Verifying transaction details...',
+                    'Confirming bank transfer...',
+                    'Updating your wallet balance...',
+                    'Finalizing credit alert...',
+                    'Almost done...'
+                ];
+                
+                let msgIdx = 0;
+                const msgEl = document.getElementById('loadingMessage');
+                
+                const processInterval = setInterval(() => {
+                    msgEl.style.opacity = '0';
+                    setTimeout(() => {
+                        msgEl.textContent = processMessages[msgIdx % processMessages.length];
+                        msgEl.style.opacity = '1';
+                        msgIdx++;
+                    }, 300);
+                }, 2000);
+                
+                setTimeout(() => {
+                    clearInterval(processInterval);
+                    document.getElementById('loadingScreen').classList.remove('active');
+                    showCreditAlert();
+                }, 8000);
+            } else {
+                document.getElementById('paymentPage').classList.remove('active');
+                document.getElementById('loadingScreen').classList.add('active');
+                
+                const reviewMessages = [
+                    'Verifying payment details...',
+                    'Checking transaction status...',
+                    'Contacting admin team...',
+                    'Finalizing review...'
+                ];
+                
+                let msgIdx = 0;
+                const msgEl = document.getElementById('loadingMessage');
+                
+                const reviewInterval = setInterval(() => {
+                    msgEl.style.opacity = '0';
+                    setTimeout(() => {
+                        msgEl.textContent = reviewMessages[msgIdx % reviewMessages.length];
+                        msgEl.style.opacity = '1';
+                        msgIdx++;
+                    }, 300);
+                }, 2000);
+                
+                setTimeout(() => {
+                    clearInterval(reviewInterval);
+                    document.getElementById('loadingScreen').classList.remove('active');
+                    document.getElementById('reviewPage').classList.add('active');
+                    
+                    saveNotification('topup', 'Payment Under Review', 'Your payment of ₦' + selectedAmount.toLocaleString() + ' is being reviewed by admin.', '₦' + selectedAmount.toLocaleString(), 'debit');
+                }, 4000);
+            }
+        }
+
+        function showCreditAlert() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let refId = '';
+            for (let i = 0; i < 10; i++) {
+                refId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            const currentBalance = parseInt(loadData('balance', '0'));
+            const newBalance = currentBalance + selectedAmount;
+            
+            saveData('balance', newBalance.toString());
+            
+            document.getElementById('refId').textContent = refId;
+            document.getElementById('transDate').textContent = dateStr;
+            document.getElementById('transTime').textContent = timeStr;
+            document.getElementById('transAmount').textContent = '₦' + selectedAmount.toLocaleString();
+            document.getElementById('balanceBefore').textContent = '₦' + currentBalance.toLocaleString();
+            document.getElementById('balanceAfter').textContent = '₦' + newBalance.toLocaleString();
+            
+            document.getElementById('creditAlertPage').classList.add('active');
+            
+            saveNotification('topup', 'Credit Alert', 'Your wallet has been credited with ₦' + selectedAmount.toLocaleString() + '. Reference: ' + refId, '+₦' + selectedAmount.toLocaleString(), 'credit');
+            
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+                const gain = audioCtx.createGain();
+                gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                
+                [523, 659, 784, 1047, 1319].forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.15);
+                    osc.connect(gain);
+                    osc.start(now + i * 0.15);
+                    osc.stop(now + i * 0.15 + 0.5);
+                });
+            } catch(e) {}
+        }
+
+        function saveNotification(type, title, message, amount, amountType) {
+            const notifications = JSON.parse(loadData('notifications', '[]'));
+            const notif = {
+                id: Date.now(),
+                type: type,
+                title: title,
+                message: message,
+                amount: amount,
+                amountType: amountType || 'credit',
+                time: new Date().toISOString(),
+                read: false
+            };
+            notifications.unshift(notif);
+            saveData('notifications', JSON.stringify(notifications));
+        }
+
+        function shareReceipt() {
+            const refId = document.getElementById('refId').textContent;
+            const amount = document.getElementById('transAmount').textContent;
+            const date = document.getElementById('transDate').textContent;
+            
+            const text = 'Credit Alert!\\n\\nAmount: ' + amount + '\\nReference: ' + refId + '\\nDate: ' + date + '\\nStatus: Successful\\n\\nFairMonie Pay';
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'FairMonie Credit Alert',
+                    text: text
+                });
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Receipt copied to clipboard!');
+                });
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

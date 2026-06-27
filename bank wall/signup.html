@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Wallet - Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 20px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        /* Header with icon and brand */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 8px 30px rgba(22, 163, 74, 0.25);
+        }
+
+        .icon-box svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        .brand-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+        .form-label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #111827;
+            background: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-input:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .char-counter.warning {
+            color: #f59e0b;
+        }
+
+        .char-counter.error {
+            color: #ef4444;
+        }
+
+        /* Password strength */
+        .password-strength {
+            margin-top: 6px;
+            height: 4px;
+            border-radius: 2px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .password-strength-text {
+            font-size: 12px;
+            margin-top: 4px;
+            color: #9ca3af;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: fadeInUp 0.5s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
+        }
+
+        .cta-button:active {
+            transform: scale(0.98);
+        }
+
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cta-button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .cta-button.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spinner 0.8s linear infinite;
+        }
+
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Login link */
+        .login-link {
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out 0.7s forwards;
+            opacity: 0;
+        }
+
+        .login-link p {
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .login-link a {
+            color: #16a34a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Step indicator */
+        .steps-container {
+            margin-top: auto;
+            padding-top: 30px;
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out 0.8s forwards;
+            opacity: 0;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: #16a34a;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* Terms checkbox */
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s ease-out 0.55s forwards;
+            opacity: 0;
+        }
+
+        .terms input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #16a34a;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .terms label {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .terms a {
+            color: #16a34a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Error message */
+        .error-msg {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        /* Success banner */
+        .success-banner {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .success-banner.show {
+            display: flex;
+        }
+
+        .success-banner svg {
+            width: 20px;
+            height: 20px;
+            fill: #16a34a;
+            flex-shrink: 0;
+        }
+
+        .success-banner span {
+            font-size: 14px;
+            color: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7v2h20V7L12 2zm0 2.5L18.5 7H5.5L12 4.5zM4 10v10h3V10H4zm6 0v10h3V10h-3zm6 0v10h3V10h-3zM2 22v2h20v-2H2z"/>
+                </svg>
+            </div>
+            <div class="brand-name">Bank Wallet</div>
+        </div>
+
+        <!-- Success Banner -->
+        <div class="success-banner" id="successBanner">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span id="successText">Account created successfully!</span>
+        </div>
+
+        <!-- Form -->
+        <form id="signupForm" onsubmit="handleSignup(event)">
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label class="form-label">Phone number</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="tel" 
+                        class="form-input" 
+                        id="phone" 
+                        placeholder="Enter phone number" 
+                        maxlength="11"
+                        oninput="updateCounter('phone', 'phoneCounter', 11); clearPhoneError()"
+                    >
+                </div>
+                <div class="char-counter" id="phoneCounter">0/11</div>
+                <div class="error-msg" id="phoneError">Please enter a valid 11-digit phone number</div>
+                <div class="error-msg" id="phoneExistsError">This phone number is already registered. Please login instead.</div>
+            </div>
+
+            <!-- Account Name -->
+            <div class="form-group">
+                <label class="form-label">Account Name</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="accountName" 
+                        placeholder="Enter account name"
+                        oninput="toggleSubmit()"
+                    >
+                </div>
+            </div>
+
+            <!-- Account Number -->
+            <div class="form-group">
+                <label class="form-label">Account number</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="accountNumber" 
+                        placeholder="Enter account number" 
+                        maxlength="10"
+                        oninput="updateCounter('accountNumber', 'accountCounter', 10); toggleSubmit()"
+                    >
+                </div>
+                <div class="char-counter" id="accountCounter">0/10</div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="password" 
+                        placeholder="Create a password"
+                        oninput="checkPasswordStrength(); toggleSubmit()"
+                    >
+                </div>
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="strengthBar"></div>
+                </div>
+                <div class="password-strength-text" id="strengthText">Enter at least 8 characters</div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="confirmPassword" 
+                        placeholder="Confirm your password"
+                        oninput="checkPasswordMatch(); toggleSubmit()"
+                    >
+                </div>
+                <div class="error-msg" id="passwordError">Passwords do not match</div>
+            </div>
+
+            <!-- Terms -->
+            <div class="terms">
+                <input type="checkbox" id="terms" onchange="toggleSubmit()">
+                <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="cta-button" id="submitBtn" disabled>Start Earning</button>
+        </form>
+
+        <!-- Login Link -->
+        <div class="login-link">
+            <p>Already have an account? <a href="login.html">Log in</a></p>
+        </div>
+
+        <!-- Steps -->
+        <div class="steps-container">
+            <div class="steps">
+                <div class="step-dot"></div>
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+            </div>
+            <div class="step-label">Step 2 of 3</div>
+        </div>
+    </div>
+
+    <script>
+        function updateCounter(inputId, counterId, max) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            const length = input.value.length;
+            counter.textContent = `${length}/${max}`;
+
+            if (length >= max) {
+                counter.classList.add('warning');
+            } else {
+                counter.classList.remove('warning');
+            }
+
+            toggleSubmit();
+        }
+
+        function clearPhoneError() {
+            document.getElementById('phoneError').classList.remove('show');
+            document.getElementById('phoneExistsError').classList.remove('show');
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+
+            let strength = 0;
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 25;
+            if (/[A-Z]/.test(password)) strength += 25;
+            if (/[0-9!@#$%^&*]/.test(password)) strength += 25;
+
+            bar.style.width = strength + '%';
+
+            if (strength <= 25) {
+                bar.style.background = '#ef4444';
+                text.textContent = 'Weak password';
+                text.style.color = '#ef4444';
+            } else if (strength <= 50) {
+                bar.style.background = '#f59e0b';
+                text.textContent = 'Fair password';
+                text.style.color = '#f59e0b';
+            } else if (strength <= 75) {
+                bar.style.background = '#3b82f6';
+                text.textContent = 'Good password';
+                text.style.color = '#3b82f6';
+            } else {
+                bar.style.background = '#16a34a';
+                text.textContent = 'Strong password';
+                text.style.color = '#16a34a';
+            }
+
+            toggleSubmit();
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const error = document.getElementById('passwordError');
+
+            if (confirmPassword && password !== confirmPassword) {
+                error.classList.add('show');
+                return false;
+            } else {
+                error.classList.remove('show');
+                return true;
+            }
+        }
+
+        function toggleSubmit() {
+            const phone = document.getElementById('phone').value;
+            const accountName = document.getElementById('accountName').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+            const btn = document.getElementById('submitBtn');
+
+            const passwordsMatch = password === confirmPassword;
+            const isValid = phone.length === 11 && 
+                           accountName.length > 0 && 
+                           accountNumber.length === 10 && 
+                           password.length >= 8 && 
+                           passwordsMatch && 
+                           terms;
+
+            btn.disabled = !isValid;
+        }
+
+        function showSuccess(message) {
+            const banner = document.getElementById('successBanner');
+            document.getElementById('successText').textContent = message;
+            banner.classList.add('show');
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 3000);
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+
+            const phone = document.getElementById('phone').value.trim();
+            const accountName = document.getElementById('accountName').value.trim();
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const btn = document.getElementById('submitBtn');
+
+            // Validate phone number (exactly 11 digits)
+            const phoneRegex = /^[0-9]{11}$/;
+            if (!phoneRegex.test(phone)) {
+                document.getElementById('phoneError').classList.add('show');
+                return;
+            }
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                document.getElementById('passwordError').classList.add('show');
+                return;
+            }
+
+            // Check if account already exists
+            const userKey = `bankWallet_user_${phone}`;
+            const existingUser = localStorage.getItem(userKey);
+            
+            if (existingUser) {
+                document.getElementById('phoneExistsError').classList.add('show');
+                return;
+            }
+
+            // Create new user account
+            const userData = {
+                phone: phone,
+                accountName: accountName,
+                accountNumber: accountNumber,
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+
+            // Save user data
+            localStorage.setItem(userKey, JSON.stringify(userData));
+
+            // Initialize mining data for this user (starting balance = 0)
+            const miningKey = `bankWallet_mining_${phone}`;
+            const miningData = {
+                phone: phone,
+                balance: 0,
+                totalMined: 0,
+                lastMiningTime: null,
+                createdAt: new Date().toISOString()
+            };
+            localStorage.setItem(miningKey, JSON.stringify(miningData));
+
+            // Save login state
+            const loginData = {
+                loginId: phone,
+                isLoggedIn: true,
+                loginTime: new Date().toISOString(),
+                rememberMe: true
+            };
+            localStorage.setItem('bankWalletUser', JSON.stringify(loginData));
+
+            // Show loading state on button
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Auto-login after signup
+                localStorage.setItem('bankWallet_currentUser', phone);
+                showSuccess('Account created successfully! Redirecting...');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

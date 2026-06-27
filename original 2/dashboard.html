@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Dashboard - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --accent-green: #00d4aa;
+            --accent-green-dark: #00a884; --accent-orange: #ff8c00; --accent-gold: #ffd700;
+            --accent-red: #ff4757; --text-white: #ffffff; --text-muted: rgba(255,255,255,0.55);
+            --text-dim: rgba(255,255,255,0.35); --border-subtle: rgba(255,255,255,0.04);
+            --border-light: rgba(255,255,255,0.07); --border-medium: rgba(255,255,255,0.12);
+        }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-primary); color: var(--text-white);
+            overflow-x: hidden; min-height: 100vh;
+            padding-top: 125px; 
+            padding-bottom: 120px;
+            background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(0,212,170,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 90%, rgba(255,140,0,0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        body.loaded { opacity: 1; }
+
+        /* Auth check overlay */
+        .auth-check-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .auth-check-overlay.hidden { display: none; }
+        .auth-check-spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(0,212,170,0.15);
+            border-top-color: var(--accent-green); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .auth-check-text { font-size: 14px; color: var(--text-muted); }
+
+        #live-banner-container {
+            position: fixed; top: 66px; left: 0; width: 100%; z-index: 99;
+            padding: 10px 16px; pointer-events: none; display: flex; justify-content: center;
+        }
+        .live-notification {
+            width: 100%; max-width: 520px;
+            background: rgba(15, 22, 42, 0.95); backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px;
+            padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            opacity: 0; transform: translateY(-20px) scale(0.98);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .live-notification.active { opacity: 1; transform: translateY(0) scale(1); }
+        .live-notification.removing { opacity: 0; transform: translateY(-20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .notif-icon-wrap { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+        .notif-icon-wrap.green { background: rgba(0, 212, 170, 0.12); color: var(--accent-green); }
+        .notif-icon-wrap.orange { background: rgba(255, 140, 0, 0.12); color: var(--accent-orange); }
+        .notif-icon-wrap.purple { background: rgba(138, 43, 226, 0.12); color: #8b5cf6; }
+        .notif-icon-wrap.pink { background: rgba(236, 72, 153, 0.12); color: #ec4899; }
+        .notif-content { flex: 1; display: flex; flex-direction: column; }
+        .notif-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .notif-title.green { color: var(--accent-green); }
+        .notif-title.orange { color: var(--accent-orange); }
+        .notif-title.purple { color: #8b5cf6; }
+        .notif-title.pink { color: #ec4899; }
+        .notif-sub { font-size: 14px; font-weight: 500; color: var(--text-white); }
+        .notif-sub span { color: var(--text-muted); font-weight: 400; }
+        .notif-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .notif-dot.green { background: var(--accent-green); }
+        .notif-dot.orange { background: var(--accent-orange); }
+        .notif-dot.purple { background: #8b5cf6; }
+        .notif-dot.pink { background: #ec4899; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(16px);
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease;
+            padding: 20px;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-card {
+            width: 100%; max-width: 400px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(6,13,26,0.96) 100%);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+            padding: 40px 28px 32px; text-align: center; position: relative;
+            transform: translateY(40px) scale(0.95);
+            transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .modal-overlay.visible .modal-card { transform: translateY(0) scale(1); }
+        .modal-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: var(--text-muted); font-size: 20px; cursor: pointer; transition: all 0.3s; }
+        .modal-close:hover { background: rgba(255,255,255,0.15); transform: rotate(90deg); }
+        .modal-icon-wrapper { width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+        .modal-icon-wrapper.green { background: linear-gradient(135deg, rgba(0,212,170,0.25), rgba(0,168,132,0.18)); }
+        .modal-icon-wrapper.orange { background: linear-gradient(135deg, rgba(255,140,0,0.25), rgba(255,107,0,0.18)); }
+        .modal-icon-wrapper.purple { background: linear-gradient(135deg, rgba(138,43,226,0.25), rgba(75,0,130,0.18)); }
+        .modal-icon-wrapper svg { width: 36px; height: 36px; }
+        .modal-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+        .modal-text { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
+        .modal-btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; color: #fff; }
+        .modal-btn.green { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); }
+        .modal-btn.orange { background: linear-gradient(135deg, var(--accent-orange), #ff6b00); }
+        .modal-btn:hover { transform: translateY(-2px); }
+        .modal-dots { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+        .modal-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12); transition: all 0.3s; }
+        .modal-dot.active { background: var(--accent-green); width: 28px; border-radius: 4px; }
+
+        .dash-header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+            background: rgba(6,13,26,0.92); backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .dash-header .logo-section { display: flex; align-items: center; gap: 10px; }
+        .dash-header .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .dash-header .logo-icon svg { width: 20px; height: 20px; fill: #fff; }
+        .dash-header .logo-text { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+        .dash-header-actions { display: flex; align-items: center; gap: 12px; }
+        .header-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.03); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; color: var(--text-white); cursor: pointer; position: relative; }
+        .header-btn:hover { background: rgba(255,255,255,0.08); }
+        .header-btn .badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; background: var(--accent-red); border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-primary); }
+        .user-avatar-sm { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-orange)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
+
+        .main-content { padding: 0 16px 0; max-width: 520px; margin: 0 auto; position: relative; z-index: 1; }
+
+        .wallet-balance-wrapper { margin-top: 16px; margin-bottom: 16px; }
+        .wallet-balance-card { background: linear-gradient(145deg, rgba(0,212,170,0.08), rgba(6,13,26,0.6)); border: 1px solid rgba(0,212,170,0.15); border-radius: 20px; padding: 24px; position: relative; overflow: hidden; }
+        .wallet-balance-card::before { content: ''; position: absolute; top: -35%; right: -20%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,212,170,0.1) 0%, transparent 70%); pointer-events: none; }
+        .wallet-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; position: relative; z-index: 1; }
+        .wallet-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+        .wallet-eye-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.4); }
+        .wallet-eye-btn:hover { color: var(--text-white); }
+        .wallet-amount { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; position: relative; z-index: 1; }
+        .wallet-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; position: relative; z-index: 1; }
+        .wallet-actions { display: flex; gap: 12px; position: relative; z-index: 1; }
+        .wallet-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .wallet-btn-add { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; }
+        .wallet-btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,170,0.3); }
+        .wallet-btn-withdraw { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; }
+        .wallet-btn-withdraw:hover { background: rgba(255,255,255,0.1); }
+
+        .fluxcore-card { background: linear-gradient(145deg, rgba(10,18,40,0.8) 0%, rgba(6,13,26,0.9) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 24px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .fluxcore-icon-wrap { width: 56px; height: 56px; border-radius: 50%; background: rgba(0,212,170,0.08); border: 2px solid rgba(0,212,170,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .fluxcore-icon-wrap svg { width: 26px; height: 26px; fill: var(--accent-green); }
+        .fluxcore-info { flex: 1; position: relative; z-index: 1; }
+        .fluxcore-label { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .fluxcore-label span { color: var(--accent-green); font-weight: 700; }
+        .fluxcore-amount { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; transition: transform 0.15s; }
+        .fluxcore-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+        .fluxcore-claim-btn { padding: 14px 24px; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; flex-shrink: 0; white-space: nowrap; background: linear-gradient(135deg, var(--accent-orange), #ff6b00); color: #fff; box-shadow: 0 4px 20px rgba(255,140,0,0.3); }
+        .fluxcore-claim-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 35px rgba(255,140,0,0.5); }
+        .fluxcore-claim-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .invest-card { padding: 20px; margin-bottom: 16px; background: rgba(255,255,255,0.02); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; }
+        .invest-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .invest-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+        .invest-link { font-size: 13px; color: var(--accent-green); font-weight: 600; text-decoration: none; }
+        .invest-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+        .menu-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; padding: 18px 10px; text-align: center; cursor: pointer; transition: all 0.3s; text-decoration: none; color: #fff; display: block; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); transform: translateY(-4px); }
+        .menu-icon-wrap { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+        .menu-icon-wrap svg { width: 22px; height: 22px; }
+        .menu-icon-wrap.green { background: rgba(0,212,170,0.12); } .menu-icon-wrap.green svg { stroke: var(--accent-green); fill: none; }
+        .menu-icon-wrap.blue { background: rgba(59,130,246,0.12); } .menu-icon-wrap.blue svg { stroke: #3b82f6; fill: none; }
+        .menu-icon-wrap.purple { background: rgba(138,43,226,0.12); } .menu-icon-wrap.purple svg { stroke: #8b5cf6; fill: none; }
+        .menu-icon-wrap.orange { background: rgba(255,140,0,0.12); } .menu-icon-wrap.orange svg { stroke: var(--accent-orange); fill: none; }
+        .menu-icon-wrap.yellow { background: rgba(255,215,0,0.12); } .menu-icon-wrap.yellow svg { stroke: var(--accent-gold); fill: none; }
+        .menu-icon-wrap.pink { background: rgba(236,72,153,0.12); } .menu-icon-wrap.pink svg { stroke: #ec4899; fill: none; }
+        .menu-name { font-size: 13px; font-weight: 600; }
+        .menu-desc { font-size: 10px; color: var(--text-dim); }
+
+        .tasks-banner { background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(255,140,0,0.05)); border: 1px solid rgba(0,212,170,0.15); border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; text-decoration: none; margin-bottom: 16px; }
+        .tasks-banner:hover { transform: translateX(4px); border-color: rgba(0,212,170,0.35); }
+        .tasks-banner-icon-wrap { width: 46px; height: 46px; background: rgba(0,212,170,0.12); border-radius: 13px; display: flex; align-items: center; justify-content: center; }
+        .tasks-banner-icon-wrap svg { width: 24px; height: 24px; stroke: var(--accent-green); fill: none; }
+        .tasks-banner-text { flex: 1; }
+        .tasks-banner-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .tasks-banner-sub { font-size: 11px; color: var(--text-muted); }
+        .tasks-banner-arrow { font-size: 20px; color: var(--accent-green); }
+
+        .discover-section { margin-bottom: 16px; }
+        .discover-title { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 12px; }
+        .discover-scroll { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 6px; }
+        .discover-card { min-width: 240px; height: 140px; border-radius: 18px; overflow: hidden; position: relative; scroll-snap-align: start; cursor: pointer; border: 1px solid var(--border-light); flex-shrink: 0; }
+        .discover-card:hover { transform: scale(1.03); }
+        .discover-card img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
+        .discover-card-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 16px; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%); }
+        .discover-card-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+        .discover-card-sub { font-size: 11px; color: var(--text-dim); }
+
+        .testimonial-section { margin-bottom: 16px; }
+        .testimonial-section .section-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 12px; }
+        .testimonial-ticker-wrapper { overflow: hidden; position: relative; background: rgba(255,255,255,0.015); border: 1px solid var(--border-light); border-radius: 16px; padding: 14px 0; }
+        .testimonial-ticker-wrapper::before, .testimonial-ticker-wrapper::after { content: ''; position: absolute; top: 0; width: 50px; height: 100%; z-index: 2; pointer-events: none; }
+        .testimonial-ticker-wrapper::before { left: 0; background: linear-gradient(to right, rgba(6,13,26,0.8), transparent); }
+        .testimonial-ticker-wrapper::after { right: 0; background: linear-gradient(to left, rgba(6,13,26,0.8), transparent); }
+        .testimonial-track { display: flex; animation: testimonial-scroll 30s linear infinite; width: max-content; }
+        .testimonial-track:hover { animation-play-state: paused; }
+        @keyframes testimonial-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .testimonial-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; white-space: nowrap; flex-shrink: 0; }
+        .testimonial-avatar-sm { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-orange)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+        .testimonial-info-sm { display: flex; flex-direction: column; }
+        .testimonial-name-sm { font-size: 13px; font-weight: 600; }
+        .testimonial-action-sm { font-size: 11px; color: var(--text-dim); }
+        .testimonial-amount-sm { font-size: 13px; font-weight: 700; color: var(--accent-green); margin-left: 4px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(6,13,26,0.95); backdrop-filter: blur(24px); border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-around; align-items: center; padding: 6px 0 14px; z-index: 500; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 14px; text-decoration: none; color: var(--text-dim); font-size: 10px; font-weight: 500; transition: all 0.3s; cursor: pointer; border: none; background: none; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-item.active svg { stroke: var(--accent-green); }
+        .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .nav-item:hover { color: var(--text-white); }
+
+        .toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(15,22,42,0.96); border: 1px solid var(--border-medium); backdrop-filter: blur(24px); border-radius: 14px; padding: 14px 28px; font-size: 14px; font-weight: 500; color: #fff; z-index: 3000; opacity: 0; visibility: hidden; transition: all 0.35s; box-shadow: 0 12px 40px rgba(0,0,0,0.5); white-space: nowrap; }
+        .toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: rgba(0,212,170,0.4); }
+        .toast.error { border-color: rgba(255,71,87,0.4); }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- Auth Check Overlay -->
+    <div class="auth-check-overlay" id="authCheckOverlay">
+        <div class="auth-check-spinner"></div>
+        <div class="auth-check-text">Checking your account...</div>
+    </div>
+
+    <div id="live-banner-container">
+        <div class="live-notification" id="liveNotif">
+            <div class="notif-icon-wrap orange" id="notifIcon"><i class="fa-solid fa-crown"></i></div>
+            <div class="notif-content">
+                <div class="notif-title orange" id="notifTitle">Account Upgraded</div>
+                <div class="notif-sub" id="notifSub"><span>Someone</span> upgraded their account</div>
+            </div>
+            <div class="notif-dot orange" id="notifDot"></div>
+        </div>
+    </div>
+
+    <!-- Onboarding Modals -->
+    <div class="modal-overlay" id="modal1">
+        <div class="modal-card">
+            <button class="modal-close" onclick="skipOnboarding()">×</button>
+            <div class="modal-icon-wrapper green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00d4aa" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <h2 class="modal-title">Welcome to Flux Pay!</h2>
+            <p class="modal-text">Your account is ready! You have a <strong style="color:var(--accent-green);">₦100,000</strong> FluxCore welcome bonus waiting. Claim it now!</p>
+            <button class="modal-btn green" onclick="nextModal(2)">Next →</button>
+            <div class="modal-dots"><div class="modal-dot active"></div><div class="modal-dot"></div><div class="modal-dot"></div></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="modal2">
+        <div class="modal-card">
+            <button class="modal-close" onclick="skipOnboarding()">×</button>
+            <div class="modal-icon-wrapper orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <h2 class="modal-title">Recurring Earnings</h2>
+            <p class="modal-text">After claiming your ₦100k welcome bonus, you can claim <strong style="color:var(--accent-gold);">₦5,000</strong> every 10 minutes!</p>
+            <button class="modal-btn orange" onclick="nextModal(3)">Next →</button>
+            <div class="modal-dots"><div class="modal-dot"></div><div class="modal-dot active"></div><div class="modal-dot"></div></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="modal3">
+        <div class="modal-card">
+            <button class="modal-close" onclick="skipOnboarding()">×</button>
+            <div class="modal-icon-wrapper purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg>
+            </div>
+            <h2 class="modal-title">Invite & Earn More</h2>
+            <p class="modal-text">Refer friends and earn <strong style="color:var(--accent-green);">₦1,000</strong> per referral. No limit!</p>
+            <button class="modal-btn green" onclick="finishOnboarding()">Go to Dashboard →</button>
+            <div class="modal-dots"><div class="modal-dot"></div><div class="modal-dot"></div><div class="modal-dot active"></div></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <header class="dash-header">
+        <div class="logo-section">
+            <div class="logo-icon"><svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg></div>
+            <span class="logo-text">FluxPay</span>
+        </div>
+        <div class="dash-header-actions">
+            <button class="header-btn" onclick="showToast('No new notifications')">
+                <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <span class="badge" id="notifBadge" style="display:none;">0</span>
+            </button>
+            <div class="user-avatar-sm" id="headerAvatar">U</div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="wallet-balance-wrapper">
+            <div class="wallet-balance-card">
+                <div class="wallet-header">
+                    <span class="wallet-label">Wallet Balance</span>
+                    <button class="wallet-eye-btn" onclick="toggleBalanceVisibility()">
+                        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+                <div class="wallet-amount" id="walletBalanceDisplay">₦0.00</div>
+                <div class="wallet-sub">Available Balance</div>
+                <div class="wallet-actions">
+                    <button class="wallet-btn wallet-btn-add" onclick="goToAddFunds()">+ Add Funds</button>
+                    <button class="wallet-btn wallet-btn-withdraw" onclick="goToWithdraw()">Withdraw</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="fluxcore-card" id="fluxcoreCard">
+            <div class="fluxcore-icon-wrap"><svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg></div>
+            <div class="fluxcore-info">
+                <div class="fluxcore-label">FluxCore <span id="fluxcoreStatus">Active</span></div>
+                <div class="fluxcore-amount" id="fluxcoreAmount">₦100,000</div>
+                <div class="fluxcore-sub" id="fluxcoreSub">Tap to claim your FluxCore bonus</div>
+            </div>
+            <button class="fluxcore-claim-btn active-btn" id="fluxcoreClaimBtn" onclick="handleFluxcoreClaim()">
+                <span id="claimBtnText">Claim Now</span>
+            </button>
+        </div>
+
+        <div class="invest-card">
+            <div class="invest-header">
+                <span class="invest-label">Investments</span>
+                <a href="#" class="invest-link" onclick="goToProducts(); return false;">Open Products →</a>
+            </div>
+            <p class="invest-text">No live investments yet. Approved plans will appear here automatically.</p>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-item" onclick="goToHistory()">
+                <div class="menu-icon-wrap green"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="menu-name">History</div><div class="menu-desc">Transactions</div>
+            </div>
+            <div class="menu-item" onclick="goToPlatform()">
+                <div class="menu-icon-wrap blue"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+                <div class="menu-name">Platform</div><div class="menu-desc">Services</div>
+            </div>
+            <div class="menu-item" onclick="goToInvite()">
+                <div class="menu-icon-wrap purple"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg></div>
+                <div class="menu-name">Invite</div><div class="menu-desc">Referrals</div>
+            </div>
+            <div class="menu-item" onclick="goToSupport()">
+                <div class="menu-icon-wrap orange"><svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg></div>
+                <div class="menu-name">Support</div><div class="menu-desc">Help Center</div>
+            </div>
+            <div class="menu-item" onclick="goToProducts()">
+                <div class="menu-icon-wrap yellow"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+                <div class="menu-name">Products</div><div class="menu-desc">Invest</div>
+            </div>
+            <div class="menu-item" onclick="goToFluxCore()">
+                <div class="menu-icon-wrap pink"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                <div class="menu-name">FluxCore</div><div class="menu-desc">Earnings</div>
+            </div>
+        </div>
+
+        <div class="tasks-banner" onclick="goToTasks()">
+            <div class="tasks-banner-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <div class="tasks-banner-text">
+                <div class="tasks-banner-title">Complete Tasks & Earn</div>
+                <div class="tasks-banner-sub">Earn up to ₦55,000 daily</div>
+            </div>
+            <span class="tasks-banner-arrow">→</span>
+        </div>
+
+        <div class="discover-section">
+            <div class="discover-title">Discover</div>
+            <div class="discover-scroll">
+                <div class="discover-card" onclick="showToast('Coming soon!')">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop&crop=face" alt="Happy woman" loading="lazy">
+                    <div class="discover-card-overlay"><div class="discover-card-title">Instant Withdrawals</div><div class="discover-card-sub">Withdraw to any bank in minutes</div></div>
+                </div>
+                <div class="discover-card" onclick="showToast('Coming soon!')">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face" alt="Confident man" loading="lazy">
+                    <div class="discover-card-overlay"><div class="discover-card-title">Daily Rewards</div><div class="discover-card-sub">Earn with simple tasks every day</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-section">
+            <div class="section-label">Live Activity</div>
+            <div class="testimonial-ticker-wrapper">
+                <div class="testimonial-track" id="testimonialTrack"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home', this)">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span>
+        </button>
+        <button class="nav-item" onclick="goToHistory()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>History</span>
+        </button>
+        <button class="nav-item" onclick="goToAddFunds()">
+            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12" r="4"/></svg><span>Wallet</span>
+        </button>
+        <button class="nav-item" onclick="goToProfile()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg><span>Profile</span>
+        </button>
+    </nav>
+
+    <script>
+    // ========== SUPABASE CONFIG ==========
+    const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase connected');
+    } catch (e) {
+        console.error('❌ Supabase connection failed:', e);
+    }
+
+    // ========== GLOBAL STATE (from Supabase) ==========
+    let currentUser = null;
+    let userProfile = null;
+    let state = {
+        balance: 0,
+        welcomeBonusClaimed: false,
+        lastClaimTime: 0,
+        totalEarned: 0,
+        claimCount: 0,
+        onboardingSeen: false,
+        balanceHidden: false
+    };
+
+    // ========== CLAIM SETTINGS ==========
+    const CLAIM_INTERVAL = 10 * 60 * 1000; // 10 minutes
+    const WELCOME_BONUS = 100000;
+    const RECURRING_AMOUNT = 5000;
+    let countdownTimer = null;
+
+    // ========== DOM ELEMENTS ==========
+    const walletBalanceDisplay = document.getElementById('walletBalanceDisplay');
+    const fluxcoreAmount = document.getElementById('fluxcoreAmount');
+    const fluxcoreStatus = document.getElementById('fluxcoreStatus');
+    const fluxcoreSub = document.getElementById('fluxcoreSub');
+    const fluxcoreClaimBtn = document.getElementById('fluxcoreClaimBtn');
+    const claimBtnText = document.getElementById('claimBtnText');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const authCheckOverlay = document.getElementById('authCheckOverlay');
+
+    // ========== AUTH CHECK ==========
+    async function checkAuth() {
+        if (!supabase) {
+            showToast('Connection error. Please refresh.', 'error');
+            return;
+        }
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                // Not logged in - redirect to login
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+            console.log('Logged in as:', currentUser.email);
+            await loadUserProfile();
+            authCheckOverlay.classList.add('hidden');
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'login.html';
+        }
+    }
+
+    // ========== LOAD USER PROFILE FROM SUPABASE ==========
+    async function loadUserProfile() {
+        try {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error) {
+                console.error('Profile fetch error:', error);
+                // Create profile if doesn't exist
+                await createProfile();
+                return;
+            }
+
+            userProfile = profile;
+            // ALWAYS use Supabase balance as source of truth
+            state.balance = profile.wallet_balance || 0;
+            state.welcomeBonusClaimed = profile.welcome_bonus_claimed || false;
+            state.lastClaimTime = new Date(profile.last_claim_time || 0).getTime();
+            state.totalEarned = profile.total_earned || 0;
+            state.claimCount = profile.claim_count || 0;
+            state.onboardingSeen = profile.onboarding_seen || false;
+
+            console.log('Profile loaded, balance:', state.balance);
+            updateUI();
+
+        } catch (e) {
+            console.error('Load profile error:', e);
+        }
+    }
+
+    // ========== CREATE PROFILE IF MISSING ==========
+    async function createProfile() {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .insert([{
+                    id: currentUser.id,
+                    referral_code: generateReferralCode(),
+                    wallet_balance: 0,
+                    referral_balance: 0,
+                    total_referrals: 0,
+                    welcome_bonus_claimed: false,
+                    last_claim_time: null,
+                    total_earned: 0,
+                    claim_count: 0,
+                    onboarding_seen: false
+                }])
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Create profile error:', error);
+                return;
+            }
+
+            userProfile = data;
+            state.balance = 0;
+            state.welcomeBonusClaimed = false;
+            state.lastClaimTime = 0;
+            state.totalEarned = 0;
+            state.claimCount = 0;
+            state.onboardingSeen = false;
+
+            console.log('New profile created');
+            updateUI();
+
+        } catch (e) {
+            console.error('Create profile error:', e);
+        }
+    }
+
+    function generateReferralCode() {
+        return 'FLUX' + Math.floor(1000 + Math.random() * 9000);
+    }
+
+    // ========== SAVE STATE TO SUPABASE ==========
+    async function saveState() {
+        if (!currentUser || !supabase) return;
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    wallet_balance: state.balance,
+                    welcome_bonus_claimed: state.welcomeBonusClaimed,
+                    last_claim_time: state.lastClaimTime ? new Date(state.lastClaimTime).toISOString() : null,
+                    total_earned: state.totalEarned,
+                    claim_count: state.claimCount,
+                    onboarding_seen: state.onboardingSeen
+                })
+                .eq('id', currentUser.id);
+
+            if (error) console.error('Save state error:', error);
+            else console.log('State saved to Supabase');
+        } catch (e) {
+            console.error('Save state error:', e);
+        }
+    }
+
+    // ========== REAL-TIME BALANCE SUBSCRIPTION ==========
+    function subscribeToBalance() {
+        if (!currentUser || !supabase) return;
+        supabase
+            .channel('balance-updates')
+            .on('postgres_changes', 
+                { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${currentUser.id}` },
+                (payload) => {
+                    console.log('Balance updated live:', payload.new.wallet_balance);
+                    state.balance = payload.new.wallet_balance;
+                    updateBalanceDisplay();
+                }
+            )
+            .subscribe();
+    }
+
+    // ========== UPDATE UI ==========
+    function updateUI() {
+        updateBalanceDisplay();
+        updateFluxcoreDisplay();
+        updateHeaderAvatar();
+        if (!state.onboardingSeen) {
+            document.getElementById('modal1').classList.add('visible');
+        }
+    }
+
+    function updateHeaderAvatar() {
+        if (headerAvatar && currentUser) {
+            const email = currentUser.email || 'User';
+            headerAvatar.textContent = email.charAt(0).toUpperCase();
+        }
+    }
+
+    function toggleBalanceVisibility() {
+        state.balanceHidden = !state.balanceHidden;
+        updateBalanceDisplay();
+    }
+
+    function updateBalanceDisplay() {
+        if (state.balanceHidden) {
+            walletBalanceDisplay.textContent = '₦****';
+        } else {
+            walletBalanceDisplay.textContent = '₦' + state.balance.toLocaleString() + '.00';
+        }
+    }
+
+    function updateFluxcoreDisplay() {
+        if (!state.welcomeBonusClaimed) {
+            fluxcoreAmount.textContent = '₦' + WELCOME_BONUS.toLocaleString();
+            fluxcoreStatus.textContent = 'Active';
+            fluxcoreStatus.style.color = 'var(--accent-green)';
+            fluxcoreSub.textContent = 'Tap to claim your FluxCore bonus';
+            fluxcoreClaimBtn.disabled = false;
+            claimBtnText.textContent = 'Claim Now';
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+        } else {
+            var remaining = getTimeRemaining();
+            fluxcoreAmount.textContent = '₦' + RECURRING_AMOUNT.toLocaleString();
+            if (remaining > 0) {
+                fluxcoreStatus.textContent = 'Cooldown';
+                fluxcoreStatus.style.color = 'var(--accent-orange)';
+                fluxcoreSub.textContent = 'Next claim available in ' + formatTimeHHMM(remaining);
+                fluxcoreClaimBtn.disabled = true;
+                claimBtnText.textContent = 'Wait ' + formatTimeHHMM(remaining);
+                startCountdownDisplay(remaining);
+            } else {
+                fluxcoreStatus.textContent = 'Ready';
+                fluxcoreStatus.style.color = 'var(--accent-green)';
+                fluxcoreSub.textContent = 'Tap to claim your ₦5,000 now!';
+                fluxcoreClaimBtn.disabled = false;
+                claimBtnText.textContent = 'Claim Now';
+                if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            }
+        }
+    }
+
+    // ========== FLUXCORE CLAIM ==========
+    async function handleFluxcoreClaim() {
+        if (fluxcoreClaimBtn.disabled) return;
+
+        if (!state.welcomeBonusClaimed) {
+            // Claim welcome bonus
+            state.balance += WELCOME_BONUS;
+            state.welcomeBonusClaimed = true;
+            state.lastClaimTime = Date.now();
+            state.totalEarned += WELCOME_BONUS;
+            state.claimCount++;
+
+            await saveState();
+            await logTransaction('bonus', WELCOME_BONUS, 'Welcome Bonus Claimed', 'completed');
+            updateBalanceDisplay();
+            updateFluxcoreDisplay();
+
+            showToast('₦100,000 Welcome Bonus Claimed!', 'success');
+        } else {
+            // Claim recurring
+            var now = Date.now();
+            if ((now - state.lastClaimTime) < CLAIM_INTERVAL) return;
+
+            state.balance += RECURRING_AMOUNT;
+            state.lastClaimTime = now;
+            state.totalEarned += RECURRING_AMOUNT;
+            state.claimCount++;
+
+            await saveState();
+            await logTransaction('claim', RECURRING_AMOUNT, 'FluxCore Recurring Claim', 'completed');
+            updateBalanceDisplay();
+            updateFluxcoreDisplay();
+
+            showToast('₦5,000 Claimed Successfully!', 'success');
+        }
+    }
+
+    function getTimeRemaining() {
+        if (state.lastClaimTime === 0) return 0;
+        return Math.max(0, CLAIM_INTERVAL - (Date.now() - state.lastClaimTime));
+    }
+
+    function formatTimeHHMM(ms) {
+        var totalSeconds = Math.max(0, Math.floor(ms / 1000));
+        var hours = Math.floor(totalSeconds / 3600);
+        var minutes = Math.floor((totalSeconds % 3600) / 60);
+        return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+    }
+
+    function startCountdownDisplay(initialRemaining) {
+        if (countdownTimer) clearInterval(countdownTimer);
+        var remaining = initialRemaining;
+
+        function updateDisplay() {
+            claimBtnText.textContent = 'Wait ' + formatTimeHHMM(remaining);
+            fluxcoreSub.textContent = 'Next claim available in ' + formatTimeHHMM(remaining);
+        }
+        updateDisplay();
+
+        countdownTimer = setInterval(function() {
+            remaining -= 60000;
+            if (remaining <= 0) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+                updateFluxcoreDisplay();
+                return;
+            }
+            updateDisplay();
+        }, 60000);
+    }
+
+    function startCountdownChecker() {
+        setInterval(function() {
+            if (state.welcomeBonusClaimed && getTimeRemaining() <= 0 && fluxcoreClaimBtn.disabled) {
+                updateFluxcoreDisplay();
+            }
+        }, 30000);
+    }
+
+    // ========== LOG TRANSACTION TO SUPABASE ==========
+    async function logTransaction(type, amt, description, status) {
+        if (!currentUser) return;
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .insert([{
+                    user_id: currentUser.id,
+                    type: type,
+                    amount: amt,
+                    description: description,
+                    status: status
+                }]);
+            if (error) console.error('Transaction log error:', error);
+        } catch (e) {
+            console.error('Log transaction error:', e);
+        }
+    }
+
+    // ========== LIVE NOTIFICATIONS ==========
+    const notifEl = document.getElementById('liveNotif');
+    const notifIcon = document.getElementById('notifIcon');
+    const notifTitle = document.getElementById('notifTitle');
+    const notifSub = document.getElementById('notifSub');
+    const notifDot = document.getElementById('notifDot');
+
+    const notificationTemplates = [
+        { title: 'Account Upgraded', titlePrefix: 'upgraded their account', icon: 'fa-solid fa-crown', color: 'orange' },
+        { title: 'Withdrawal Successful', titlePrefix: 'just withdrew', icon: 'fa-solid fa-money-bill-wave', color: 'green' },
+        { title: 'Bonus Claimed', titlePrefix: 'claimed', icon: 'fa-solid fa-gift', color: 'pink' },
+        { title: 'New Investment', titlePrefix: 'invested', icon: 'fa-solid fa-chart-line', color: 'purple' }
+    ];
+
+    const firstNames = ['Chidi', 'Amina', 'Tunde', 'Ngozi', 'Emeka', 'Fatima', 'Kunle', 'Blessing', 'Adamu', 'Zainab', 'Eunice'];
+    const lastNames = ['Okoroji', 'Bello', 'Adeyemi', 'Okafor', 'Hassan', 'Eze', 'Ogunwale', 'Nwachukwu'];
+
+    function showLiveNotification() {
+        notifEl.classList.remove('active', 'removing');
+        const template = notificationTemplates[Math.floor(Math.random() * notificationTemplates.length)];
+        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+        const fullName = firstName + ' ' + lastName;
+        let amountStr = '';
+        if (Math.random() > 0.4) {
+            const amt = Math.floor(Math.random() * (250000 - 5000 + 1)) + 5000;
+            amountStr = ' ₦' + amt.toLocaleString();
+        }
+        notifIcon.className = 'notif-icon-wrap ' + template.color;
+        notifIcon.innerHTML = '<i class="' + template.icon + '"></i>';
+        notifTitle.className = 'notif-title ' + template.color;
+        notifTitle.textContent = template.title;
+        notifSub.innerHTML = '<strong>' + fullName + '</strong> ' + template.titlePrefix + amountStr;
+        notifDot.className = 'notif-dot ' + template.color;
+        setTimeout(() => { notifEl.classList.add('active'); }, 50);
+        setTimeout(() => {
+            notifEl.classList.remove('active');
+            notifEl.classList.add('removing');
+        }, 5000);
+    }
+
+    // ========== TESTIMONIALS ==========
+    function generateTestimonials() {
+        var track = document.getElementById('testimonialTrack');
+        var names = ['Chidi', 'Amina', 'Tunde', 'Ngozi', 'Emeka', 'Fatima', 'Kunle', 'Blessing'];
+        var actions = ['just claimed', 'earned', 'withdrew'];
+        var html = '';
+        for (var d = 0; d < 2; d++) {
+            for (var i = 0; i < names.length; i++) {
+                var amount = Math.floor(Math.random() * (25000 - 5000 + 1)) + 5000;
+                html += '<div class="testimonial-item">';
+                html += '<div class="testimonial-avatar-sm">' + names[i].charAt(0) + '</div>';
+                html += '<div class="testimonial-info-sm">';
+                html += '<span class="testimonial-name-sm">' + names[i] + '</span>';
+                html += '<span class="testimonial-action-sm">' + actions[Math.floor(Math.random() * actions.length)] + '</span>';
+                html += '</div>';
+                html += '<span class="testimonial-amount-sm">₦' + amount.toLocaleString() + '</span>';
+                html += '</div>';
+            }
+        }
+        track.innerHTML = html;
+        setInterval(function(){
+            var items = track.querySelectorAll('.testimonial-amount-sm');
+            for(var i=0; i<items.length; i+=Math.floor(Math.random()*3)+1) {
+                var newAmt = Math.floor(Math.random() * (30000 - 5000 + 1)) + 5000;
+                if(items[i]) items[i].textContent = '₦' + newAmt.toLocaleString();
+            }
+        }, 6000);
+    }
+
+    // ========== MODALS ==========
+    function nextModal(id) { 
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('visible')); 
+        document.getElementById('modal' + id).classList.add('visible'); 
+    }
+    async function finishOnboarding() { 
+        state.onboardingSeen = true; 
+        await saveState();
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('visible')); 
+    }
+    function skipOnboarding() { finishOnboarding(); }
+
+    // ========== NAVIGATION ==========
+    function goToAddFunds() { window.location.href = 'add-funds.html'; }
+    function goToWithdraw() { window.location.href = 'withdraw.html'; }
+    function goToHistory() { window.location.href = 'history.html'; }
+    function goToPlatform() { window.location.href = 'platform.html'; }
+    function goToInvite() { window.location.href = 'invite.html'; }
+    function goToSupport() { window.location.href = 'support.html'; }
+    function goToProducts() { window.location.href = 'product.html'; }
+    function goToFluxCore() { window.location.href = 'spin.html'; }
+    function goToTasks() { window.location.href = 'earn.html'; }
+    function goToProfile() { window.location.href = 'profile.html'; }
+
+    function switchTab(tab, el) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if (el) el.classList.add('active');
+        var tabs = { home: 'You are already on Home!' };
+        showToast(tabs[tab] || 'Coming soon!');
+    }
+
+    function showToast(message, type) {
+        var toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast';
+        if (type === 'success') toast.classList.add('success');
+        if (type === 'error') toast.classList.add('error');
+        toast.classList.add('visible');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => { toast.classList.remove('visible', 'success', 'error'); }, 2500);
+    }
+
+    // ========== INITIALIZE ==========
+    async function init() {
+        // Check auth first
+        await checkAuth();
+
+        // Subscribe to live balance updates
+        subscribeToBalance();
+
+        // Start live notifications
+        setInterval(showLiveNotification, 5500); 
+        setTimeout(showLiveNotification, 1000);
+
+        // Start countdown checker
+        startCountdownChecker();
+
+        // Generate testimonials
+        generateTestimonials();
+
+        // Show page
+        setTimeout(function(){
+            document.body.classList.add('loaded');
+        }, 300);
+    }
+
+    init();
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

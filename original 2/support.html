@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Live Support - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #020d0a; --bg-secondary: #041a14; --bg-card: #0a2820;
+            --bg-card-hover: #0e3228; --accent-green: #00d4aa; --accent-green-dark: #00a884;
+            --accent-blue: #3b82f6; --accent-purple: #8b5cf6; --text-primary: #f8fafc;
+            --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-bg: rgba(10, 40, 32, 0.7);
+            --glass-border: rgba(0, 212, 170, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
+            --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(0,212,170,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(0,168,132,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(0,212,170,0.02) 0%, transparent 70%);
+        }
+        body.light-mode {
+            --bg-primary: #f0f4f3; --bg-secondary: #e8f0ee; --bg-card: #ffffff;
+            --bg-card-hover: #f5faf9; --text-primary: #1a1a2e; --text-secondary: #64748b;
+            --text-muted: #94a3b8; --border-color: rgba(0, 212, 170, 0.15);
+            --glass-bg: rgba(255,255,255,0.7); --glass-border: rgba(0,212,170,0.15);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.7; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(2,13,10,0.94); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+        body.light-mode .header { background: rgba(240,244,243,0.94); }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .support-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; }
+        .support-avatar::after { content: ''; position: absolute; bottom: 2px; right: 2px; width: 9px; height: 9px; background: var(--accent-green); border-radius: 50%; border: 2px solid var(--bg-primary); animation: pulse-dot 2s ease-in-out infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.2); } }
+        .header-info h1 { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+        .header-info p { font-size: 11px; color: var(--accent-green); font-weight: 500; font-family: 'Amaranth', sans-serif; }
+        .header-actions { margin-left: auto; display: flex; gap: 8px; }
+        .header-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 13px; }
+        .header-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+        .faq-section { padding: 14px 16px; border-bottom: 1px solid var(--border-color); position: relative; z-index: 1; }
+        .faq-title { font-family: 'Amaranth', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-green); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .faq-chip { background: rgba(0,212,170,0.04); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(0,212,170,0.08); border-radius: 12px; padding: 12px 10px; text-align: center; cursor: pointer; transition: var(--transition-smooth); font-size: 11px; font-weight: 500; color: var(--text-secondary); font-family: 'Amaranth', sans-serif; }
+        .faq-chip:hover { background: rgba(0,212,170,0.08); border-color: var(--accent-green); color: var(--text-primary); transform: translateY(-2px); }
+        .faq-chip i { display: block; font-size: 16px; margin-bottom: 5px; color: var(--accent-green); }
+
+        .chat-container { padding: 14px 16px; padding-bottom: 100px; min-height: calc(100vh - 200px); position: relative; z-index: 1; }
+        .date-divider { text-align: center; margin: 14px 0; position: relative; }
+        .date-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border-color); }
+        .date-divider span { background: var(--bg-primary); padding: 0 12px; font-size: 10px; color: var(--text-muted); position: relative; font-weight: 500; font-family: 'Amaranth', sans-serif; }
+
+        .message { display: flex; gap: 8px; margin-bottom: 14px; animation: messageSlide 0.3s ease; position: relative; }
+        @keyframes messageSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message.user { flex-direction: row-reverse; }
+        .message-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+        .message.bot .message-avatar { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); }
+        .message.user .message-avatar { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+        .message-bubble { max-width: 75%; padding: 11px 13px; border-radius: 14px; font-size: 13px; line-height: 1.6; word-wrap: break-word; position: relative; }
+        .message.bot .message-bubble { background: rgba(0,212,170,0.04); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(0,212,170,0.08); color: var(--text-primary); border-top-left-radius: 4px; }
+        body.light-mode .message.bot .message-bubble { background: #ffffff; border: 1px solid rgba(0,212,170,0.15); }
+        .message.user .message-bubble { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #020d0a; border-top-right-radius: 4px; }
+        .message-time { font-size: 9px; color: var(--text-muted); margin-top: 4px; text-align: right; }
+        .message.user .message-time { text-align: left; }
+        .message-status { font-size: 9px; color: var(--accent-green); margin-top: 2px; text-align: left; }
+        .message.user .message-status { text-align: right; }
+
+        .message-reactions { display: flex; gap: 4px; margin-top: 4px; justify-content: flex-end; }
+        .message.user .message-reactions { justify-content: flex-start; }
+        .reaction-btn { background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.15); border-radius: 12px; padding: 2px 8px; font-size: 12px; cursor: pointer; transition: var(--transition-smooth); }
+        .reaction-btn:hover { background: rgba(0,212,170,0.15); transform: scale(1.1); }
+        .reaction-btn.active { background: rgba(0,212,170,0.2); border-color: var(--accent-green); }
+
+        .message-copy { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: var(--transition-smooth); font-size: 10px; }
+        .message:hover .message-copy { opacity: 1; }
+        .message-copy:hover { color: var(--accent-green); border-color: var(--accent-green); }
+        .message.user .message-copy { right: auto; left: -8px; }
+
+        .typing-indicator { display: flex; gap: 8px; margin-bottom: 14px; animation: messageSlide 0.3s ease; }
+        .typing-bubble { background: rgba(0,212,170,0.04); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(0,212,170,0.08); border-radius: 14px; border-top-left-radius: 4px; padding: 14px 18px; display: flex; align-items: center; gap: 4px; }
+        .typing-dot { width: 7px; height: 7px; background: var(--text-muted); border-radius: 50%; animation: typingBounce 1.4s ease-in-out infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+        .quick-replies { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0; margin-bottom: 6px; scrollbar-width: none; }
+        .quick-replies::-webkit-scrollbar { display: none; }
+        .quick-reply-btn { background: rgba(0,212,170,0.04); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(0,212,170,0.08); border-radius: 20px; padding: 7px 14px; font-size: 11px; font-weight: 500; color: var(--accent-green); cursor: pointer; transition: var(--transition-smooth); white-space: nowrap; font-family: 'Amaranth', sans-serif; }
+        .quick-reply-btn:hover { background: var(--accent-green); color: #020d0a; border-color: var(--accent-green); }
+
+        .input-area { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(2,13,10,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-color); padding: 10px 14px; padding-bottom: 22px; z-index: 100; }
+        body.light-mode .input-area { background: rgba(240,244,243,0.96); }
+        .input-wrapper { display: flex; align-items: center; gap: 8px; }
+        .attach-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 16px; flex-shrink: 0; }
+        .attach-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .message-input { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; padding: 11px 16px; color: var(--text-primary); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: var(--transition-smooth); }
+        .message-input:focus { border-color: var(--accent-green); background: var(--bg-card-hover); }
+        .message-input::placeholder { color: var(--text-muted); font-size: 12px; font-family: 'Amaranth', sans-serif; }
+        .send-btn { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); border: none; color: #020d0a; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; flex-shrink: 0; }
+        .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,212,170,0.4); }
+        .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .welcome-card { background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,168,132,0.04)); border: 1px solid rgba(0,212,170,0.15); border-radius: 14px; padding: 14px; margin-bottom: 14px; text-align: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .welcome-card h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .welcome-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-dialog { width: 100%; max-width: 340px; background: linear-gradient(180deg, rgba(0,212,170,0.05) 0%, rgba(2,13,10,0.96) 100%); border: 1px solid rgba(0,212,170,0.15); border-radius: 18px; padding: 28px 22px; text-align: center; transform: translateY(20px) scale(0.95); transition: transform 0.35s ease; box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
+        .modal-overlay.visible .modal-dialog { transform: translateY(0) scale(1); }
+        .modal-icon-wrap { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,71,87,0.1); border: 2px solid rgba(255,71,87,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .modal-icon-wrap svg { width: 24px; height: 24px; fill: none; stroke: #ff4757; stroke-width: 2; }
+        .modal-title { font-family: 'Amaranth', sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+        .modal-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: var(--transition-smooth); font-family: 'Amaranth', sans-serif; border: none; }
+        .modal-btn.cancel { background: rgba(255,255,255,0.06); color: var(--text-primary); border: 1px solid rgba(255,255,255,0.1); }
+        .modal-btn.cancel:hover { background: rgba(255,255,255,0.12); }
+        .modal-btn.danger { background: #ff4757; color: #fff; box-shadow: 0 4px 15px rgba(255,71,87,0.3); }
+        .modal-btn.danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,71,87,0.4); }
+
+        .search-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: flex; flex-direction: column; align-items: center; padding: 60px 20px 20px; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .search-overlay.visible { opacity: 1; visibility: visible; }
+        .search-box { width: 100%; max-width: 500px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .search-input { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 18px; color: var(--text-primary); font-size: 15px; font-family: 'Inter', sans-serif; outline: none; }
+        .search-input:focus { border-color: var(--accent-green); }
+        .search-close { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+        .search-results { width: 100%; max-width: 500px; overflow-y: auto; max-height: calc(100vh - 140px); }
+        .search-result-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: var(--transition-smooth); }
+        .search-result-item:hover { border-color: var(--accent-green); background: var(--bg-card-hover); }
+        .search-result-item .sr-text { font-size: 13px; color: var(--text-primary); margin-bottom: 4px; }
+        .search-result-item .sr-time { font-size: 10px; color: var(--text-muted); }
+        .search-result-item .sr-sender { font-size: 10px; color: var(--accent-green); font-weight: 600; margin-bottom: 4px; }
+        .search-no-results { text-align: center; color: var(--text-muted); font-size: 14px; padding: 40px; }
+
+        .chat-image { max-width: 200px; border-radius: 12px; cursor: pointer; transition: var(--transition-smooth); }
+        .chat-image:hover { transform: scale(1.02); }
+        .image-preview-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px; }
+        .image-preview-modal.visible { opacity: 1; visibility: visible; }
+        .image-preview-modal img { max-width: 90%; max-height: 80vh; border-radius: 16px; object-fit: contain; }
+        .image-preview-close { position: absolute; top: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; }
+
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(0,212,170,0.2); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { width: 22px; height: 22px; border-radius: 6px; background: rgba(0,212,170,0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 11px; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <canvas id="bg-particles"></canvas>
+
+    <div class="toast" id="toast">
+        <div class="toast-icon">✅</div>
+        <span id="toastText">Copied!</span>
+    </div>
+
+    <div class="image-preview-modal" id="imagePreviewModal" onclick="closeImagePreview()">
+        <img id="previewImage" src="" alt="Preview">
+        <button class="image-preview-close" onclick="closeImagePreview()">✕</button>
+    </div>
+
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search messages..." oninput="performSearch()" onkeypress="if(event.key==='Enter')closeSearch()">
+            <button class="search-close" onclick="closeSearch()">✕</button>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-dialog">
+            <div class="modal-icon-wrap">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="modal-title">Clear Chat History?</div>
+            <div class="modal-text">This will permanently delete all messages in this conversation.</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeConfirmModal()">Cancel</button>
+                <button class="modal-btn danger" onclick="confirmClearChat()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <div class="support-avatar">🎧</div>
+        <div class="header-info">
+            <h1>Flux Support</h1>
+            <p>● Online — typically replies fast</p>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="toggleTheme()" title="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></button>
+            <button class="header-btn" onclick="openSearch()" title="Search chat"><i class="fas fa-search"></i></button>
+            <button class="header-btn" onclick="openConfirmModal()" title="Clear chat"><i class="fas fa-trash-alt"></i></button>
+        </div>
+    </header>
+
+    <div class="faq-section">
+        <div class="faq-title"><span>Quick Help</span></div>
+        <div class="faq-grid">
+            <div class="faq-chip" onclick="sendFAQ('How do I withdraw?')"><i class="fas fa-wallet"></i> Withdraw</div>
+            <div class="faq-chip" onclick="sendFAQ('How do referrals work?')"><i class="fas fa-users"></i> Referrals</div>
+            <div class="faq-chip" onclick="sendFAQ('How do I deposit?')"><i class="fas fa-plus-circle"></i> Deposit</div>
+            <div class="faq-chip" onclick="sendFAQ('Tell me about VIP investments')"><i class="fas fa-chart-line"></i> Investments</div>
+            <div class="faq-chip" onclick="sendFAQ('How do I reset my password?')"><i class="fas fa-key"></i> Password</div>
+            <div class="faq-chip" onclick="sendFAQ('Is Flux Pay legit?')"><i class="fas fa-shield-alt"></i> Legit?</div>
+            <div class="faq-chip" onclick="sendFAQ('How long do withdrawals take?')"><i class="fas fa-clock"></i> Duration</div>
+            <div class="faq-chip" onclick="sendFAQ('How do I change my bank?')"><i class="fas fa-university"></i> Bank</div>
+        </div>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="date-divider"><span>Today</span></div>
+        <div class="message bot" id="welcomeMessage">
+            <div class="message-avatar">🤖</div>
+            <div>
+                <div class="message-bubble">👋 Hi there! I'm your Flux Pay assistant.<br><br>I can help with:<br>• Withdrawals & deposits<br>• FluxCore claims<br>• VIP Investment plans<br>• Referral program<br>• Account & upgrade issues<br><br>Ask me anything or tap a quick reply!</div>
+                <div class="message-time">Just now</div>
+                <div class="message-reactions">
+                    <button class="reaction-btn" onclick="addReaction(this,'👍')">👍</button>
+                    <button class="reaction-btn" onclick="addReaction(this,'❤️')">❤️</button>
+                    <button class="reaction-btn" onclick="addReaction(this,'😂')">😂</button>
+                    <button class="reaction-btn" onclick="addReaction(this,'🔥')">🔥</button>
+                </div>
+            </div>
+        </div>
+        <div class="quick-replies" id="quickReplies">
+            <button class="quick-reply-btn" onclick="sendQuickReply('How do I withdraw?')">💰 Withdraw</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Tell me about referrals')">🎁 Referrals</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('How to deposit?')">💳 Deposit</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Tell me about VIP investments')">📈 Invest</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Is Flux Pay legit?')">🛡️ Legit?</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('How long do withdrawals take?')">⏱️ Duration</button>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <button class="attach-btn" onclick="document.getElementById('fileInput').click()"><i class="fas fa-paperclip"></i></button>
+            <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleFileUpload(event)">
+            <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+
+        // ========== BIGGER FLOATING PARTICLES ==========
+        (function() {
+            var canvas = document.getElementById('bg-particles');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var particles = [], w, h;
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            resize(); window.addEventListener('resize', resize);
+            function Particle() { this.reset(); }
+            Particle.prototype.reset = function() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.size = Math.random() * 4 + 2; this.speedY = -(Math.random() * 0.4 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.2; this.opacity = Math.random() * 0.4 + 0.2;
+                this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+            };
+            Particle.prototype.update = function() {
+                this.y += this.speedY; this.x += this.speedX; this.life--;
+                if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+                if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+            };
+            Particle.prototype.draw = function() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+                ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+            };
+            var count = window.innerWidth < 768 ? 25 : 40;
+            for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+            function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+            animate();
+        })();
+
+        // ========== AUDIO ==========
+        var audioCtx = null;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        function playMessageSound() {
+            try { initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume(); var o = audioCtx.createOscillator(); var g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.setValueAtTime(800, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1); g.gain.setValueAtTime(0.08, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15); o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.15); } catch(e) {}
+        }
+        function playTypingSound() {
+            try { initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume(); var o = audioCtx.createOscillator(); var g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.setValueAtTime(400, audioCtx.currentTime); g.gain.setValueAtTime(0.03, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05); o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.05); } catch(e) {}
+        }
+
+        // ========== CHAT BOT LOGIC (MASSIVELY EXPANDED) ==========
+
+
+var botResponses = {
+    'hi': 'Hello! Welcome to Flux Pay support. How can I help you today? 😊',
+    'hello': 'Hello! Welcome to Flux Pay support. How can I help you today? 😊',
+    'hey': 'Hey there! What can I do for you? 👋',
+    'good morning': 'Good morning! ☀️ Ready to earn some money today?',
+    'good afternoon': 'Good afternoon! 🌤️ How can I help?',
+    'good evening': 'Good evening! 🌙 What do you need help with?',
+    'good night': 'Good night! 🌙 Sleep well and earn more tomorrow!',
+    'withdraw': 'To withdraw your earnings:\n\n1. Go to your **Dashboard**\n2. Click **Withdraw**\n3. Enter amount (min ₦100,000)\n4. Select your bank\n5. Confirm withdrawal\n\nNote: You must be **upgraded** to withdraw.',
+    'withdrawal': 'To withdraw your earnings:\n\n1. Go to your **Dashboard**\n2. Click **Withdraw**\n3. Enter amount (min ₦100,000)\n4. Select your bank\n5. Confirm withdrawal\n\nNote: You must be **upgraded** to withdraw.',
+    'withdraw money': 'To withdraw your earnings:\n\n1. Go to your **Dashboard**\n2. Click **Withdraw**\n3. Enter amount (min ₦100,000)\n4. Select your bank\n5. Confirm withdrawal\n\nNote: You must be **upgraded** to withdraw.',
+    'referral': 'Our referral program rewards you!\n\n• Share your code from **Invite & Earn**\n• Friends sign up with your code\n• You earn **₦1,000** per referral\n• No limit — invite as many as you want!\n\nStart sharing now! 🚀',
+    'refer': 'Our referral program rewards you!\n\n• Share your code from **Invite & Earn**\n• Friends sign up with your code\n• You earn **₦1,000** per referral',
+    'referrals': 'Our referral program rewards you!\n\n• Share your code from **Invite & Earn**\n• Friends sign up with your code\n• You earn **₦1,000** per referral\n• No limit — invite as many as you want!\n\nStart sharing now! 🚀',
+    'invite': 'Our referral program rewards you!\n\n• Share your code from **Invite & Earn**\n• Friends sign up with your code\n• You earn **₦1,000** per referral\n• No limit — invite as many as you want!\n\nStart sharing now! 🚀',
+    'code': 'Find your referral code in **Invite & Earn** on your dashboard. Share it and earn ₦1,000 per signup! 🎁',
+    'deposit': 'To add funds to your wallet:\n\n1. Go to **Dashboard**\n2. Click **+ Add Funds**\n3. Enter deposit amount\n4. Transfer to the bank details shown\n5. Upload receipt & submit\n\nFunds appear after admin review. 💳',
+    'fund': 'To add funds to your wallet:\n\n1. Go to **Dashboard**\n2. Click **+ Add Funds**\n3. Enter deposit amount\n4. Transfer to the bank details shown',
+    'add funds': 'To add funds to your wallet:\n\n1. Go to **Dashboard**\n2. Click **+ Add Funds**\n3. Enter deposit amount\n4. Transfer to the bank details shown\n5. Upload receipt & submit\n\nFunds appear after admin review. 💳',
+    'add money': 'To add funds to your wallet:\n\n1. Go to **Dashboard**\n2. Click **+ Add Funds**\n3. Enter deposit amount\n4. Transfer to the bank details shown\n5. Upload receipt & submit\n\nFunds appear after admin review. 💳',
+    'fluxcore': 'FluxCore is your earning engine! ⚡\n\n• New users get **₦100,000** welcome bonus\n• After claiming, earn **₦5,000** every 24 hours\n• Just tap **Claim Now** on your dashboard\n• Watch the countdown for your next claim!\n\nStart claiming now! 💰',
+    'claim': 'FluxCore is your earning engine! ⚡\n\n• New users get **₦100,000** welcome bonus\n• After claiming, earn **₦5,000** every 24 hours',
+    'welcome bonus': 'New users get **₦100,000** welcome bonus! Just sign up and claim it on your dashboard. 💰',
+    'earn': 'You earn through:\n\n• **FluxCore** — ₦5,000 every 24 hours\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — up to 80% returns\n\nStart earning today! 🚀',
+    'earning': 'You earn through:\n\n• **FluxCore** — ₦5,000 every 24 hours\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — up to 80% returns\n\nStart earning today! 🚀',
+    'investment': 'We have 7 VIP investment plans! 💰\n\n• **VIP 1** - ₦5,000 → ₦7,750 (55%)\n• **VIP 2** - ₦10,000 → ₦15,800 (58%)\n• **VIP 3** - ₦25,000 → ₦40,000 (60%)\n• **VIP 4** - ₦50,000 → ₦82,500 (65%)\n• **VIP 5** - ₦100,000 → ₦170,000 (70%)\n• **VIP 6** - ₦150,000 → ₦262,500 (75%)\n• **VIP 7** - ₦250,000 → ₦450,000 (80%)\n\nGo to **Products** on your dashboard to invest! 📈',
+    'vip': 'We have 7 VIP investment plans! 💰\n\n• **VIP 1** - ₦5,000 → ₦7,750 (55%)\n• **VIP 2** - ₦10,000 → ₦15,800 (58%)\n• **VIP 3** - ₦25,000 → ₦40,000 (60%)\n• **VIP 4** - ₦50,000 → ₦82,500 (65%)\n• **VIP 5** - ₦100,000 → ₦170,000 (70%)\n• **VIP 6** - ₦150,000 → ₦262,500 (75%)\n• **VIP 7** - ₦250,000 → ₦450,000 (80%)\n\nGo to **Products** on your dashboard to invest! 📈',
+    'plan': 'We have 7 VIP investment plans! 💰\n\nCheck **Products** on your dashboard to see all plans and invest!',
+    'invest': 'We have 7 VIP investment plans! 💰\n\nGo to **Products** on your dashboard to see all plans and start investing! 📈',
+    'return': 'Our VIP plans offer returns from 55% up to 80% depending on the plan you choose. Check **Products** on your dashboard! 💰',
+    'products': 'The **Products** page has all our investment plans. Go to your dashboard and click **Products** to see them! 📦',
+    'profit': 'Our VIP plans offer returns from 55% up to 80% depending on the plan you choose. Check **Products** on your dashboard! 💰',
+    'roi': 'Our VIP plans offer returns from 55% up to 80% depending on the plan you choose. Check **Products** on your dashboard! 💰',
+    'upgrade': 'To upgrade your account:\n\n1. Go to **Dashboard** → try to withdraw\n2. You\'ll be taken to the **Upgrade** page\n3. Choose Premium (₦6,350) or Lifetime (₦20,000)\n4. Make payment & upload receipt\n5. Enjoy full withdrawal access! ⭐',
+    'premium': 'To upgrade your account:\n\n1. Go to **Dashboard** → try to withdraw\n2. Choose Premium (₦6,350) or Lifetime (₦20,000)\n3. Make payment & upload receipt',
+    'lifetime': 'To upgrade your account:\n\n1. Go to **Dashboard** → try to withdraw\n2. Choose Premium (₦6,350) or Lifetime (₦20,000)\n3. Make payment & upload receipt\n\nLifetime gives you unlimited withdrawals forever! 🌟',
+    'account': 'For account issues:\n\n• **Forgot password?** Use reset on login page\n• **Can\'t login?** Check your registered email\n• **Wrong balance?** Refresh the dashboard\n• **Need help?** Email support@fluxpay.com',
+    'login': 'For account issues:\n\n• **Forgot password?** Use reset on login page\n• **Can\'t login?** Check your registered email',
+    'balance': 'Your balance shows on the **Dashboard**.\n\n• Pull down to refresh\n• Check **History** for all transactions\n• Balance updates instantly after claims/deposits',
+    'money': 'Your balance shows on the **Dashboard**.\n\n• Pull down to refresh\n• Check **History** for all transactions\n• Balance updates instantly after claims/deposits',
+    'contact': 'Reach us here:\n\n• 📧 Email: support@fluxpay.com\n• 💬 This chat (24/7)',
+    'help': 'Reach us here:\n\n• 📧 Email: support@fluxpay.com\n• 💬 This chat (24/7)',
+    'support': 'Reach us here:\n\n• 📧 Email: support@fluxpay.com\n• 💬 This chat (24/7)',
+    'email': 'You can reach us at **support@fluxpay.com** 📧',
+    'phone': 'We currently only support email and chat support. Contact us at **support@fluxpay.com** 📧',
+    'number': 'We currently only support email and chat support. Contact us at **support@fluxpay.com** 📧',
+    'bye': 'Goodbye! Keep earning with Flux Pay! 👋💰',
+    'thanks': 'You\'re welcome! 😊\n\nAnything else I can help with?',
+    'thank you': 'You\'re welcome! 😊\n\nAnything else I can help with?',
+    'thank': 'You\'re welcome! 😊\n\nAnything else I can help with?',
+    'password': 'To reset your password:\n\n1. Go to the **Login** page\n2. Click **Forgot Password?**\n3. Enter your registered email\n4. Check your inbox for reset link\n5. Create a new password\n\nStill stuck? Email support@fluxpay.com 🔐',
+    'reset': 'To reset your password:\n\n1. Go to the **Login** page\n2. Click **Forgot Password?**\n3. Enter your registered email\n4. Check your inbox for reset link\n5. Create a new password\n\nStill stuck? Email support@fluxpay.com 🔐',
+    'forgot': 'To reset your password:\n\n1. Go to the **Login** page\n2. Click **Forgot Password?**\n3. Enter your registered email\n4. Check your inbox for reset link\n5. Create a new password\n\nStill stuck? Email support@fluxpay.com 🔐',
+    'forgot password': 'To reset your password:\n\n1. Go to the **Login** page\n2. Click **Forgot Password?**\n3. Enter your registered email\n4. Check your inbox for reset link\n5. Create a new password\n\nStill stuck? Email support@fluxpay.com 🔐',
+    'bank': 'To add or change your bank account:\n\n1. Go to **Dashboard** → **Profile**\n2. Click **Bank Details**\n3. Add your bank name, account number & name\n4. Save changes\n\nMake sure details are correct! 🏦',
+    'bank account': 'To add or change your bank account:\n\n1. Go to **Dashboard** → **Profile**\n2. Click **Bank Details**\n3. Add your bank name, account number & name\n4. Save changes\n\nMake sure details are correct! 🏦',
+    'change bank': 'To add or change your bank account:\n\n1. Go to **Dashboard** → **Profile**\n2. Click **Bank Details**\n3. Add your bank name, account number & name\n4. Save changes\n\nMake sure details are correct! 🏦',
+    'account number': 'To add or change your bank account:\n\n1. Go to **Dashboard** → **Profile**\n2. Click **Bank Details**\n3. Add your bank name, account number & name\n4. Save changes\n\nMake sure details are correct! 🏦',
+    'minimum': 'Minimum withdrawal is **₦100,000**. You must also be upgraded to withdraw. 💰',
+    'maximum': 'There is no maximum withdrawal limit! Withdraw as much as you\'ve earned. 🚀',
+    'limit': 'Minimum withdrawal is **₦100,000**. No maximum limit! You must be upgraded to withdraw. 💰',
+    'min': 'Minimum withdrawal is **₦100,000**. You must also be upgraded to withdraw. 💰',
+    'max': 'There is no maximum withdrawal limit! Withdraw as much as you\'ve earned. 🚀',
+    'time': 'Withdrawals are processed within **24-48 hours** after request. Make sure you\'re upgraded! ⏱️',
+    'how long': 'Withdrawals are processed within **24-48 hours** after request. Make sure you\'re upgraded! ⏱️',
+    'duration': 'Withdrawals are processed within **24-48 hours** after request. Make sure you\'re upgraded! ⏱️',
+    'when': 'Withdrawals are processed within **24-48 hours** after request. Make sure you\'re upgraded! ⏱️',
+    'wait': 'Withdrawals are processed within **24-48 hours** after request. Make sure you\'re upgraded! ⏱️',
+    'scam': 'Flux Pay is **100% legit**! ✅\n\n• Thousands of users are earning daily\n• Real payouts processed regularly\n• Transparent investment plans\n• Active 24/7 support\n\nJoin the community and start earning! 🚀',
+    'legit': 'Flux Pay is **100% legit**! ✅\n\n• Thousands of users are earning daily\n• Real payouts processed regularly\n• Transparent investment plans\n• Active 24/7 support\n\nJoin the community and start earning! 🚀',
+    'real': 'Flux Pay is **100% legit**! ✅\n\n• Thousands of users are earning daily\n• Real payouts processed regularly\n• Transparent investment plans\n• Active 24/7 support\n\nJoin the community and start earning! 🚀',
+    'fake': 'Flux Pay is **100% legit**! ✅\n\n• Thousands of users are earning daily\n• Real payouts processed regularly\n• Transparent investment plans\n• Active 24/7 support\n\nJoin the community and start earning! 🚀',
+    'trusted': 'Flux Pay is **100% legit**! ✅\n\n• Thousands of users are earning daily\n• Real payouts processed regularly\n• Transparent investment plans\n• Active 24/7 support\n\nJoin the community and start earning! 🚀',
+    'refund': 'Refunds are reviewed on a case-by-case basis.\n\n• Contact **support@fluxpay.com** with your transaction details\n• Include receipt and reason for refund\n• Our team will respond within 48 hours\n\nNote: VIP investments are non-refundable once activated. 🔄',
+    'cancel': 'To cancel a pending transaction:\n\n• Go to **History** on your dashboard\n• Find the pending transaction\n• Contact **support@fluxpay.com** with details\n\nNote: Completed transactions cannot be cancelled. 🚫',
+    'reverse': 'To request a reversal:\n\n• Contact **support@fluxpay.com** immediately\n• Provide transaction ID and reason\n• Our team will review within 48 hours\n\nNote: Not all transactions are reversible. 🔄',
+    'history': 'View your full transaction history:\n\n• Go to **Dashboard** → **History**\n• See all deposits, withdrawals, claims & investments\n• Filter by type or date\n• Download statement if needed\n\nAll records are saved securely! 📋',
+    'transaction': 'View your full transaction history:\n\n• Go to **Dashboard** → **History**\n• See all deposits, withdrawals, claims & investments\n• Filter by type or date',
+    'record': 'View your full transaction history:\n\n• Go to **Dashboard** → **History**\n• See all deposits, withdrawals, claims & investments',
+    'profile': 'Manage your profile:\n\n• Go to **Dashboard** → **Profile**\n• Update name, email, phone\n• Add/change bank details\n• Set security preferences\n\nKeep your info up to date! 👤',
+    'settings': 'Manage your profile:\n\n• Go to **Dashboard** → **Profile**\n• Update name, email, phone\n• Add/change bank details\n• Set security preferences',
+    'notification': 'Manage notifications:\n\n• Go to **Dashboard** → **Profile** → **Settings**\n• Toggle push notifications\n• Set email alerts\n• Choose what you want to be notified about\n\nStay updated on your earnings! 🔔',
+    'alert': 'Manage notifications:\n\n• Go to **Dashboard** → **Profile** → **Settings**\n• Toggle push notifications\n• Set email alerts',
+    'security': 'Security tips:\n\n• Never share your password\n• Use a strong, unique password\n• Enable 2FA if available\n• Log out from shared devices\n• Report suspicious activity immediately\n\nYour security is our priority! 🔒',
+    'hack': 'If you suspect unauthorized access:\n\n• Change your password immediately\n• Check **History** for unknown transactions\n• Contact **support@fluxpay.com**\n• Log out all devices from settings\n\nWe take security very seriously! 🛡️',
+    'hacked': 'If you suspect unauthorized access:\n\n• Change your password immediately\n• Check **History** for unknown transactions\n• Contact **support@fluxpay.com**\n• Log out all devices from settings',
+    'error': 'If you\'re experiencing an error:\n\n• Refresh the page\n• Clear browser cache\n• Try a different browser\n• Check your internet connection\n• If still stuck, contact **support@fluxpay.com**\n\nSorry for the inconvenience! 🛠️',
+    'bug': 'If you\'re experiencing an error:\n\n• Refresh the page\n• Clear browser cache\n• Try a different browser\n• Check your internet connection\n• If still stuck, contact **support@fluxpay.com**',
+    'problem': 'If you\'re experiencing an error:\n\n• Refresh the page\n• Clear browser cache\n• Try a different browser\n• Check your internet connection\n• If still stuck, contact **support@fluxpay.com**',
+    'issue': 'If you\'re experiencing an error:\n\n• Refresh the page\n• Clear browser cache\n• Try a different browser\n• Check your internet connection\n• If still stuck, contact **support@fluxpay.com**',
+    'pending': 'Pending transactions usually clear within **24-48 hours**.\n\n• Check **History** for status updates\n• If still pending after 48 hours, contact **support@fluxpay.com**\n• Include your transaction ID for faster help\n\nWe appreciate your patience! ⏳',
+    'status': 'Pending transactions usually clear within **24-48 hours**.\n\n• Check **History** for status updates\n• If still pending after 48 hours, contact **support@fluxpay.com**',
+    'receipt': 'Uploading your receipt:\n\n• Take a clear screenshot of payment\n• Make sure amount and date are visible\n• Upload in **Dashboard** → **Add Funds** or **Upgrade**\n• Wait for admin verification\n\nClear receipts = faster approval! 📸',
+    'upload': 'Uploading your receipt:\n\n• Take a clear screenshot of payment\n• Make sure amount and date are visible\n• Upload in **Dashboard** → **Add Funds** or **Upgrade**\n• Wait for admin verification',
+    'screenshot': 'Uploading your receipt:\n\n• Take a clear screenshot of payment\n• Make sure amount and date are visible\n• Upload in **Dashboard** → **Add Funds** or **Upgrade**\n• Wait for admin verification',
+    'verify': 'Verification typically takes **24-48 hours**.\n\n• Upload a clear receipt\n• Make sure all details are visible\n• Check **History** for status\n• Contact **support@fluxpay.com** if delayed\n\nWe verify every transaction carefully! ✅',
+    'verification': 'Verification typically takes **24-48 hours**.\n\n• Upload a clear receipt\n• Make sure all details are visible\n• Check **History** for status\n• Contact **support@fluxpay.com** if delayed',
+    'approved': 'Verification typically takes **24-48 hours**.\n\n• Upload a clear receipt\n• Make sure all details are visible\n• Check **History** for status',
+    'fee': 'Flux Pay charges **no hidden fees**!\n\n• Free registration\n• Free deposits\n• Free claims\n• Only upgrade fee (Premium ₦6,350 / Lifetime ₦20,000)\n\nWhat you see is what you get! 💯',
+    'charge': 'Flux Pay charges **no hidden fees**!\n\n• Free registration\n• Free deposits\n• Free claims\n• Only upgrade fee (Premium ₦6,350 / Lifetime ₦20,000)',
+    'cost': 'Flux Pay charges **no hidden fees**!\n\n• Free registration\n• Free deposits\n• Free claims\n• Only upgrade fee (Premium ₦6,350 / Lifetime ₦20,000)',
+    'start': 'Getting started is easy! 🚀\n\n1. **Sign up** on the login page\n2. **Claim** your ₦100,000 welcome bonus\n3. **Earn** ₦5,000 every 24 hours via FluxCore\n4. **Invite** friends for ₦1,000 each\n5. **Invest** in VIP plans for bigger returns\n6. **Upgrade** to withdraw your earnings\n\nStart now! 💰',
+    'begin': 'Getting started is easy! 🚀\n\n1. **Sign up** on the login page\n2. **Claim** your ₦100,000 welcome bonus\n3. **Earn** ₦5,000 every 24 hours via FluxCore\n4. **Invite** friends for ₦1,000 each\n5. **Invest** in VIP plans for bigger returns\n6. **Upgrade** to withdraw your earnings',
+    'new user': 'Welcome! 🎉\n\n1. **Sign up** on the login page\n2. **Claim** your ₦100,000 welcome bonus\n3. **Earn** ₦5,000 every 24 hours via FluxCore\n4. **Invite** friends for ₦1,000 each\n5. **Invest** in VIP plans for bigger returns\n6. **Upgrade** to withdraw your earnings',
+    'register': 'Welcome! 🎉\n\n1. **Sign up** on the login page\n2. **Claim** your ₦100,000 welcome bonus\n3. **Earn** ₦5,000 every 24 hours via FluxCore\n4. **Invite** friends for ₦1,000 each',
+    'signup': 'Welcome! 🎉\n\n1. **Sign up** on the login page\n2. **Claim** your ₦100,000 welcome bonus\n3. **Earn** ₦5,000 every 24 hours via FluxCore\n4. **Invite** friends for ₦1,000 each',
+    'dashboard': 'Your **Dashboard** is your command center! 📊\n\n• View your balance\n• Claim FluxCore earnings\n• Access Products & Investments\n• Withdraw funds\n• View History\n• Manage Profile\n\nEverything you need in one place!',
+    'home': 'Your **Dashboard** is your command center! 📊\n\n• View your balance\n• Claim FluxCore earnings\n• Access Products & Investments\n• Withdraw funds\n• View History\n• Manage Profile',
+    'down': 'If the site is down:\n\n• Check your internet connection\n• Try again in a few minutes\n• Clear browser cache\n• We may be doing maintenance\n• Contact **support@fluxpay.com** if persistent\n\nSorry for any inconvenience! 🙏',
+    'maintenance': 'If the site is down:\n\n• Check your internet connection\n• Try again in a few minutes\n• Clear browser cache\n• We may be doing maintenance\n• Contact **support@fluxpay.com** if persistent',
+    'offline': 'If the site is down:\n\n• Check your internet connection\n• Try again in a few minutes\n• Clear browser cache\n• We may be doing maintenance',
+    'complaint': 'We\'re sorry to hear you\'re not satisfied. 😔\n\n• Please email **support@fluxpay.com** with details\n• Include your registered email and issue description\n• Our team will resolve it within 48 hours\n\nYour feedback helps us improve! 🙏',
+    'complain': 'We\'re sorry to hear you\'re not satisfied. 😔\n\n• Please email **support@fluxpay.com** with details\n• Include your registered email and issue description\n• Our team will resolve it within 48 hours',
+    'bad': 'We\'re sorry to hear you\'re not satisfied. 😔\n\n• Please email **support@fluxpay.com** with details\n• Include your registered email and issue description\n• Our team will resolve it within 48 hours',
+    'test': 'Test received! ✅ The chat is working perfectly. How can I help you today?',
+    'testing': 'Test received! ✅ The chat is working perfectly. How can I help you today?',
+    'what is flux': 'Flux Pay is a Nigerian fintech platform that lets you earn money through:\n\n• **FluxCore** — Daily claims (₦5,000/24hrs)\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — Up to 80% returns\n\nSign up and start earning today! 🚀',
+    'about flux': 'Flux Pay is a Nigerian fintech platform that lets you earn money through:\n\n• **FluxCore** — Daily claims (₦5,000/24hrs)\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — Up to 80% returns',
+    'about': 'Flux Pay is a Nigerian fintech platform that lets you earn money through:\n\n• **FluxCore** — Daily claims (₦5,000/24hrs)\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — Up to 80% returns',
+    'flux pay': 'Flux Pay is a Nigerian fintech platform that lets you earn money through:\n\n• **FluxCore** — Daily claims (₦5,000/24hrs)\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — Up to 80% returns',
+    'nigeria': 'Flux Pay operates in **Nigeria** 🇳🇬\n\n• All amounts in Nigerian Naira (₦)\n• Local bank transfers supported\n• Customer support in English\n\nWe\'re expanding to more countries soon! 🌍',
+    'country': 'Flux Pay operates in **Nigeria** 🇳🇬\n\n• All amounts in Nigerian Naira (₦)\n• Local bank transfers supported\n• Customer support in English',
+    'app': 'Flux Pay is a **web-based platform** — no app download needed!\n\n• Access from any browser\n• Works on mobile, tablet & desktop\n• Save the site to your home screen for app-like experience\n\nJust visit the website and start earning! 📱',
+    'download': 'Flux Pay is a **web-based platform** — no app download needed!\n\n• Access from any browser\n• Works on mobile, tablet & desktop\n• Save the site to your home screen for app-like experience',
+    'mobile app': 'Flux Pay is a **web-based platform** — no app download needed!\n\n• Access from any browser\n• Works on mobile, tablet & desktop\n• Save the site to your home screen for app-like experience',
+    'update': 'To update your profile:\n\n• Go to **Dashboard** → **Profile**\n• Edit your details\n• Save changes\n\nMake sure your info is always current! ✏️',
+    'edit': 'To update your profile:\n\n• Go to **Dashboard** → **Profile**\n• Edit your details\n• Save changes',
+    'change': 'To update your profile:\n\n• Go to **Dashboard** → **Profile**\n• Edit your details\n• Save changes',
+    'delete': 'To delete your account:\n\n• Email **support@fluxpay.com** with your request\n• Include your registered email\n• Our team will process it within 7 days\n\nNote: All balances and history will be lost permanently. ⚠️',
+    'remove': 'To delete your account:\n\n• Email **support@fluxpay.com** with your request\n• Include your registered email\n• Our team will process it within 7 days',
+    'close': 'To delete your account:\n\n• Email **support@fluxpay.com** with your request\n• Include your registered email\n• Our team will process it within 7 days',
+    'how are you': 'I\'m great, thanks for asking! 🤖 Ready to help you earn more with Flux Pay. What can I do for you?',
+    'how are u': 'I\'m great, thanks for asking! 🤖 Ready to help you earn more with Flux Pay. What can I do for you?',
+    'how r u': 'I\'m great, thanks for asking! 🤖 Ready to help you earn more with Flux Pay. What can I do for you?',
+    'what\'s up': 'Not much! Just here to help you make money with Flux Pay. 💰 What\'s on your mind?',
+    'sup': 'Not much! Just here to help you make money with Flux Pay. 💰 What\'s on your mind?',
+    'ok': 'Got it! 👍 Let me know if you need anything else.',
+    'okay': 'Got it! 👍 Let me know if you need anything else.',
+    'yes': 'Great! 👍 What would you like to do next?',
+    'no': 'Alright! Let me know if you change your mind or need help with something else.',
+    'maybe': 'No problem! Take your time. I\'m here whenever you need help. 😊',
+    'sure': 'Awesome! Let\'s get started. What do you need help with?',
+    'nice': 'Thank you! 😊 We\'re glad you\'re enjoying Flux Pay!',
+    'cool': 'Glad you think so! 😎 Ready to earn more?',
+    'awesome': 'Thank you! 🙌 We\'re working hard to make Flux Pay the best earning platform!',
+    'great': 'Thank you! 🙌 We\'re working hard to make Flux Pay the best earning platform!',
+    'love': 'We love you too! ❤️ Thanks for being part of the Flux Pay community!',
+    'hate': 'We\'re sorry to hear that. 😔 Please email **support@fluxpay.com** with your feedback so we can improve.',
+    'stupid': 'We\'re sorry to hear that. 😔 Please email **support@fluxpay.com** with your feedback so we can improve.',
+    'dumb': 'We\'re sorry to hear that. 😔 Please email **support@fluxpay.com** with your feedback so we can improve.',
+    'slow': 'If the site is slow:\n\n• Check your internet connection\n• Close other browser tabs\n• Clear cache and cookies\n• Try a different browser\n\nIf still slow, contact **support@fluxpay.com** 🐌',
+    'fast': 'Glad it\'s fast for you! 🚀 Speed is important to us.',
+    'work': 'Flux Pay **works** for thousands of users! 💪\n\n• Sign up and claim your welcome bonus\n• Earn daily with FluxCore\n• Invite friends for extra income\n• Invest in VIP plans\n\nStart earning today!',
+    'job': 'Flux Pay is a great side hustle! 💼\n\n• No boss, no schedule\n• Earn from your phone\n• Multiple income streams\n• Work from anywhere\n\nSign up and start earning!',
+    'cash': 'You can make money on Flux Pay through:\n\n• **FluxCore** — ₦5,000 every 24 hours\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — up to 80% returns\n\nStart now! 💰',
+    'income': 'You can make money on Flux Pay through:\n\n• **FluxCore** — ₦5,000 every 24 hours\n• **Referrals** — ₦1,000 per friend\n• **VIP Investments** — up to 80% returns',
+    'rich': 'Flux Pay can help you build wealth! 💎\n\n• Consistent daily earnings\n• Compound with VIP investments\n• Scale with referrals\n• Upgrade for full access\n\nThe more you engage, the more you earn!',
+    'wealth': 'Flux Pay can help you build wealth! 💎\n\n• Consistent daily earnings\n• Compound with VIP investments\n• Scale with referrals\n• Upgrade for full access',
+    'rich quick': 'Flux Pay rewards **consistent effort**! 💪\n\n• Daily FluxCore claims\n• Referral bonuses\n• Smart VIP investments\n\nStay active and watch your earnings grow!',
+    'get rich': 'Flux Pay rewards **consistent effort**! 💪\n\n• Daily FluxCore claims\n• Referral bonuses\n• Smart VIP investments\n\nStay active and watch your earnings grow!',
+    'today': 'You can start earning **today**! 🎉\n\n1. Sign up\n2. Claim ₦100,000 welcome bonus\n3. Start earning ₦5,000 every 24 hours\n\nNo waiting — start now!',
+    'now': 'You can start earning **today**! 🎉\n\n1. Sign up\n2. Claim ₦100,000 welcome bonus\n3. Start earning ₦5,000 every 24 hours',
+    'immediately': 'You can start earning **today**! 🎉\n\n1. Sign up\n2. Claim ₦100,000 welcome bonus\n3. Start earning ₦5,000 every 24 hours',
+    'free': 'Flux Pay is **free to join**! 🎉\n\n• No registration fee\n• Free daily claims\n• Free deposits\n• Only pay for upgrade when you want to withdraw\n\nSign up and start earning for free!',
+    'pay': 'Flux Pay is **free to join**! 🎉\n\n• No registration fee\n• Free daily claims\n• Free deposits\n• Only pay for upgrade when you want to withdraw',
+    'price': 'Flux Pay is **free to join**! 🎉\n\n• No registration fee\n• Free daily claims\n• Free deposits\n• Only pay for upgrade when you want to withdraw',
+    'guarantee': 'While we can\'t guarantee specific earnings, thousands of users are successfully earning daily! 💪\n\n• Consistent FluxCore payouts\n• Real referral bonuses\n• Verified VIP returns\n\nJoin and see for yourself!',
+    'promise': 'While we can\'t guarantee specific earnings, thousands of users are successfully earning daily! 💪\n\n• Consistent FluxCore payouts\n• Real referral bonuses\n• Verified VIP returns',
+    'risk': 'All investments carry some risk. ⚠️\n\n• Start with smaller VIP plans\n• Only invest what you can afford\n• Diversify your earnings (FluxCore + referrals + investments)\n\nWe\'re transparent about our processes!',
+    'safe': 'Flux Pay prioritizes security! 🔒\n\n• Encrypted transactions\n• Verified payment processing\n• Secure data storage\n• 24/7 monitoring\n\nYour safety is our top concern!',
+    'secure': 'Flux Pay prioritizes security! 🔒\n\n• Encrypted transactions\n• Verified payment processing\n• Secure data storage\n• 24/7 monitoring',
+    'protect': 'Flux Pay prioritizes security! 🔒\n\n• Encrypted transactions\n• Verified payment processing\n• Secure data storage\n• 24/7 monitoring',
+    'privacy': 'Your privacy matters! 🔐\n\n• We never sell your data\n• Bank details are encrypted\n• Only you can access your account\n• GDPR compliant\n\nYour information is safe with us!',
+    'data': 'Your privacy matters! 🔐\n\n• We never sell your data\n• Bank details are encrypted\n• Only you can access your account\n• GDPR compliant',
+    'terms': 'Read our Terms of Service on the website footer. 📄\n\nKey points:\n• Must be 18+ to use\n• One account per person\n• No fraudulent activity\n• Upgrade required for withdrawals\n\nContact support@fluxpay.com for questions!',
+    'condition': 'Read our Terms of Service on the website footer. 📄\n\nKey points:\n• Must be 18+ to use\n• One account per person\n• No fraudulent activity\n• Upgrade required for withdrawals',
+    'policy': 'Read our Terms of Service on the website footer. 📄\n\nKey points:\n• Must be 18+ to use\n• One account per person\n• No fraudulent activity\n• Upgrade required for withdrawals',
+    'age': 'You must be **18 years or older** to use Flux Pay. 🔞\n\n• Age verification may be required\n• One account per person\n• Parental consent not accepted\n\nPlease use responsibly!',
+    'underage': 'You must be **18 years or older** to use Flux Pay. 🔞\n\n• Age verification may be required\n• One account per person\n• Parental consent not accepted',
+    'child': 'You must be **18 years or older** to use Flux Pay. 🔞\n\n• Age verification may be required\n• One account per person\n• Parental consent not accepted',
+    'multiple': 'Only **one account per person** is allowed. ⚠️\n\n• Multiple accounts will be banned\n• All earnings forfeited\n• IP tracking in place\n\nPlay fair and earn more!',
+    'ban': 'Account bans happen for:\n\n• Multiple accounts\n• Fraudulent activity\n• Fake referrals\n• Chargebacks\n\nFollow the rules and you\'ll never be banned! ✅',
+    'suspended': 'Account bans happen for:\n\n• Multiple accounts\n• Fraudulent activity\n• Fake referrals\n• Chargebacks\n\nFollow the rules and you\'ll never be banned!',
+    'block': 'Account bans happen for:\n\n• Multiple accounts\n• Fraudulent activity\n• Fake referrals\n• Chargebacks',
+    'unblock': 'If your account was blocked:\n\n• Email **support@fluxpay.com** with your details\n• Explain the situation honestly\n• Our team will review within 48 hours\n\nWe believe in second chances! 🙏',
+    'restore': 'If your account was blocked:\n\n• Email **support@fluxpay.com** with your details\n• Explain the situation honestly\n• Our team will review within 48 hours',
+    'reactivate': 'If your account was blocked:\n\n• Email **support@fluxpay.com** with your details\n• Explain the situation honestly\n• Our team will review within 48 hours',
+    'proof': 'We have thousands of successful payout proofs! 🏆\n\n• Check our social media for testimonials\n• Ask in the community chat\n• Look at the leaderboard on the dashboard\n\nReal people, real earnings!',
+    'testimonial': 'We have thousands of successful payout proofs! 🏆\n\n• Check our social media for testimonials\n• Ask in the community chat\n• Look at the leaderboard on the dashboard',
+    'review': 'We have thousands of successful payout proofs! 🏆\n\n• Check our social media for testimonials\n• Ask in the community chat\n• Look at the leaderboard on the dashboard',
+    'social': 'Follow us on social media! 📱\n\n• Instagram: @fluxpay\n• Twitter: @fluxpay\n• Facebook: Flux Pay Nigeria\n\nGet updates, tips, and see payout proofs!',
+    'instagram': 'Follow us on Instagram: **@fluxpay** 📸\n\nGet updates, tips, and see payout proofs!',
+    'twitter': 'Follow us on Twitter: **@fluxpay** 🐦\n\nGet updates, tips, and see payout proofs!',
+    'facebook': 'Follow us on Facebook: **Flux Pay Nigeria** 📘\n\nGet updates, tips, and see payout proofs!',
+    'whatsapp': 'We don\'t have WhatsApp support yet. 📵\n\n• Use this chat (24/7)\n• Email: support@fluxpay.com\n\nWe\'re working on adding more channels!',
+    'telegram': 'We don\'t have Telegram support yet. 📵\n\n• Use this chat (24/7)\n• Email: support@fluxpay.com',
+    'call': 'We currently only support email and chat support. 📵\n\n• Use this chat (24/7)\n• Email: support@fluxpay.com\n\nWe\'re working on adding phone support!',
+    'phone call': 'We currently only support email and chat support. 📵\n\n• Use this chat (24/7)\n• Email: support@fluxpay.com',
+    'voice': 'We currently only support email and chat support. 📵\n\n• Use this chat (24/7)\n• Email: support@fluxpay.com',
+    'video': 'We currently only support email and chat support. 📵\n\n• Use this chat (24/7)\n• Email: support@fluxpay.com',
+    'team': 'Our support team is here 24/7! 👥\n\n• Instant chat responses\n• Email replies within 48 hours\n• FAQ for common questions\n\nWe\'ve got your back!',
+    'staff': 'Our support team is here 24/7! 👥\n\n• Instant chat responses\n• Email replies within 48 hours\n• FAQ for common questions',
+    'admin': 'Our support team is here 24/7! 👥\n\n• Instant chat responses\n• Email replies within 48 hours\n• FAQ for common questions',
+    'manager': 'Our support team is here 24/7! 👥\n\n• Instant chat responses\n• Email replies within 48 hours\n• FAQ for common questions',
+    'owner': 'Flux Pay is owned by a team of Nigerian fintech experts. 👔\n\n• Registered and compliant\n• Transparent operations\n• Community-focused\n\nWe\'re building the future of earning!',
+    'founder': 'Flux Pay is owned by a team of Nigerian fintech experts. 👔\n\n• Registered and compliant\n• Transparent operations\n• Community-focused',
+    'ceo': 'Flux Pay is owned by a team of Nigerian fintech experts. 👔\n\n• Registered and compliant\n• Transparent operations\n• Community-focused',
+    'who': 'Flux Pay is a Nigerian fintech platform helping people earn money online. 🇳🇬\n\n• Daily FluxCore claims\n• Referral bonuses\n• VIP investment plans\n• Real payouts\n\nJoin thousands of earners today!',
+    'what': 'Flux Pay is a Nigerian fintech platform helping people earn money online. 🇳🇬\n\n• Daily FluxCore claims\n• Referral bonuses\n• VIP investment plans\n• Real payouts',
+    'why': 'Flux Pay exists to help Nigerians earn money online! 💪\n\n• No special skills needed\n• Work from your phone\n• Multiple income streams\n• Transparent and fair\n\nEveryone deserves financial freedom!',
+    'purpose': 'Flux Pay exists to help Nigerians earn money online! 💪\n\n• No special skills needed\n• Work from your phone\n• Multiple income streams\n• Transparent and fair',
+    'mission': 'Flux Pay exists to help Nigerians earn money online! 💪\n\n• No special skills needed\n• Work from your phone\n• Multiple income streams\n• Transparent and fair',
+    'vision': 'Our vision is financial freedom for every Nigerian! 🌟\n\n• Accessible earning opportunities\n• Transparent processes\n• Community growth\n• Sustainable wealth building',
+    'goal': 'Our vision is financial freedom for every Nigerian! 🌟\n\n• Accessible earning opportunities\n• Transparent processes\n• Community growth\n• Sustainable wealth building',
+    'aim': 'Our vision is financial freedom for every Nigerian! 🌟\n\n• Accessible earning opportunities\n• Transparent processes\n• Community growth\n• Sustainable wealth building',
+    'future': 'The future of Flux Pay is bright! 🌟\n\n• More earning opportunities\n• New investment products\n• Expanded to more countries\n• Mobile app coming soon\n\nStay tuned for updates!',
+    'next': 'The future of Flux Pay is bright! 🌟\n\n• More earning opportunities\n• New investment products\n• Expanded to more countries\n• Mobile app coming soon',
+    'coming': 'The future of Flux Pay is bright! 🌟\n\n• More earning opportunities\n• New investment products\n• Expanded to more countries\n• Mobile app coming soon',
+    'soon': 'The future of Flux Pay is bright! 🌟\n\n• More earning opportunities\n• New investment products\n• Expanded to more countries\n• Mobile app coming soon',
+    'news': 'The future of Flux Pay is bright! 🌟\n\n• More earning opportunities\n• New investment products\n• Expanded to more countries\n• Mobile app coming soon',
+    'announcement': 'The future of Flux Pay is bright! 🌟\n\n• More earning opportunities\n• New investment products\n• Expanded to more countries\n• Mobile app coming soon',
+    'event': 'The future of Flux Pay is bright! 🌟\n\n• More earning opportunities\n• New investment products\n• Expanded to more countries\n• Mobile app coming soon',
+    'promo': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards\n\nDon\'t miss out!',
+    'promotion': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'bonus': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'discount': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'offer': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'deal': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'gift': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'reward': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'prize': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'contest': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'competition': 'Check the **Dashboard** for current promotions! 🎁\n\n• Seasonal bonuses\n• Referral contests\n• VIP plan discounts\n• Flash rewards',
+    'leaderboard': 'Check the **Leaderboard** on your dashboard! 🏆\n\n• Top earners ranked\n• Monthly prizes for top 10\n• See who\'s earning the most\n• Compete with friends!',
+    'rank': 'Check the **Leaderboard** on your dashboard! 🏆\n\n• Top earners ranked\n• Monthly prizes for top 10\n• See who\'s earning the most',
+    'top': 'Check the **Leaderboard** on your dashboard! 🏆\n\n• Top earners ranked\n• Monthly prizes for top 10\n• See who\'s earning the most',
+    'winner': 'Check the **Leaderboard** on your dashboard! 🏆\n\n• Top earners ranked\n• Monthly prizes for top 10\n• See who\'s earning the most',
+    'certificate': 'We don\'t issue certificates, but your earnings are real! 💰\n\n• Check **History** for all transactions\n• Screenshot your balance\n• Share your success story!',
+    'statement': 'Download your statement from **History** on the dashboard. 📄\n\n• All transactions listed\n• Filter by date or type\n• Export if needed',
+    'tax': 'Flux Pay does not handle tax reporting. 📝\n\n• Keep your own records\n• Consult a tax professional\n• Report earnings as required by law\n\nWe recommend speaking to an accountant!',
+    'government': 'Flux Pay operates in compliance with Nigerian regulations. 🇳🇬\n\n• Registered business\n• Tax compliant\n• Financial regulations followed\n\nWe\'re a legitimate operation!',
+    'license': 'Flux Pay operates in compliance with Nigerian regulations. 🇳🇬\n\n• Registered business\n• Tax compliant\n• Financial regulations followed',
+    'insurance': 'Flux Pay does not offer deposit insurance. ⚠️\n\n• Invest wisely\n• Start with smaller amounts\n• Only invest what you can afford\n• Diversify your earnings\n\nWe\'re transparent about risks!',
+    'loss': 'We\'re sorry for any losses. 😔\n\n• Contact **support@fluxpay.com** immediately\n• Provide transaction details\n• Our team will investigate\n\nWe take every case seriously!',
+    'phishing': 'Beware of phishing! ⚠️\n\n• We never ask for passwords via email\n• Only use the official website\n• Verify URLs before clicking\n• Report suspicious messages\n\nStay safe!',
+    'fraud': 'Beware of fraud! ⚠️\n\n• Only use official Flux Pay website\n• We never ask for passwords\n• No one from Flux Pay will DM you for money\n• Report suspicious activity',
+    'clone': 'Beware of clone sites! ⚠️\n\n• Only use the official Flux Pay URL\n• Check for the padlock icon 🔒\n• Bookmark the real site\n• Report fake sites to us\n\nStay vigilant!',
+    'url': 'Always use the official Flux Pay website! 🔒\n\n• Check for HTTPS\n• Look for the padlock icon\n• Bookmark the real URL\n• Never click suspicious links',
+    'verify': 'You can verify Flux Pay by:\n\n• Checking our social media presence\n• Reading user reviews\n• Asking in community forums\n• Testing with small amounts first\n\nWe welcome scrutiny! 🔍',
+    'evidence': 'You can verify Flux Pay by:\n\n• Checking our social media presence\n• Reading user reviews\n• Asking in community forums\n• Testing with small amounts first',
+    'show me': 'Check out our social media for proof! 📱\n\n• Instagram: @fluxpay\n• Twitter: @fluxpay\n• Facebook: Flux Pay Nigeria\n\nSee real user testimonials and payout proofs!'
+};
+
+function getDefaultResponse() {
+    var defaults = [
+        "I'm not sure I understand. Could you rephrase that? 🤔",
+        "I'm still learning! Try asking about withdrawals, FluxCore, referrals, investments, or deposits.",
+        "For this specific issue, please email support@fluxpay.com and we'll get back to you quickly! 📩",
+        "Hmm, I don't have an answer for that yet. Try our FAQ chips above or contact support@fluxpay.com"
+    ];
+    return defaults[Math.floor(Math.random() * defaults.length)];
+}
+
+function getBotResponse(message) {
+    var lowerMsg = message.toLowerCase().trim();
+    if (botResponses[lowerMsg]) return botResponses[lowerMsg];
+    for (var key in botResponses) {
+        if (lowerMsg.indexOf(key) !== -1) return botResponses[key];
+    }
+    return getDefaultResponse();
+}
+
+
+        // ========== CHAT FUNCTIONS ==========
+        var chatContainer = document.getElementById('chatContainer');
+        var messageInput = document.getElementById('messageInput');
+        var sendBtn = document.getElementById('sendBtn');
+        var isTyping = false;
+
+        function handleKeyPress(event) { if (event.key === 'Enter') sendMessage(); }
+
+        function sendMessage() {
+            var message = messageInput.value.trim();
+            if (!message || isTyping) return;
+            addMessage(message, 'user');
+            messageInput.value = '';
+            showTypingIndicator();
+            var typingDuration = 1500 + Math.random() * 1000 + (message.length * 30);
+            setTimeout(function() {
+                hideTypingIndicator();
+                var response = getBotResponse(message);
+                addMessage(response, 'bot');
+                playMessageSound();
+                saveChat();
+            }, typingDuration);
+        }
+
+        function sendQuickReply(text) { messageInput.value = text; sendMessage(); }
+        function sendFAQ(question) { messageInput.value = question; sendMessage(); }
+
+        function addMessage(text, sender) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + sender;
+            var avatar = sender === 'bot' ? '🤖' : '👤';
+            var time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            var formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            var status = sender === 'user' ? '<div class="message-status">✓ Delivered</div>' : '';
+            var reactions = sender === 'bot' ? '<div class="message-reactions"><button class="reaction-btn" onclick="addReaction(this,\'👍\')">👍</button><button class="reaction-btn" onclick="addReaction(this,\'❤️\')">❤️</button><button class="reaction-btn" onclick="addReaction(this,\'😂\')">😂</button><button class="reaction-btn" onclick="addReaction(this,\'🔥\')">🔥</button></div>' : '';
+            var copyBtn = '<button class="message-copy" onclick="copyMessage(this)" title="Copy message"><i class="fas fa-copy"></i></button>';
+            messageDiv.innerHTML = '<div class="message-avatar">' + avatar + '</div><div><div class="message-bubble">' + formattedText + '</div>' + copyBtn + '<div class="message-time">' + time + '</div>' + status + reactions + '</div>';
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addImageMessage(imageSrc, sender) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + sender;
+            var avatar = sender === 'bot' ? '🤖' : '👤';
+            var time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            var status = sender === 'user' ? '<div class="message-status">✓ Delivered</div>' : '';
+            messageDiv.innerHTML = '<div class="message-avatar">' + avatar + '</div><div><img src="' + imageSrc + '" class="chat-image" onclick="openImagePreview(this.src)"><div class="message-time">' + time + '</div>' + status + '</div>';
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addReaction(btn, emoji) {
+            btn.classList.toggle('active');
+            btn.textContent = btn.classList.contains('active') ? emoji : emoji;
+            showToast('Reaction added!');
+        }
+
+        function copyMessage(btn) {
+            var bubble = btn.parentElement.querySelector('.message-bubble');
+            var text = bubble.innerText;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(function() { showToast('Message copied!'); });
+            } else {
+                var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t);
+                t.select(); document.execCommand('copy'); document.body.removeChild(t);
+                showToast('Message copied!');
+            }
+        }
+
+        function showTypingIndicator() {
+            isTyping = true; sendBtn.disabled = true;
+            var typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator'; typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = '<div class="message-avatar">🤖</div><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+            chatContainer.appendChild(typingDiv); scrollToBottom();
+            playTypingSound();
+        }
+
+        function hideTypingIndicator() {
+            isTyping = false; sendBtn.disabled = false;
+            var indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function scrollToBottom() { chatContainer.scrollTop = chatContainer.scrollHeight; }
+
+        function handleFileUpload(event) {
+            var file = event.target.files[0]; if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                addImageMessage(e.target.result, 'user');
+                showTypingIndicator();
+                setTimeout(function() {
+                    hideTypingIndicator();
+                    addMessage('I received your file! 📎\n\nOur support team will review it and get back to you shortly.', 'bot');
+                    playMessageSound();
+                    saveChat();
+                }, 1500);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ========== IMAGE PREVIEW ==========
+        function openImagePreview(src) {
+            document.getElementById('previewImage').src = src;
+            document.getElementById('imagePreviewModal').classList.add('visible');
+        }
+        function closeImagePreview() {
+            document.getElementById('imagePreviewModal').classList.remove('visible');
+        }
+
+        // ========== SEARCH ==========
+        function openSearch() {
+            document.getElementById('searchOverlay').classList.add('visible');
+            document.getElementById('searchInput').focus();
+        }
+        function closeSearch() {
+            document.getElementById('searchOverlay').classList.remove('visible');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+        function performSearch() {
+            var query = document.getElementById('searchInput').value.toLowerCase().trim();
+            var resultsDiv = document.getElementById('searchResults');
+            if (!query) { resultsDiv.innerHTML = ''; return; }
+            var messages = JSON.parse(localStorage.getItem('fluxpay_chat_history') || '[]');
+            var matches = messages.filter(function(m) { return m.text.toLowerCase().indexOf(query) !== -1; });
+            if (matches.length === 0) { resultsDiv.innerHTML = '<div class="search-no-results">No messages found</div>'; return; }
+            var html = '';
+            for (var i = 0; i < matches.length; i++) {
+                var m = matches[i];
+                html += '<div class="search-result-item" onclick="jumpToMessage(' + i + ')">';
+                html += '<div class="sr-sender">' + (m.sender === 'bot' ? '🤖 Bot' : '👤 You') + '</div>';
+                html += '<div class="sr-text">' + m.text.substring(0, 100) + (m.text.length > 100 ? '...' : '') + '</div>';
+                html += '<div class="sr-time">' + m.time + '</div></div>';
+            }
+            resultsDiv.innerHTML = html;
+        }
+        function jumpToMessage(index) { closeSearch(); scrollToBottom(); }
+
+        // ========== THEME TOGGLE ==========
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            var icon = document.getElementById('themeIcon');
+            icon.className = document.body.classList.contains('light-mode') ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('fluxpay_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+        function loadTheme() {
+            var saved = localStorage.getItem('fluxpay_theme');
+            if (saved === 'light') { document.body.classList.add('light-mode'); document.getElementById('themeIcon').className = 'fas fa-sun'; }
+        }
+
+        // ========== TOAST ==========
+        function showToast(message) {
+            var toast = document.getElementById('toast');
+            document.getElementById('toastText').textContent = message;
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 2000);
+        }
+
+        // ========== SAVE & LOAD CHAT ==========
+        function saveChat() {
+            var messages = [];
+            document.querySelectorAll('.message').forEach(function(msg) {
+                var isUser = msg.classList.contains('user');
+                var bubble = msg.querySelector('.message-bubble');
+                var text = bubble ? bubble.innerText : '';
+                var time = msg.querySelector('.message-time');
+                var timeStr = time ? time.innerText : '';
+                if (text && !text.includes('Hi there')) messages.push({ sender: isUser ? 'user' : 'bot', text: text, time: timeStr });
+            });
+            localStorage.setItem('fluxpay_chat_history', JSON.stringify(messages));
+        }
+
+        function loadChat() {
+            var saved = localStorage.getItem('fluxpay_chat_history');
+            if (!saved) return;
+            try {
+                var messages = JSON.parse(saved);
+                document.querySelectorAll('.message:not(#welcomeMessage)').forEach(function(m) { m.remove(); });
+                document.querySelectorAll('.typing-indicator').forEach(function(t) { t.remove(); });
+                messages.forEach(function(msg) {
+                    if (msg.text.includes('Hi there')) return;
+                    addMessage(msg.text, msg.sender);
+                });
+            } catch(e) { console.error('Failed to load chat:', e); }
+        }
+
+        function openConfirmModal() { document.getElementById('confirmModal').classList.add('visible'); }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('visible'); }
+
+        function confirmClearChat() {
+            closeConfirmModal();
+            localStorage.removeItem('fluxpay_chat_history');
+            location.reload();
+        }
+
+        // ========== INIT ==========
+        loadTheme();
+        loadChat();
+        messageInput.focus();
+        console.log('🤖 Flux Support Bot — Enhanced Edition Ready');
+        console.log('✅ 100+ responses loaded');
+        console.log('✅ Audio, search, reactions, copy, theme toggle active');
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

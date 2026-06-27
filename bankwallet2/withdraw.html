@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Withdraw</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fff;
+            color: #1a1a2e;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .main-content { padding: 40px 20px 24px; }
+
+        .page-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 24px;
+        }
+
+        .bank-icon {
+            width: 80px; height: 80px;
+            background: #16a34a;
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 32px;
+        }
+        .bank-icon svg { width: 40px; height: 40px; fill: white; }
+
+        .form-group { margin-bottom: 16px; }
+
+        .input-field {
+            width: 100%; padding: 16px;
+            border: 1px solid #16a34a;
+            border-radius: 12px;
+            font-size: 16px; color: #1a1a2e;
+            background: #fff; outline: none;
+        }
+        .input-field::placeholder { color: #666; }
+
+        .char-count {
+            text-align: right; font-size: 12px;
+            color: #999; margin-top: 4px; padding-right: 4px;
+        }
+
+        .select-bank {
+            width: 100%; padding: 16px;
+            border: 1px solid #16a34a;
+            border-radius: 12px; font-size: 16px;
+            color: #666; background: #fff;
+            display: flex; align-items: center;
+            justify-content: space-between; cursor: pointer;
+        }
+        .select-bank .arrow { font-size: 12px; color: #666; }
+        .select-bank.selected { color: #1a1a2e; }
+
+        .fixed-amount {
+            width: 100%; padding: 16px;
+            background: #1a1a2e;
+            border-radius: 12px;
+            font-size: 20px; font-weight: 600;
+            color: #fff; margin-bottom: 8px;
+        }
+        .fixed-label {
+            font-size: 12px; color: #999;
+            margin-bottom: 24px; padding-left: 4px;
+        }
+
+        .withdraw-btn {
+            width: 100%; padding: 18px;
+            background: #16a34a;
+            color: #1a1a2e;
+            border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 700;
+            text-transform: uppercase; cursor: pointer;
+            margin-top: 8px;
+        }
+        .withdraw-btn:active { opacity: 0.9; }
+
+        /* Bank Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: flex-end;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            width: 100%; background: #fff;
+            border-radius: 20px 20px 0 0;
+            max-height: 70vh; overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .modal-header h3 { font-size: 16px; font-weight: 500; color: #999; }
+        .close-modal {
+            width: 24px; height: 24px;
+            border: 2px solid #ccc; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .bank-list { overflow-y: auto; max-height: calc(70vh - 60px); }
+        .bank-item {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+        .bank-item span { font-size: 16px; color: #1a1a2e; }
+        .radio-circle {
+            width: 22px; height: 22px;
+            border: 2px solid #666; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .radio-circle.active::after {
+            content: ''; width: 12px; height: 12px;
+            background: #16a34a; border-radius: 50%;
+        }
+
+        /* Confirm Modal */
+        .confirm-modal .modal-content {
+            border-radius: 16px; margin: 20px;
+            max-height: none; padding: 32px 24px;
+            text-align: center;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .confirm-icon {
+            width: 80px; height: 80px;
+            border: 3px solid #7eb8c7; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .confirm-icon span { font-size: 40px; color: #7eb8c7; }
+        .confirm-title { font-size: 28px; font-weight: 700; color: #555; margin-bottom: 12px; }
+        .confirm-text { font-size: 16px; color: #666; margin-bottom: 24px; line-height: 1.5; }
+        .confirm-amount { font-weight: 700; color: #1a1a2e; }
+        .confirm-buttons { display: flex; gap: 12px; }
+        .btn-yes {
+            flex: 1; padding: 16px;
+            background: #22c55e; color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .btn-cancel {
+            flex: 1; padding: 16px;
+            background: #dc2626; color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+
+        /* Processing */
+        .processing-modal .modal-content {
+            border-radius: 16px; margin: 20px;
+            max-height: none; padding: 40px 24px;
+            text-align: center;
+        }
+        .processing-title { font-size: 28px; font-weight: 700; color: #555; margin-bottom: 12px; }
+        .processing-text { font-size: 16px; color: #666; margin-bottom: 24px; line-height: 1.5; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #3b82f6;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Code Page */
+        .code-page { display: none; padding: 40px 20px 24px; }
+        .code-page.active { display: block; }
+        .code-title {
+            text-align: center; font-size: 20px;
+            font-weight: 700; color: #1a1a2e;
+            margin-bottom: 24px;
+        }
+        .code-display {
+            width: 100%; height: 56px;
+            border: 1px solid #16a34a;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 700;
+            letter-spacing: 4px; color: #1a1a2e;
+            background: #fff;
+            outline: none;
+            text-align: center;
+            padding: 0 12px;
+        }
+        .code-display:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+        .keypad {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; max-width: 320px; margin: 0 auto;
+        }
+        .key {
+            aspect-ratio: 1; background: #16a34a;
+            border: none; border-radius: 12px;
+            color: #fff; font-size: 22px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; -webkit-appearance: none;
+        }
+        .key:active { opacity: 0.8; }
+        .key.special { font-size: 20px; }
+        .buy-code-btn {
+            width: 100%; max-width: 320px;
+            margin: 20px auto 0; padding: 16px;
+            background: #16a34a; color: #fff;
+            border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600;
+            display: block; cursor: pointer;
+        }
+        .buy-code-btn:active { opacity: 0.9; }
+
+        /* Code Verification Loading */
+        .code-loading-modal .modal-content {
+            border-radius: 16px; margin: 20px;
+            max-height: none; padding: 40px 24px;
+            text-align: center;
+        }
+
+        /* Success Page */
+        .success-page {
+            display: none;
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+        .success-page.active { display: block; }
+        .success-check {
+            width: 80px; height: 80px;
+            background: #22c55e; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 28px;
+        }
+        .success-check span { font-size: 40px; color: #fff; }
+        .success-title {
+            font-size: 32px; font-weight: 700;
+            color: #16a34a; margin-bottom: 16px;
+        }
+        .success-sub {
+            font-size: 16px; color: #333;
+            margin-bottom: 8px;
+        }
+        .success-amount {
+            font-size: 48px; font-weight: 700;
+            color: #16a34a; margin-bottom: 40px;
+        }
+        .btn-return-dash {
+            width: 100%; max-width: 320px;
+            padding: 18px; background: #16a34a;
+            color: #fff; border: none;
+            border-radius: 14px; font-size: 16px;
+            font-weight: 700; cursor: pointer;
+            margin: 0 auto; display: block;
+        }
+        .btn-return-dash:active { opacity: 0.9; }
+
+        /* Error modal */
+        .error-modal .modal-content {
+            border-radius: 16px; margin: 20px;
+            max-height: none; padding: 32px 24px;
+            text-align: center;
+        }
+        .error-icon {
+            width: 60px; height: 60px;
+            background: #dc2626; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .error-icon span { font-size: 28px; color: #fff; }
+        .error-title { font-size: 22px; font-weight: 700; color: #dc2626; margin-bottom: 8px; }
+        .error-text { font-size: 14px; color: #666; margin-bottom: 20px; }
+        .btn-ok {
+            padding: 12px 32px; background: #16a34a;
+            color: #fff; border: none;
+            border-radius: 10px; font-size: 15px;
+            font-weight: 600; cursor: pointer;
+        }
+
+        .form-page.hidden { display: none; }
+        .toast {
+            position: fixed; bottom: 80px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #22c55e; color: #fff;
+            padding: 12px 24px; border-radius: 10px;
+            font-size: 14px; font-weight: 600;
+            opacity: 0; transition: all 0.3s ease;
+            z-index: 2000;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Form Page -->
+    <div class="form-page" id="formPage">
+        <div class="main-content">
+            <h2 class="page-title">Input your withdraw details</h2>
+            <div class="bank-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12h-3v7h3v-7zM12 4L2 9h19L12 4z"/></svg>
+            </div>
+            <div class="form-group">
+                <input type="text" class="input-field" id="accountNumber" placeholder="Enter account number" maxlength="10" oninput="updateCharCount(this)">
+                <div class="char-count" id="charCount">0/10</div>
+            </div>
+            <div class="form-group">
+                <input type="text" class="input-field" id="accountName" placeholder="Enter account name">
+            </div>
+            <div class="form-group">
+                <div class="select-bank" id="selectBankBtn" onclick="openBankModal()">
+                    <span id="bankLabel">Select Bank</span>
+                    <span class="arrow">&#9662;</span>
+                </div>
+            </div>
+            <div class="fixed-amount" id="balanceDisplay">86,000</div>
+            <div class="fixed-label">Fixed withdrawal amount</div>
+            <button class="withdraw-btn" onclick="showConfirm()">WITHDRAW</button>
+        </div>
+    </div>
+
+    <!-- Code Page -->
+    <div class="code-page" id="codePage">
+        <div class="main-content">
+            <div class="bank-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12h-3v7h3v-7zM12 4L2 9h19L12 4z"/></svg>
+            </div>
+            <h2 class="code-title">Enter Your WITHDRAW CODE</h2>
+            <input type="text" class="code-display" id="codeDisplay" maxlength="11" placeholder="Enter or paste code" onpaste="handlePaste(event)" onclick="focusCodeInput()">
+            <div class="keypad">
+                <button class="key" onclick="addDigit('1')">1</button>
+                <button class="key" onclick="addDigit('2')">2</button>
+                <button class="key" onclick="addDigit('3')">3</button>
+                <button class="key" onclick="addDigit('4')">4</button>
+                <button class="key" onclick="addDigit('5')">5</button>
+                <button class="key" onclick="addDigit('6')">6</button>
+                <button class="key" onclick="addDigit('7')">7</button>
+                <button class="key" onclick="addDigit('8')">8</button>
+                <button class="key" onclick="addDigit('9')">9</button>
+                <button class="key special" onclick="clearDigit()">&#10005;</button>
+                <button class="key" onclick="addDigit('0')">0</button>
+                <button class="key special" onclick="submitCode()">&#10003;</button>
+            </div>
+            <button class="buy-code-btn" onclick="goToBuyCode()">Buy Code</button>
+        </div>
+    </div>
+
+    <!-- Success Page -->
+    <div class="success-page" id="successPage">
+        <div class="success-check"><span>&#10003;</span></div>
+        <h2 class="success-title">Withdrawal<br>Successful</h2>
+        <p class="success-sub">You have successfully withdrawn:</p>
+        <div class="success-amount">&#8358;86,000</div>
+        <button class="btn-return-dash" onclick="returnToDashboard()">Return to Dashboard</button>
+    </div>
+
+    <!-- Bank Modal -->
+    <div class="modal-overlay" id="bankModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Bank</h3>
+                <div class="close-modal" onclick="closeBankModal()"></div>
+            </div>
+            <div class="bank-list" id="bankList"></div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay confirm-modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="confirm-icon"><span>?</span></div>
+            <h2 class="confirm-title">Confirm Withdrawal</h2>
+            <p class="confirm-text">Are you sure you want to withdraw<br><span class="confirm-amount">&#8358;86,000?</span></p>
+            <div class="confirm-buttons">
+                <button class="btn-yes" onclick="processWithdrawal()">Yes, Withdraw</button>
+                <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Modal -->
+    <div class="modal-overlay processing-modal" id="processingModal">
+        <div class="modal-content">
+            <h2 class="processing-title">Processing...</h2>
+            <p class="processing-text">Please wait while we process your<br>withdrawal.</p>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Code Verification Loading -->
+    <div class="modal-overlay code-loading-modal" id="codeLoadingModal">
+        <div class="modal-content">
+            <h2 class="processing-title">Processing...</h2>
+            <p class="processing-text" id="codeLoadingText">Getting your withdrawal ready...</p>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal-overlay error-modal" id="errorModal">
+        <div class="modal-content">
+            <div class="error-icon"><span>&#10005;</span></div>
+            <h2 class="error-title">Invalid Code</h2>
+            <p class="error-text">The withdrawal code you entered is incorrect or has expired. Please purchase a valid code.</p>
+            <button class="btn-ok" onclick="closeError()">OK</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Copied!</div>
+
+    <script>
+        // Load balance from dashboard localStorage
+        let balance = parseFloat(localStorage.getItem('bankwallet_balance')) || 86000;
+        document.getElementById('balanceDisplay').textContent = balance.toLocaleString();
+
+        // Top 30 Nigerian Banks
+        const banks = [
+            "Access Bank", "Citibank Nigeria", "Ecobank Nigeria", "Fidelity Bank",
+            "First Bank of Nigeria", "First City Monument Bank", "Guaranty Trust Bank",
+            "Heritage Bank", "Keystone Bank", "Polaris Bank", "Stanbic IBTC Bank",
+            "Standard Chartered Bank", "Sterling Bank", "Union Bank",
+            "United Bank for Africa", "Unity Bank", "Wema Bank", "Zenith Bank",
+            "Jaiz Bank", "SunTrust Bank", "Providus Bank", "Titan Trust Bank",
+            "Globus Bank", "Premium Trust Bank", "Parallex Bank", "Signature Bank",
+            "Optimus Bank", "Carbon Finance", "Kuda Bank", "Moniepoint","OPAY","PALMPAY"
+        ];
+
+        let selectedBank = '';
+        let codeValue = '';
+
+        const loadingMessages = [
+            "Getting your withdrawal ready...",
+            "Verifying your code...",
+            "Processing transaction...",
+            "Confirming details...",
+            "Finalizing withdrawal...",
+            "Please wait..."
+        ];
+
+        function populateBanks() {
+            const list = document.getElementById('bankList');
+            list.innerHTML = banks.map(bank => `
+                <div class="bank-item" onclick="selectBank('${bank}')">
+                    <span>${bank}</span>
+                    <div class="radio-circle ${selectedBank === bank ? 'active' : ''}"></div>
+                </div>
+            `).join('');
+        }
+
+        function openBankModal() {
+            populateBanks();
+            document.getElementById('bankModal').classList.add('active');
+        }
+
+        function closeBankModal() {
+            document.getElementById('bankModal').classList.remove('active');
+        }
+
+        function selectBank(bank) {
+            selectedBank = bank;
+            document.getElementById('bankLabel').textContent = bank;
+            document.getElementById('bankLabel').style.color = '#1a1a2e';
+            document.getElementById('selectBankBtn').classList.add('selected');
+            closeBankModal();
+        }
+
+        function updateCharCount(input) {
+            document.getElementById('charCount').textContent = input.value.length + '/10';
+        }
+
+        function showConfirm() {
+            const accNum = document.getElementById('accountNumber').value;
+            const accName = document.getElementById('accountName').value;
+            if (!accNum || !accName || !selectedBank) {
+                alert('Please fill all fields and select a bank');
+                return;
+            }
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function processWithdrawal() {
+            closeConfirm();
+            document.getElementById('processingModal').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('processingModal').classList.remove('active');
+                document.getElementById('formPage').classList.add('hidden');
+                document.getElementById('codePage').classList.add('active');
+            }, 5000);
+        }
+
+        // ===== KEYPAD + PASTE FUNCTIONS =====
+        function addDigit(digit) {
+            if (codeValue.length < 11) {
+                codeValue += digit;
+                updateCodeDisplay();
+            }
+        }
+
+        function clearDigit() {
+            codeValue = codeValue.slice(0, -1);
+            updateCodeDisplay();
+        }
+
+        function updateCodeDisplay() {
+            document.getElementById('codeDisplay').value = codeValue;
+        }
+
+        function focusCodeInput() {
+            // Allow manual typing on the input
+            document.getElementById('codeDisplay').focus();
+        }
+
+        // Handle paste event
+        function handlePaste(e) {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text');
+            // Only keep digits, max 11
+            const digits = pasted.replace(/\D/g, '').slice(0, 11);
+            codeValue = digits;
+            updateCodeDisplay();
+        }
+
+        // Also allow manual typing in the input
+        document.getElementById('codeDisplay').addEventListener('input', function(e) {
+            // Only allow digits
+            let val = e.target.value.replace(/\D/g, '').slice(0, 11);
+            codeValue = val;
+            e.target.value = val;
+        });
+
+        // Handle keyboard input for the input field
+        document.getElementById('codeDisplay').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                submitCode();
+            }
+        });
+
+        function submitCode() {
+            if (codeValue.length !== 11) {
+                alert('Please enter the full 11-digit code');
+                return;
+            }
+
+            // Check against stored code from buy_code.html
+            const storedCode = localStorage.getItem('withdrawalCode');
+
+            if (storedCode && codeValue === storedCode) {
+                // Valid code - show loading then success
+                showCodeLoading(() => {
+                    // Debit balance to 0
+                    balance = 0;
+                    localStorage.setItem('bankwallet_balance', balance.toString());
+                    // Remove used code
+                    localStorage.removeItem('withdrawalCode');
+                    // Save transaction to history
+                    var transactions = JSON.parse(localStorage.getItem('bankwallet_transactions') || '[]');
+                    transactions.push({
+                        type: 'withdrawal',
+                        title: 'Withdrawal',
+                        amount: '₦86,000',
+                        time: new Date().toISOString()
+                    });
+                    localStorage.setItem('bankwallet_transactions', JSON.stringify(transactions));
+                    // Show success
+                    document.getElementById('codePage').classList.remove('active');
+                    document.getElementById('successPage').classList.add('active');
+                });
+            } else {
+                // Invalid code
+                document.getElementById('errorModal').classList.add('active');
+            }
+        }
+
+        function showCodeLoading(callback) {
+            const modal = document.getElementById('codeLoadingModal');
+            const textEl = document.getElementById('codeLoadingText');
+            modal.classList.add('active');
+
+            let idx = 0;
+            const interval = setInterval(() => {
+                textEl.textContent = loadingMessages[idx % loadingMessages.length];
+                idx++;
+            }, 1000);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                modal.classList.remove('active');
+                if (callback) callback();
+            }, 6000);
+        }
+
+        function closeError() {
+            document.getElementById('errorModal').classList.remove('active');
+            codeValue = '';
+            document.getElementById('codeDisplay').value = '';
+        }
+
+        function goToBuyCode() {
+            window.location.href = 'buy_code.html';
+        }
+
+        function returnToDashboard() {
+            // Save debited balance before going back
+            localStorage.setItem('bankwallet_balance', '0');
+            window.location.href = 'dashboard.html';
+        }
+
+        document.getElementById('bankModal').addEventListener('click', function(e) {
+            if (e.target === this) closeBankModal();
+        });
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) closeConfirm();
+        });
+        document.getElementById('errorModal').addEventListener('click', function(e) {
+            if (e.target === this) closeError();
+        });
+    </script>
+</body>
+</html>

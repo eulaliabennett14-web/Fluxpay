@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Withdraw - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --accent-green: #00d4aa;
+            --accent-green-dark: #00a884; --accent-orange: #ff8c00; --accent-gold: #ffd700;
+            --accent-red: #ff4757; --accent-blue: #5b6ef5; --text-white: #ffffff;
+            --text-muted: rgba(255,255,255,0.55); --text-dim: rgba(255,255,255,0.35);
+            --border-subtle: rgba(255,255,255,0.04); --border-light: rgba(255,255,255,0.07);
+            --border-medium: rgba(255,255,255,0.12);
+            --transition-smooth: all 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary); color: var(--text-white);
+            overflow-x: hidden; min-height: 100vh; padding-top: 70px; padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(255,140,0,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.5;
+        }
+
+        .page-header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+            background: rgba(6,13,26,0.88); backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 20px; display: flex; align-items: center; gap: 16px;
+        }
+        .back-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-white); text-decoration: none; transition: var(--transition-smooth);
+            cursor: pointer; flex-shrink: 0;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--border-medium); transform: translateY(-1px); }
+        .back-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .page-header h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+
+        .main-content { padding: 16px 16px 0; max-width: 520px; margin: 0 auto; position: relative; z-index: 1; }
+
+        .glass-card {
+            background: rgba(255,255,255,0.025); backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px; transition: var(--transition-smooth);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15); padding: 24px;
+        }
+
+        .step { display: block; animation: stepIn 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .step.hidden { display: none; }
+        @keyframes stepIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ===== BALANCE CARD ===== */
+        .balance-card {
+            background: linear-gradient(145deg, rgba(0,212,170,0.1), rgba(6,13,26,0.6));
+            border: 1px solid rgba(0,212,170,0.2); border-radius: 20px;
+            padding: 24px 20px; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; position: relative; overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .balance-card::before {
+            content: ''; position: absolute; top: -30%; right: -15%; width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(0,212,170,0.1) 0%, transparent 70%);
+            pointer-events: none; border-radius: 50%;
+        }
+        .balance-info { position: relative; z-index: 1; }
+        .balance-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 4px; }
+        .balance-amount { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; position: relative; z-index: 1; }
+        .balance-icon-circle {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: rgba(0,212,170,0.15); border: 2px solid rgba(0,212,170,0.25);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(0,212,170,0.15); position: relative; z-index: 1;
+        }
+        .balance-icon-circle svg { width: 24px; height: 24px; fill: var(--accent-green); }
+
+        /* ===== STATUS CARD ===== */
+        .status-card {
+            background: rgba(255,255,255,0.025); backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px; padding: 18px 20px; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        }
+        .status-icon-wrap {
+            width: 42px; height: 42px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .status-icon-wrap.orange { background: rgba(255,140,0,0.12); }
+        .status-icon-wrap.green { background: rgba(0,212,170,0.12); }
+        .status-icon-wrap svg { width: 20px; height: 20px; }
+        .status-icon-wrap.orange svg { stroke: var(--accent-orange); fill: none; stroke-width: 2; }
+        .status-icon-wrap.green svg { stroke: var(--accent-green); fill: none; stroke-width: 2; }
+        .status-info { flex: 1; }
+        .status-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 2px; }
+        .status-value { font-size: 14px; font-weight: 700; }
+        .status-value.orange { color: var(--accent-orange); }
+        .status-value.green { color: var(--accent-green); }
+
+        /* ===== FORM ===== */
+        .form-title {
+            font-size: 10px; color: var(--text-dim); text-transform: uppercase;
+            letter-spacing: 2px; font-weight: 600; margin-bottom: 20px;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 500; }
+        .form-input, .bank-select {
+            width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+            color: var(--text-white); font-size: 14px; font-family: 'Inter', sans-serif;
+            outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input:focus, .bank-select:focus {
+            border-color: rgba(0,212,170,0.3);
+            box-shadow: 0 0 20px rgba(0,212,170,0.08);
+        }
+        .form-input::placeholder { color: var(--text-dim); font-size: 13px; }
+        .bank-select {
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 16px center; padding-right: 48px;
+        }
+        .bank-select option { background: var(--bg-secondary); color: var(--text-white); }
+
+        .btn-submit {
+            width: 100%; padding: 16px; border: none; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-blue), #4b5ed7);
+            color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: var(--transition-smooth); font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 20px rgba(91,110,245,0.3);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 35px rgba(91,110,245,0.5); }
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ===== PROCESSING SCREEN ===== */
+        .processing-screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
+        .processing-screen.active { display: flex; }
+        .processing-spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(91,110,245,0.2);
+            border-top: 3px solid var(--accent-blue); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 28px;
+            box-shadow: 0 0 20px rgba(91,110,245,0.2);
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .processing-title {
+            font-size: 18px; font-weight: 700; color: var(--text-white);
+            margin-bottom: 10px; letter-spacing: -0.3px; transition: opacity 0.3s ease;
+        }
+        .processing-sub {
+            font-size: 13px; color: var(--text-muted);
+            transition: opacity 0.3s ease;
+        }
+
+        /* ===== UPGRADE ERROR PAGE ===== */
+        .error-page { display: none; animation: stepIn 0.4s ease; }
+        .error-page.active { display: block; }
+        .error-card { text-align: center; }
+        .error-icon-wrap {
+            width: 76px; height: 76px; border-radius: 50%;
+            background: rgba(255,140,0,0.1); border: 2px solid rgba(255,140,0,0.2);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px; box-shadow: 0 0 30px rgba(255,140,0,0.15);
+        }
+        .error-icon-wrap svg { width: 36px; height: 36px; fill: none; stroke: var(--accent-orange); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+        .error-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.3px; }
+        .error-text { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
+        .error-actions { display: flex; gap: 12px; }
+        .btn-gray {
+            flex: 1; padding: 16px; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
+            background: rgba(255,255,255,0.03); color: var(--text-white); font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: var(--transition-smooth); font-family: 'Inter', sans-serif;
+        }
+        .btn-gray:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+        .btn-orange {
+            flex: 1; padding: 16px; border: none; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-orange), #ff6b00);
+            color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: var(--transition-smooth); font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 20px rgba(255,140,0,0.3);
+        }
+        .btn-orange:hover { transform: translateY(-2px); box-shadow: 0 8px 35px rgba(255,140,0,0.5); }
+
+        /* ===== RECEIPT ===== */
+        .receipt-page { display: none; animation: stepIn 0.5s ease; }
+        .receipt-page.active { display: block; }
+        .receipt-card { text-align: center; }
+        .receipt-icon-wrap {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: rgba(0,212,170,0.1); border: 2px solid rgba(0,212,170,0.2);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; box-shadow: 0 0 30px rgba(0,212,170,0.15);
+            animation: checkPop 0.5s cubic-bezier(0.68,-0.55,0.265,1.55);
+        }
+        .receipt-icon-wrap svg { width: 34px; height: 34px; fill: none; stroke: var(--accent-green); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        @keyframes checkPop { 0% { transform: scale(0) rotate(-45deg); } 100% { transform: scale(1) rotate(0); } }
+        .receipt-amount { font-size: 32px; font-weight: 800; color: var(--accent-red); letter-spacing: -1px; margin-bottom: 4px; }
+        .receipt-label { font-size: 13px; color: var(--text-dim); margin-bottom: 28px; }
+
+        .receipt-details {
+            background: rgba(15,22,42,0.9); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px; padding: 24px; text-align: left;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-bottom: 24px;
+        }
+        .receipt-details .header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 16px; margin-bottom: 16px; }
+        .receipt-details .header .logo-sm {
+            width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,212,170,0.25);
+        }
+        .receipt-details .header .logo-sm svg { width: 18px; height: 18px; fill: #060d1a; }
+        .receipt-details .header span { font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
+
+        .rd-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 13px; }
+        .rd-row .rd-label { color: var(--text-dim); font-weight: 500; }
+        .rd-row .rd-val { font-weight: 600; text-align: right; color: var(--text-white); }
+        .rd-row .rd-val.green { color: var(--accent-green); font-weight: 700; }
+        .rd-row .rd-val.red { color: var(--accent-red); font-weight: 700; }
+        .rd-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 10px 0; }
+
+        .receipt-footer { text-align: center; color: var(--text-dim); font-size: 11px; line-height: 1.7; margin-bottom: 24px; }
+        .receipt-footer .brand { font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; font-size: 12px; }
+
+        .btn-home {
+            display: block; padding: 16px; background: linear-gradient(135deg, var(--accent-blue), #4b5ed7);
+            color: #fff; border-radius: 14px; font-weight: 700; text-decoration: none;
+            text-align: center; font-size: 15px; transition: var(--transition-smooth);
+            box-shadow: 0 4px 20px rgba(91,110,245,0.3);
+        }
+        .btn-home:hover { transform: translateY(-2px); box-shadow: 0 8px 35px rgba(91,110,245,0.5); }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(15,22,42,0.96); border: 1px solid var(--border-medium);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-radius: 14px; padding: 14px 28px;
+            font-size: 13px; font-weight: 500; color: var(--text-white);
+            z-index: 3000; opacity: 0; visibility: hidden;
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5); white-space: nowrap;
+        }
+        .toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: rgba(0,212,170,0.4); }
+        .toast.error { border-color: rgba(255,71,87,0.4); color: var(--accent-red); }
+
+        /* Auth check overlay */
+        .auth-check-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .auth-check-overlay.hidden { display: none; }
+        .auth-check-spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(0,212,170,0.15);
+            border-top-color: var(--accent-green); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .auth-check-text { font-size: 14px; color: var(--text-muted); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 380px) {
+            .balance-amount { font-size: 24px; }
+            .receipt-amount { font-size: 26px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .step, .error-page, .receipt-page, .receipt-icon-wrap { animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Check Overlay -->
+    <div class="auth-check-overlay" id="authCheckOverlay">
+        <div class="auth-check-spinner"></div>
+        <div class="auth-check-text">Checking your account...</div>
+    </div>
+
+    <canvas id="bg-particles"></canvas>
+    <div class="toast" id="toast"></div>
+
+    <header class="page-header">
+        <a href="dashboard.html" class="back-btn" id="headerBack">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <h1 id="pageTitle">Withdraw</h1>
+    </header>
+
+    <div class="main-content">
+        <!-- ========== WITHDRAW FORM ========== -->
+        <div class="step" id="withdrawFormPage">
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <div class="balance-info">
+                    <div class="balance-label">Available Balance</div>
+                    <div class="balance-amount" id="walletBalance">₦0.00</div>
+                </div>
+                <div class="balance-icon-circle">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+            </div>
+
+            <!-- Status Card -->
+            <div class="status-card" id="statusCard">
+                <div class="status-icon-wrap orange" id="statusIcon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="status-info">
+                    <div class="status-label">Withdrawal Access</div>
+                    <div class="status-value orange" id="statusValue">Upgrade required</div>
+                </div>
+            </div>
+
+            <!-- Withdrawal Form -->
+            <div class="glass-card" id="formCard">
+                <div class="form-title">Withdrawal Details</div>
+
+                <div class="form-group">
+                    <label class="form-group-label">Bank</label>
+                    <select class="bank-select" id="bankSelect">
+                        <option value="">Select Bank</option>
+                        <option value="Access Bank">Access Bank</option>
+                        <option value="Citibank Nigeria">Citibank Nigeria</option>
+                        <option value="Ecobank Nigeria">Ecobank Nigeria</option>
+                        <option value="Fidelity Bank">Fidelity Bank</option>
+                        <option value="First Bank of Nigeria">First Bank of Nigeria</option>
+                        <option value="FCMB">First City Monument Bank (FCMB)</option>
+                        <option value="Globus Bank">Globus Bank</option>
+                        <option value="GTBank">Guaranty Trust Bank (GTBank)</option>
+                        <option value="Heritage Bank">Heritage Bank</option>
+                        <option value="Keystone Bank">Keystone Bank</option>
+                        <option value="Kuda Bank">Kuda Bank</option>
+                        <option value="Opay">Opay</option>
+                        <option value="Palmpay">Palmpay</option>
+                        <option value="Parallex Bank">Parallex Bank</option>
+                        <option value="Polaris Bank">Polaris Bank</option>
+                        <option value="Providus Bank">Providus Bank</option>
+                        <option value="Stanbic IBTC">Stanbic IBTC Bank</option>
+                        <option value="Standard Chartered">Standard Chartered Bank</option>
+                        <option value="Sterling Bank">Sterling Bank</option>
+                        <option value="SunTrust Bank">SunTrust Bank</option>
+                        <option value="TAJ Bank">TAJ Bank</option>
+                        <option value="Titan Trust Bank">Titan Trust Bank</option>
+                        <option value="UBA">United Bank for Africa (UBA)</option>
+                        <option value="Union Bank">Union Bank of Nigeria</option>
+                        <option value="Unity Bank">Unity Bank</option>
+                        <option value="Wema Bank">Wema Bank</option>
+                        <option value="Zenith Bank">Zenith Bank</option>
+                        <option value="Jaiz Bank">Jaiz Bank</option>
+                        <option value="Lotus Bank">Lotus Bank</option>
+                        <option value="Premium Trust Bank">Premium Trust Bank</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">Account Number</label>
+                    <input type="text" class="form-input" id="accountNumber" placeholder="Enter 10-digit account number" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">Account Name</label>
+                    <input type="text" class="form-input" id="accountName" placeholder="Enter account holder name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">Amount (Min: ₦100,000)</label>
+                    <input type="text" class="form-input" id="withdrawAmount" placeholder="Enter amount">
+                </div>
+
+                <button class="btn-submit" id="withdrawBtn" onclick="submitWithdrawal()">Withdraw Funds</button>
+            </div>
+        </div>
+
+        <!-- ========== PROCESSING SCREEN ========== -->
+        <div class="glass-card step hidden" id="processingPage">
+            <div class="processing-screen active">
+                <div class="processing-spinner"></div>
+                <div class="processing-title" id="processingTitle">Processing your withdrawal...</div>
+                <div class="processing-sub" id="processingSub">Verifying account details</div>
+            </div>
+        </div>
+
+        <!-- ========== UPGRADE ERROR PAGE ========== -->
+        <div class="error-page" id="errorPage">
+            <div class="glass-card error-card">
+                <div class="error-icon-wrap">
+                    <svg viewBox="0 0 24 24"><path d="M2 4l2-2 4 4 4-4 4 4 4-4 2 2"/><path d="M4 10v10a2 2 0 002 2h12a2 2 0 002-2V10"/><path d="M12 14l4-4"/><path d="M12 14l-4-4"/></svg>
+                </div>
+                <div class="error-title">Account Not Upgraded</div>
+                <div class="error-text">Upgrade your account to unlock withdrawals and enjoy seamless transactions.</div>
+                <div class="error-actions">
+                    <button class="btn-gray" onclick="goBack()">Go Back</button>
+                    <button class="btn-orange" onclick="goToUpgrade()">Upgrade Account</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== RECEIPT PAGE ========== -->
+        <div class="receipt-page" id="receiptPage">
+            <div class="glass-card receipt-card">
+                <div class="receipt-icon-wrap">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="receipt-amount" id="rAmount">-₦0.00</div>
+                <div class="receipt-label">Withdrawal Successful</div>
+
+                <div class="receipt-details">
+                    <div class="header">
+                        <div class="logo-sm">
+                            <svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+                        </div>
+                        <span>Flux Pay — Withdrawal Receipt</span>
+                    </div>
+
+                    <div class="rd-row"><span class="rd-label">Transaction Type</span><span class="rd-val">Withdrawal</span></div>
+                    <div class="rd-row"><span class="rd-label">Category</span><span class="rd-val red">Debit</span></div>
+                    <div class="rd-row"><span class="rd-label">Status</span><span class="rd-val green">Approved</span></div>
+                    <div class="rd-row"><span class="rd-label">Date & Time</span><span class="rd-val" id="rDate">--</span></div>
+                    <div class="rd-row"><span class="rd-label">Reference</span><span class="rd-val" id="rRef">--</span></div>
+                    <div class="rd-row"><span class="rd-label">Bank</span><span class="rd-val" id="rBank">--</span></div>
+                    <div class="rd-row"><span class="rd-label">Account</span><span class="rd-val" id="rAccount">--</span></div>
+
+                    <div class="rd-divider"></div>
+
+                    <div class="rd-row"><span class="rd-label">Amount</span><span class="rd-val red" id="rAmt">₦0.00</span></div>
+                    <div class="rd-row"><span class="rd-label">Fee</span><span class="rd-val">₦0.00</span></div>
+                    <div class="rd-row" style="border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:4px;">
+                        <span class="rd-label" style="font-weight:700;color:var(--text-white);">Total Deducted</span>
+                        <span class="rd-val red" style="font-weight:800;font-size:16px;" id="rTotal">₦0.00</span>
+                    </div>
+                </div>
+
+                <div class="receipt-footer">
+                    <span class="brand">Flux Pay</span>
+                    This is an electronic receipt automatically generated by Flux Pay<br>
+                    For any issues, contact us at support@fluxpay.com
+                </div>
+
+                <a href="dashboard.html" class="btn-home">Return to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ========== SUPABASE CONFIG ==========
+    const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase connected');
+    } catch (e) {
+        console.error('❌ Supabase connection failed:', e);
+    }
+
+    // ========== GLOBAL STATE ==========
+    let currentUser = null;
+    let userProfile = null;
+    let balance = 0;
+    let isUpgraded = false;
+
+    // ========== DOM ELEMENTS ==========
+    const authCheckOverlay = document.getElementById('authCheckOverlay');
+
+    // ========== AUTH CHECK ==========
+    async function checkAuth() {
+        if (!supabase) {
+            showToast('Connection error. Please refresh.', 'error');
+            return;
+        }
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+            console.log('Logged in as:', currentUser.email);
+            await loadUserProfile();
+            authCheckOverlay.classList.add('hidden');
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'login.html';
+        }
+    }
+
+    // ========== LOAD USER PROFILE FROM SUPABASE ==========
+    async function loadUserProfile() {
+        try {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error) {
+                console.error('Profile fetch error:', error);
+                return;
+            }
+
+            userProfile = profile;
+            balance = profile.wallet_balance || 0;
+            isUpgraded = profile.is_upgraded || false;
+            console.log('Profile loaded:', userProfile);
+            init();
+
+        } catch (e) {
+            console.error('Load profile error:', e);
+        }
+    }
+
+    // ========== SAVE PROFILE TO SUPABASE ==========
+    async function saveProfile(updates) {
+        if (!currentUser || !supabase) return false;
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', currentUser.id);
+
+            if (error) {
+                console.error('Save profile error:', error);
+                return false;
+            }
+            return true;
+        } catch (e) {
+            console.error('Save profile error:', e);
+            return false;
+        }
+    }
+
+    // ========== FLOATING PARTICLES ==========
+    (function() {
+        var canvas = document.getElementById('bg-particles');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var w, h;
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function Particle() { this.reset(); }
+        Particle.prototype.reset = function() {
+            this.x = Math.random() * w; this.y = Math.random() * h;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedY = -(Math.random() * 0.3 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.15;
+            this.opacity = Math.random() * 0.3 + 0.05;
+            this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0';
+            this.life = Math.random() * 300 + 200;
+        };
+        Particle.prototype.update = function() {
+            this.y += this.speedY; this.x += this.speedX; this.life--;
+            if (this.y < -10 || this.life <= 0) { this.y = h + 10; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+            if (this.x < -10) this.x = w + 10; if (this.x > w + 10) this.x = -10;
+        };
+        Particle.prototype.draw = function() {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')'; ctx.fill();
+        };
+        var count = window.innerWidth < 768 ? 30 : 50;
+        for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+        function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+        animate();
+    })();
+
+    // ========== FORMAT NUMBER WITH COMMAS ==========
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // ========== TOAST ==========
+    function showToast(message, type) {
+        var toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.className = 'toast';
+        if (type === 'success') toast.classList.add('success');
+        if (type === 'error') toast.classList.add('error');
+        toast.classList.add('visible');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(function() { toast.classList.remove('visible', 'success', 'error'); }, 2500);
+    }
+
+    // ========== INIT ==========
+    function init() {
+        document.getElementById('walletBalance').textContent = '₦' + formatNumber(balance);
+
+        if (isUpgraded) {
+            document.getElementById('statusValue').textContent = 'Account Verified';
+            document.getElementById('statusValue').className = 'status-value green';
+            document.getElementById('statusIcon').className = 'status-icon-wrap green';
+            document.getElementById('statusIcon').innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+        } else {
+            document.getElementById('statusValue').textContent = 'Upgrade required';
+            document.getElementById('statusValue').className = 'status-value orange';
+            document.getElementById('statusIcon').className = 'status-icon-wrap orange';
+            document.getElementById('statusIcon').innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+        }
+    }
+
+    // ========== AUTO-FORMAT AMOUNT INPUT ==========
+    var amountInput = document.getElementById('withdrawAmount');
+    amountInput.addEventListener('input', function(e) {
+        var val = e.target.value.replace(/[^\d]/g, '');
+        if (val) { e.target.value = formatNumber(val); }
+    });
+
+    // ========== ACCOUNT NUMBER VALIDATION ==========
+    var accInput = document.getElementById('accountNumber');
+    accInput.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    // ========== PROCESSING MESSAGES ==========
+    var processingMessages = [
+        { title: 'Processing your withdrawal...', sub: 'Verifying account details' },
+        { title: 'Validating bank information...', sub: 'Confirming account number' },
+        { title: 'Debiting your wallet...', sub: 'Deducting requested amount' },
+        { title: 'Initiating transfer...', sub: 'Sending funds to your bank' },
+        { title: 'Finalizing transaction...', sub: 'Almost done — generating receipt' }
+    ];
+
+    // ========== SUBMIT WITHDRAWAL ==========
+    async function submitWithdrawal() {
+        var bank = document.getElementById('bankSelect').value;
+        var accNum = document.getElementById('accountNumber').value;
+        var accName = document.getElementById('accountName').value.trim();
+        var rawAmount = amountInput.value.replace(/,/g, '');
+        var withdrawAmt = parseInt(rawAmount);
+
+        if (!bank) { showToast('Please select a bank', 'error'); return; }
+        if (!accNum || accNum.length !== 10) { showToast('Enter a valid 10-digit account number', 'error'); return; }
+        if (!accName) { showToast('Please enter account holder name', 'error'); return; }
+        if (!withdrawAmt || withdrawAmt < 100000) { showToast('Minimum withdrawal is ₦100,000', 'error'); return; }
+        if (withdrawAmt > balance) { showToast('Insufficient balance', 'error'); return; }
+
+        if (!isUpgraded) {
+            document.getElementById('withdrawFormPage').classList.add('hidden');
+            document.getElementById('errorPage').classList.add('active');
+            document.getElementById('pageTitle').textContent = 'Withdrawal Error';
+            document.getElementById('headerBack').style.display = 'none';
+            return;
+        }
+
+        var newBalance = balance - withdrawAmt;
+        var ref = 'FLX-W' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ', ' +
+                      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        document.getElementById('withdrawFormPage').classList.add('hidden');
+        document.getElementById('processingPage').classList.remove('hidden');
+        document.getElementById('pageTitle').textContent = 'Processing...';
+        document.getElementById('headerBack').style.display = 'none';
+
+        var msgIndex = 0;
+        var processingTitle = document.getElementById('processingTitle');
+        var processingSub = document.getElementById('processingSub');
+
+        processingTitle.textContent = processingMessages[0].title;
+        processingSub.textContent = processingMessages[0].sub;
+
+        var messageInterval = setInterval(function() {
+            msgIndex++;
+            if (msgIndex < processingMessages.length) {
+                processingTitle.style.opacity = '0';
+                processingSub.style.opacity = '0';
+                setTimeout(function() {
+                    processingTitle.textContent = processingMessages[msgIndex].title;
+                    processingSub.textContent = processingMessages[msgIndex].sub;
+                    processingTitle.style.opacity = '1';
+                    processingSub.style.opacity = '1';
+                }, 300);
+            }
+        }, 1600);
+
+        setTimeout(async function() {
+            clearInterval(messageInterval);
+
+            // Update Supabase
+            var saved = await saveProfile({ wallet_balance: newBalance });
+            if (saved) {
+                await logTransaction('withdrawal', withdrawAmt, 'Bank Withdrawal to ' + bank, 'completed', ref);
+                balance = newBalance;
+                showReceipt(withdrawAmt, ref, dateStr, bank, accNum, accName);
+            } else {
+                showToast('Error processing withdrawal. Contact support.', 'error');
+            }
+        }, 8000);
+    }
+
+    function showReceipt(amt, ref, dateStr, bank, accNum, accName) {
+        document.getElementById('processingPage').classList.add('hidden');
+        document.getElementById('receiptPage').classList.add('active');
+        document.getElementById('pageTitle').textContent = 'Withdrawal Receipt';
+
+        document.getElementById('rAmount').textContent = '-₦' + formatNumber(amt);
+        document.getElementById('rAmt').textContent = '₦' + formatNumber(amt);
+        document.getElementById('rTotal').textContent = '₦' + formatNumber(amt);
+        document.getElementById('rRef').textContent = ref;
+        document.getElementById('rDate').textContent = dateStr;
+        document.getElementById('rBank').textContent = bank;
+        document.getElementById('rAccount').textContent = accNum + ' (' + accName + ')';
+    }
+
+    // ========== LOG TRANSACTION TO SUPABASE ==========
+    async function logTransaction(type, amt, description, status, refCode) {
+        if (!currentUser) return;
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .insert([{
+                    user_id: currentUser.id,
+                    type: type,
+                    amount: amt,
+                    description: description,
+                    status: status,
+                    reference: refCode
+                }]);
+            if (error) console.error('Transaction log error:', error);
+        } catch (e) {
+            console.error('Log transaction error:', e);
+        }
+    }
+
+    // ========== NAVIGATION ==========
+    function goBack() {
+        window.location.href = 'dashboard.html';
+    }
+
+    function goToUpgrade() {
+        window.location.href = 'upgrade.html';
+    }
+
+    // ========== INITIALIZE ==========
+    async function initApp() {
+        await checkAuth();
+        console.log('💸 Flux Pay Withdraw — Supabase Connected');
+    }
+
+    initApp();
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

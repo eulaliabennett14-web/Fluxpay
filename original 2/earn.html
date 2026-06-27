@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Earn Rewards - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --bg-card: #1a2332; --bg-card-hover: #1e293b;
+            --accent-green: #00d4aa; --accent-green-dark: #00a884; --accent-gold: #f59e0b;
+            --accent-gold-light: #fbbf24; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+            --accent-red: #ef4444; --accent-orange: #f97316; --accent-pink: #ec4899;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-border: rgba(0, 212, 170, 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(6,13,26,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .main-content { position: relative; z-index: 1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+
+        .promo-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .promo-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); opacity: 0.6; }
+        .promo-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .promo-header i { font-size: 20px; color: var(--accent-gold); }
+        .promo-header h3 { font-family: 'Amaranth', sans-serif; font-size: 17px; font-weight: 700; }
+        .promo-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+        .promo-code-box { display: flex; align-items: center; gap: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; cursor: pointer; transition: var(--transition-smooth); }
+        .promo-code-box:hover { border-color: var(--accent-gold); background: rgba(245,158,11,0.03); }
+        .promo-code { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-dim); flex: 1; }
+        .promo-code-arrow { font-size: 16px; color: var(--text-muted); transition: var(--transition-smooth); }
+        .promo-code-box:hover .promo-code-arrow { color: var(--accent-gold); }
+        .share-row { display: flex; gap: 8px; margin-top: 12px; }
+        .share-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition-smooth); display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .share-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--accent-green); }
+        .share-btn i { font-size: 14px; }
+
+        .redeem-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .redeem-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark), var(--accent-green)); opacity: 0.6; }
+        .redeem-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .redeem-title { display: flex; align-items: center; gap: 12px; }
+        .redeem-icon { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,212,170,0.05)); border: 1px solid rgba(0,212,170,0.2); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--accent-green); }
+        .redeem-text h3 { font-family: 'Amaranth', sans-serif; font-size: 17px; font-weight: 700; }
+        .redeem-text p { font-size: 12px; color: var(--text-secondary); }
+        .redeem-amount { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent-gold); }
+        .redeem-input-row { display: flex; gap: 10px; margin-top: 14px; opacity: 0.5; pointer-events: none; }
+        .redeem-input { flex: 1; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; color: var(--text-primary); font-size: 14px; font-family: 'Inter', sans-serif; outline: none; text-transform: uppercase; }
+        .redeem-input::placeholder { color: var(--text-muted); font-size: 13px; }
+        .redeem-btn { padding: 14px 24px; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); border-radius: 14px; font-family: 'Amaranth', sans-serif; font-size: 14px; font-weight: 700; cursor: not-allowed; white-space: nowrap; }
+        .redeem-coming-soon { display: flex; align-items: center; gap: 8px; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15); border-radius: 12px; padding: 12px 16px; margin-top: 14px; color: var(--accent-gold); font-size: 12px; font-weight: 500; }
+        .redeem-coming-soon i { font-size: 14px; }
+
+        .progress-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; text-align: center; }
+        .progress-card h3 { font-family: 'Amaranth', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .progress-amount { font-family: 'Amaranth', sans-serif; font-size: 42px; font-weight: 700; color: var(--accent-gold); margin-bottom: 4px; text-shadow: 0 0 30px rgba(245,158,11,0.2); }
+        .progress-bar-container { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; margin: 16px 0; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 4px; transition: width 0.8s ease; width: 0%; }
+        .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+        .streak-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .streak-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .streak-title { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .streak-title i { color: var(--accent-gold); }
+        .streak-count { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; color: var(--accent-gold); }
+        .streak-days { display: flex; gap: 6px; justify-content: center; }
+        .streak-day { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+        .streak-day.active { background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #fff; border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(245,158,11,0.3); }
+        .streak-day.today { border-color: var(--accent-gold); color: var(--accent-gold); }
+        .streak-day.missed { opacity: 0.3; }
+        .streak-reward { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-secondary); }
+        .streak-reward span { color: var(--accent-gold); font-weight: 700; }
+
+        .task-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 14px; position: relative; overflow: hidden; transition: var(--transition-smooth); }
+        .task-card:hover { transform: translateY(-2px); border-color: rgba(0,212,170,0.2); }
+        .task-card.locked { opacity: 0.6; border-color: rgba(100,100,100,0.1); }
+        .task-card.locked::after { content: '🔒'; position: absolute; top: 16px; right: 16px; font-size: 18px; }
+        .task-card.completed { border-color: rgba(0,212,170,0.3); }
+        .task-card.completed::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark), var(--accent-green)); }
+        .task-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .task-info { display: flex; align-items: center; gap: 12px; }
+        .task-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .task-icon.youtube { background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05)); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; }
+        .task-icon.whatsapp { background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,212,170,0.05)); border: 1px solid rgba(0,212,170,0.2); color: var(--accent-green); }
+        .task-icon.instagram { background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(236,72,153,0.05)); border: 1px solid rgba(236,72,153,0.2); color: #ec4899; }
+        .task-icon.twitter { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); border: 1px solid rgba(59,130,246,0.2); color: #3b82f6; }
+        .task-icon.tiktok { background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1)); border: 1px solid rgba(255,255,255,0.1); color: #fff; }
+        .task-icon.telegram { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); border: 1px solid rgba(59,130,246,0.2); color: #3b82f6; }
+        .task-text h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; }
+        .task-text p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+        .task-amount { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent-gold); }
+        .task-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; font-family: 'Amaranth', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+        .task-btn.youtube { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 4px 15px rgba(239,68,68,0.3); }
+        .task-btn.youtube:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239,68,68,0.4); }
+        .task-btn.whatsapp { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; box-shadow: 0 4px 15px rgba(0,212,170,0.3); }
+        .task-btn.whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,212,170,0.4); }
+        .task-btn.locked { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); cursor: not-allowed; }
+        .task-btn.completed { background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,212,170,0.05)); color: var(--accent-green); border: 1px solid rgba(0,212,170,0.2); cursor: default; }
+        .task-btn.completed::before { content: '✅ '; }
+        .task-locked-msg { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; font-style: italic; }
+
+        .activity-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .activity-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .activity-header i { color: var(--accent-green); font-size: 14px; }
+        .activity-header h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; }
+        .live-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; margin-left: auto; }
+        @keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+        .activity-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-user { display: flex; align-items: center; gap: 10px; }
+        .activity-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-blue)); display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .activity-name { font-size: 12px; font-weight: 600; }
+        .activity-action { font-size: 11px; color: var(--text-muted); }
+        .activity-amount { font-family: 'Amaranth', sans-serif; font-size: 13px; font-weight: 700; color: var(--accent-green); }
+
+        .win-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.4s ease; }
+        .win-modal-overlay.active { opacity: 1; visibility: visible; }
+        .win-modal { background: linear-gradient(135deg, rgba(26,35,50,0.98) 0%, rgba(17,24,39,0.99) 100%); border: 1px solid rgba(0,212,170,0.3); border-radius: 24px; padding: 40px 24px; width: 100%; max-width: 360px; text-align: center; position: relative; overflow: hidden; transform: scale(0.8) translateY(20px); transition: transform 0.5s cubic-bezier(0.68,-0.55,0.265,1.55); }
+        .win-modal-overlay.active .win-modal { transform: scale(1) translateY(0); }
+        .win-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark), var(--accent-green)); }
+        .win-icon { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 36px; animation: win-pop 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); box-shadow: 0 0 40px rgba(0,212,170,0.4); }
+        @keyframes win-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .win-title { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .win-amount { font-family: 'Amaranth', sans-serif; font-size: 42px; font-weight: 700; color: var(--accent-gold); margin: 16px 0; text-shadow: 0 0 30px rgba(245,158,11,0.3); }
+        .win-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; }
+        .win-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; border: none; border-radius: 14px; font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 20px rgba(0,212,170,0.3); }
+        .win-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,212,170,0.4); }
+
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1999; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(0,212,170,0.2); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { width: 22px; height: 22px; border-radius: 6px; background: rgba(0,212,170,0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 11px; }
+
+        .hidden { display: none !important; }
+
+        /* Auth check overlay */
+        .auth-check-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .auth-check-overlay.hidden { display: none; }
+        .auth-check-spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(0,212,170,0.15);
+            border-top-color: var(--accent-green); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .auth-check-text { font-size: 14px; color: var(--text-muted); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- Auth Check Overlay -->
+    <div class="auth-check-overlay" id="authCheckOverlay">
+        <div class="auth-check-spinner"></div>
+        <div class="auth-check-text">Checking your account...</div>
+    </div>
+
+    <canvas id="bg-particles"></canvas>
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="toast" id="toast"><div class="toast-icon">✅</div><span id="toastText">Message</span></div>
+
+    <!-- Win Modal -->
+    <div class="win-modal-overlay" id="winModal">
+        <div class="win-modal">
+            <div class="win-icon">🎉</div>
+            <h2 class="win-title">Reward Claimed!</h2>
+            <div class="win-amount" id="winAmount">₦0</div>
+            <p class="win-subtitle">Added to your wallet balance</p>
+            <button class="win-btn" onclick="closeWinModal()">Awesome! 🚀</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <h1>🎁 Earn Rewards</h1>
+    </header>
+
+    <div class="main-content">
+        <!-- Promo Code - Get Your Code -->
+        <div class="promo-card">
+            <div class="promo-header"><i class="fas fa-ticket-alt"></i><h3>Your Unique Promo Code</h3></div>
+            <p class="promo-desc">Share your personal code with friends to earn rewards</p>
+            <div class="promo-code-box" onclick="getPromoCode()">
+                <div class="promo-code" id="promoCode">Get Your Code →</div>
+                <div class="promo-code-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            <div class="share-row">
+                <button class="share-btn" onclick="shareToWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                <button class="share-btn" onclick="shareToTelegram()"><i class="fab fa-telegram"></i> Telegram</button>
+                <button class="share-btn" onclick="shareViaSMS()"><i class="fas fa-sms"></i> SMS</button>
+            </div>
+        </div>
+
+        <!-- Redeem Promo Code -->
+        <div class="redeem-card">
+            <div class="redeem-header">
+                <div class="redeem-title">
+                    <div class="redeem-icon">🎁</div>
+                    <div class="redeem-text"><h3>Redeem Promo Code</h3><p>Enter your promo code to earn</p></div>
+                </div>
+                <div class="redeem-amount">₦20,000</div>
+            </div>
+            <div class="redeem-input-row">
+                <input type="text" class="redeem-input" placeholder="Coming soon..." disabled>
+                <button class="redeem-btn" disabled>Redeem</button>
+            </div>
+            <div class="redeem-coming-soon"><i class="fas fa-clock"></i> Promo code redemption will be available soon</div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-card">
+            <h3>Daily Task Rewards Available</h3>
+            <div class="progress-amount" id="progressAmount">₦6,000</div>
+            <div class="progress-bar-container"><div class="progress-bar-fill" id="progressBar"></div></div>
+            <div class="progress-labels"><span>0 tasks</span><span id="progressText">0/2 completed</span><span>2 tasks</span></div>
+        </div>
+
+        <!-- Streak -->
+        <div class="streak-card">
+            <div class="streak-header">
+                <div class="streak-title"><i class="fas fa-fire"></i> Daily Check-In Streak</div>
+                <div class="streak-count" id="streakCount">🔥 1 day</div>
+            </div>
+            <div class="streak-days" id="streakDays">
+                <div class="streak-day active">M</div>
+                <div class="streak-day missed">T</div>
+                <div class="streak-day missed">W</div>
+                <div class="streak-day today">T</div>
+                <div class="streak-day">F</div>
+                <div class="streak-day">S</div>
+                <div class="streak-day">S</div>
+            </div>
+            <div class="streak-reward">Next streak bonus: <span>₦2,000</span> at 5 days</div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="task-card" id="taskYouTube">
+            <div class="task-header">
+                <div class="task-info">
+                    <div class="task-icon youtube"><i class="fab fa-youtube"></i></div>
+                    <div class="task-text"><h3>Subscribe to YouTube</h3><p>Earn every day · resets at midnight</p></div>
+                </div>
+                <div class="task-amount">₦3,000</div>
+            </div>
+            <button class="task-btn youtube" id="btnYouTube" onclick="doTask('youtube')">▶ Subscribe & Earn ₦3,000</button>
+        </div>
+
+        <div class="task-card" id="taskWhatsApp">
+            <div class="task-header">
+                <div class="task-info">
+                    <div class="task-icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+                    <div class="task-text"><h3>Join WhatsApp Channel</h3><p>Earn every day · resets at midnight</p></div>
+                </div>
+                <div class="task-amount">₦3,000</div>
+            </div>
+            <button class="task-btn whatsapp" id="btnWhatsApp" onclick="doTask('whatsapp')">💬 Join & Earn ₦3,000</button>
+        </div>
+
+        <div class="task-card locked" id="taskInstagram">
+            <div class="task-header">
+                <div class="task-info">
+                    <div class="task-icon instagram"><i class="fab fa-instagram"></i></div>
+                    <div class="task-text"><h3>Follow on Instagram</h3><p>Earn every day · resets at midnight</p></div>
+                </div>
+                <div class="task-amount">₦3,000</div>
+            </div>
+            <button class="task-btn locked" disabled>🔒 Not Available</button>
+            <p class="task-locked-msg">This feature is not available in your country yet. Coming soon!</p>
+        </div>
+
+        <div class="task-card locked" id="taskTwitter">
+            <div class="task-header">
+                <div class="task-info">
+                    <div class="task-icon twitter"><i class="fab fa-twitter"></i></div>
+                    <div class="task-text"><h3>Follow on Twitter</h3><p>Earn every day · resets at midnight</p></div>
+                </div>
+                <div class="task-amount">₦3,000</div>
+            </div>
+            <button class="task-btn locked" disabled>🔒 Not Available</button>
+            <p class="task-locked-msg">This feature is not available in your country yet. Coming soon!</p>
+        </div>
+
+        <div class="task-card locked" id="taskTikTok">
+            <div class="task-header">
+                <div class="task-info">
+                    <div class="task-icon tiktok"><i class="fab fa-tiktok"></i></div>
+                    <div class="task-text"><h3>Follow on TikTok</h3><p>Earn every day · resets at midnight</p></div>
+                </div>
+                <div class="task-amount">₦3,000</div>
+            </div>
+            <button class="task-btn locked" disabled>🔒 Not Available</button>
+            <p class="task-locked-msg">This feature is not available in your country yet. Coming soon!</p>
+        </div>
+
+        <div class="task-card locked" id="taskTelegram">
+            <div class="task-header">
+                <div class="task-info">
+                    <div class="task-icon telegram"><i class="fab fa-telegram"></i></div>
+                    <div class="task-text"><h3>Join Telegram Channel</h3><p>Earn every day · resets at midnight</p></div>
+                </div>
+                <div class="task-amount">₦3,000</div>
+            </div>
+            <button class="task-btn locked" disabled>🔒 Not Available</button>
+            <p class="task-locked-msg">This feature is not available in your country yet. Coming soon!</p>
+        </div>
+
+        <!-- Live Activity -->
+        <div class="activity-card">
+            <div class="activity-header"><i class="fas fa-bolt"></i><h3>Live Activity</h3><div class="live-dot"></div></div>
+            <div id="activityList">
+                <div class="activity-item"><div class="activity-user"><div class="activity-avatar">👤</div><div><div class="activity-name">Chinedu O.</div><div class="activity-action">Subscribed to YouTube</div></div></div><div class="activity-amount">+₦3,000</div></div>
+                <div class="activity-item"><div class="activity-user"><div class="activity-avatar">👤</div><div><div class="activity-name">Amina K.</div><div class="activity-action">Joined WhatsApp</div></div></div><div class="activity-amount">+₦3,000</div></div>
+                <div class="activity-item"><div class="activity-user"><div class="activity-avatar">👤</div><div><div class="activity-name">Tunde B.</div><div class="activity-action">Subscribed to YouTube</div></div></div><div class="activity-amount">+₦3,000</div></div>
+                <div class="activity-item"><div class="activity-user"><div class="activity-avatar">👤</div><div><div class="activity-name">Fatima S.</div><div class="activity-action">Joined WhatsApp</div></div></div><div class="activity-amount">+₦3,000</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ========== SUPABASE CONFIG ==========
+    const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase connected');
+    } catch (e) {
+        console.error('❌ Supabase connection failed:', e);
+    }
+
+    // ========== GLOBAL STATE ==========
+    let currentUser = null;
+    let userProfile = null;
+    let balance = 0;
+    let tasksDone = [];
+
+    // ========== DOM ELEMENTS ==========
+    const authCheckOverlay = document.getElementById('authCheckOverlay');
+
+    // ========== AUTH CHECK ==========
+    async function checkAuth() {
+        if (!supabase) {
+            showToast('Connection error. Please refresh.', true);
+            return;
+        }
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+            console.log('Logged in as:', currentUser.email);
+            await loadUserProfile();
+            authCheckOverlay.classList.add('hidden');
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'login.html';
+        }
+    }
+
+    // ========== LOAD USER PROFILE FROM SUPABASE ==========
+    async function loadUserProfile() {
+        try {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error) {
+                console.error('Profile fetch error:', error);
+                return;
+            }
+
+            userProfile = profile;
+            balance = profile.wallet_balance || 0;
+            console.log('Profile loaded:', userProfile);
+            
+            // NOW load tasks and update UI after profile is ready
+            loadTasks();
+            updateUI();
+
+        } catch (e) {
+            console.error('Load profile error:', e);
+        }
+    }
+
+    // ========== SAVE PROFILE TO SUPABASE ==========
+    async function saveProfile(updates) {
+        if (!currentUser || !supabase) return false;
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', currentUser.id);
+
+            if (error) {
+                console.error('Save profile error:', error);
+                return false;
+            }
+            return true;
+        } catch (e) {
+            console.error('Save profile error:', e);
+            return false;
+        }
+    }
+
+    // ========== LOAD TASKS FROM LOCALSTORAGE ==========
+    function loadTasks() {
+        var today = new Date().toDateString();
+        var lastTaskDate = localStorage.getItem('fluxpay_task_date');
+        if (lastTaskDate !== today) {
+            localStorage.setItem('fluxpay_task_date', today);
+            localStorage.removeItem('fluxpay_tasks_done');
+            tasksDone = [];
+        } else {
+            tasksDone = JSON.parse(localStorage.getItem('fluxpay_tasks_done') || '[]');
+        }
+        console.log('Tasks loaded:', tasksDone);
+    }
+
+    // ========== FLOATING PARTICLES ==========
+    (function() {
+        var canvas = document.getElementById('bg-particles');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var particles = [], w, h;
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function Particle() { this.reset(); }
+        Particle.prototype.reset = function() {
+            this.x = Math.random() * w; this.y = Math.random() * h;
+            this.size = Math.random() * 3 + 1.5; this.speedY = -(Math.random() * 0.35 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.18; this.opacity = Math.random() * 0.4 + 0.2;
+            this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+        };
+        Particle.prototype.update = function() {
+            this.y += this.speedY; this.x += this.speedX; this.life--;
+            if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+            if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+        };
+        Particle.prototype.draw = function() {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+            ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+        };
+        var count = window.innerWidth < 768 ? 25 : 40;
+        for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+        function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+        animate();
+    })();
+
+    // ========== FORMAT NUMBER WITH COMMAS ==========
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // ========== UPDATE UI ==========
+    function updateUI() {
+        var completedCount = tasksDone.length;
+        var totalTasks = 2;
+        var totalAvailable = 6000;
+        var earned = tasksDone.length * 3000;
+        var remaining = totalAvailable - earned;
+
+        document.getElementById('progressAmount').textContent = '₦' + formatNumber(Math.max(0, remaining));
+        document.getElementById('progressText').textContent = completedCount + '/' + totalTasks + ' completed';
+        document.getElementById('progressBar').style.width = (completedCount / totalTasks * 100) + '%';
+
+        // YouTube task
+        var ytBtn = document.getElementById('btnYouTube');
+        var ytCard = document.getElementById('taskYouTube');
+        if (tasksDone.indexOf('youtube') !== -1) {
+            ytBtn.className = 'task-btn completed';
+            ytBtn.textContent = '✅ Claimed ₦3,000';
+            ytBtn.disabled = true;
+            ytBtn.onclick = null;
+            ytCard.classList.add('completed');
+            console.log('YouTube marked as completed');
+        }
+
+        // WhatsApp task
+        var waBtn = document.getElementById('btnWhatsApp');
+        var waCard = document.getElementById('taskWhatsApp');
+        if (tasksDone.indexOf('whatsapp') !== -1) {
+            waBtn.className = 'task-btn completed';
+            waBtn.textContent = '✅ Claimed ₦3,000';
+            waBtn.disabled = true;
+            waBtn.onclick = null;
+            waCard.classList.add('completed');
+            console.log('WhatsApp marked as completed');
+        }
+    }
+
+    // ========== GET PROMO CODE ==========
+    function getPromoCode() {
+        showToast('Promo codes are not available in your country yet 🌍', true);
+    }
+
+    // ========== SHARE ==========
+    function shareToWhatsApp() {
+        var text = 'Join Flux Pay and start earning money! Sign up now and complete tasks for rewards.';
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    }
+
+    function shareToTelegram() {
+        var text = 'Join Flux Pay and start earning money! Sign up now and complete tasks for rewards.';
+        window.open('https://t.me/share/url?url=' + encodeURIComponent('https://fluxpay.com') + '&text=' + encodeURIComponent(text), '_blank');
+    }
+
+    function shareViaSMS() {
+        var text = 'Join Flux Pay and start earning! Complete tasks for rewards. https://fluxpay.com';
+        window.open('sms:?body=' + encodeURIComponent(text), '_blank');
+    }
+
+    // ========== DO TASK ==========
+    async function doTask(taskName) {
+        console.log('Doing task:', taskName);
+        if (tasksDone.indexOf(taskName) !== -1) { 
+            showToast('Already claimed today!', true); 
+            return; 
+        }
+
+        var urls = {
+            youtube: 'https://youtube.com/@TheDarkVault-v4y',
+            whatsapp: 'https://whatsapp.com/channel/0029VbChXCg5a23zm42vXs0R'
+        };
+
+        window.open(urls[taskName], '_blank');
+
+        setTimeout(async function() {
+            tasksDone.push(taskName);
+            localStorage.setItem('fluxpay_tasks_done', JSON.stringify(tasksDone));
+            console.log('Task saved:', tasksDone);
+
+            // Update Supabase balance
+            var newBalance = balance + 3000;
+            console.log('Old balance:', balance, 'New balance:', newBalance);
+            
+            var saved = await saveProfile({ wallet_balance: newBalance });
+            if (saved) {
+                balance = newBalance;
+                await logTransaction('claim', 3000, 'Task Reward: ' + taskName, 'completed');
+                showWinModal(3000);
+                fireConfetti();
+                updateUI();
+                showToast('₦3,000 reward added!');
+            } else {
+                showToast('Error saving reward. Try again.', true);
+            }
+        }, 3000);
+    }
+
+    // ========== LOG TRANSACTION TO SUPABASE ==========
+    async function logTransaction(type, amt, description, status) {
+        if (!currentUser) return;
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .insert([{
+                    user_id: currentUser.id,
+                    type: type,
+                    amount: amt,
+                    description: description,
+                    status: status
+                }]);
+            if (error) console.error('Transaction log error:', error);
+        } catch (e) {
+            console.error('Log transaction error:', e);
+        }
+    }
+
+    // ========== WIN MODAL ==========
+    function showWinModal(amount) {
+        document.getElementById('winAmount').textContent = '₦' + formatNumber(amount);
+        document.getElementById('winModal').classList.add('active');
+    }
+
+    function closeWinModal() {
+        document.getElementById('winModal').classList.remove('active');
+    }
+
+    // ========== CONFETTI ==========
+    function fireConfetti() {
+        var canvas = document.getElementById('confetti-canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        var particles = [];
+        var colors = ['#f59e0b', '#fbbf24', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#ef4444', '#00d4aa'];
+
+        for (var i = 0; i < 120; i++) {
+            particles.push({
+                x: canvas.width / 2, y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 18, vy: (Math.random() - 0.5) * 18 - 4,
+                size: Math.random() * 8 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rotation: Math.random() * 360, rotationSpeed: (Math.random() - 0.5) * 10,
+                gravity: 0.3, drag: 0.98, life: 1
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            var alive = false;
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                if (p.life <= 0) continue;
+                alive = true;
+                p.x += p.vx; p.y += p.vy;
+                p.vy += p.gravity;
+                p.vx *= p.drag; p.vy *= p.drag;
+                p.rotation += p.rotationSpeed;
+                p.life -= 0.015;
+                ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctx.restore();
+            }
+            if (alive) requestAnimationFrame(animate);
+            else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        animate();
+    }
+
+    // ========== TOAST ==========
+    function showToast(message, isError) {
+        var toast = document.getElementById('toast');
+        var toastText = document.getElementById('toastText');
+        var toastIcon = toast.querySelector('.toast-icon');
+        toastText.textContent = message;
+        toastIcon.textContent = isError ? '⚠️' : '✅';
+        toastIcon.style.color = isError ? '#ef4444' : '#00d4aa';
+        toastIcon.style.background = isError ? 'rgba(239,68,68,0.15)' : 'rgba(0,212,170,0.15)';
+        toast.classList.add('show');
+        setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+
+    // ========== LIVE ACTIVITY ==========
+    var activityNames = ['Chinedu O.', 'Amina K.', 'Tunde B.', 'Fatima S.', 'Emeka N.', 'Blessing M.', 'David A.', 'Grace I.'];
+    var activityActions = ['Subscribed to YouTube', 'Joined WhatsApp', 'Subscribed to YouTube', 'Joined WhatsApp'];
+    var activityAmounts = ['+₦3,000', '+₦3,000', '+₦3,000', '+₦3,000'];
+
+    function addLiveActivity() {
+        var list = document.getElementById('activityList');
+        var idx = Math.floor(Math.random() * activityNames.length);
+        var item = document.createElement('div');
+        item.className = 'activity-item';
+        item.innerHTML = '<div class="activity-user"><div class="activity-avatar">👤</div><div><div class="activity-name">' + activityNames[idx] + '</div><div class="activity-action">' + activityActions[idx] + '</div></div></div><div class="activity-amount">' + activityAmounts[idx] + '</div>';
+        list.insertBefore(item, list.firstChild);
+        if (list.children.length > 5) list.removeChild(list.lastChild);
+    }
+
+    setInterval(function() {
+        if (Math.random() > 0.3) addLiveActivity();
+    }, 8000 + Math.random() * 7000);
+
+    // ========== INIT ==========
+    async function initApp() {
+        await checkAuth();
+        console.log('🎁 Flux Pay Earn Rewards — Supabase Connected');
+    }
+
+    initApp();
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

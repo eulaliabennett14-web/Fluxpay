@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Apply for Loan - FairMonie Pay</title>
+<link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', sans-serif; background: #050505; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 20px; }
+.aurora-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: #050505; overflow: hidden; }
+.aurora-wave { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(ellipse at 30% 20%, rgba(34,197,94,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.05) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.04) 0%, transparent 60%); animation: auroraMove 15s ease-in-out infinite; }
+.aurora-wave:nth-child(2) { animation-delay: -5s; animation-duration: 20s; background: radial-gradient(ellipse at 60% 30%, rgba(34,197,94,0.06) 0%, transparent 50%), radial-gradient(ellipse at 20% 70%, rgba(74,222,128,0.04) 0%, transparent 50%); }
+.aurora-wave:nth-child(3) { animation-delay: -10s; animation-duration: 25s; background: radial-gradient(ellipse at 80% 60%, rgba(16,185,129,0.05) 0%, transparent 50%), radial-gradient(ellipse at 40% 40%, rgba(34,197,94,0.03) 0%, transparent 50%); }
+@keyframes auroraMove { 0%,100% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(5%,5%) rotate(2deg); } 50% { transform: translate(-3%,8%) rotate(-1deg); } 75% { transform: translate(8%,-5%) rotate(1deg); } }
+.grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px); background-size: 50px 50px; animation: gridMove 20s linear infinite; }
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
+#particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.header { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; padding: 16px 20px 12px; }
+.back-btn { width: 40px; height: 40px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22c55e; transition: all 0.3s; }
+.back-btn:hover { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.2); }
+.back-btn svg { width: 20px; height: 20px; }
+.header-title h1 { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; color: white; }
+.header-title p { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+.country-hero { position: relative; z-index: 2; margin: 0 16px 20px; padding: 24px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); display: flex; align-items: center; gap: 16px; }
+.country-hero-icon { width: 48px; height: 48px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.country-hero-icon svg { width: 24px; height: 24px; color: #22c55e; }
+.country-hero-title { font-size: 18px; font-weight: 700; color: white; margin-bottom: 4px; }
+.country-hero-sub { font-size: 13px; color: rgba(255,255,255,0.5); }
+.country-grid { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px; margin-bottom: 20px; }
+.country-card { padding: 20px 16px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); display: flex; flex-direction: column; gap: 10px; }
+.country-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(34,197,94,0.15); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+.country-flag { font-size: 32px; line-height: 1; }
+.country-name { font-size: 15px; font-weight: 700; color: white; }
+.country-pay { font-size: 12px; color: rgba(255,255,255,0.5); }
+.glass-card { position: relative; z-index: 2; margin: 0 16px 20px; padding: 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
+.form-group { margin-bottom: 24px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label { display: block; font-size: 15px; font-weight: 700; color: white; margin-bottom: 12px; }
+.form-input-wrap { display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 0 16px; transition: all 0.3s; }
+.form-input-wrap:focus-within { border-color: rgba(34,197,94,0.4); box-shadow: 0 0 20px rgba(34,197,94,0.1), inset 0 0 20px rgba(34,197,94,0.02); }
+.form-input-wrap.error { border-color: rgba(239,68,68,0.5); box-shadow: 0 0 20px rgba(239,68,68,0.1); animation: shake 0.5s ease; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 10%,30%,50%,70%,90% { transform: translateX(-4px); } 20%,40%,60%,80% { transform: translateX(4px); } }
+.form-input { flex: 1; padding: 16px 0; background: none; border: none; color: white; font-size: 16px; font-weight: 600; font-family: inherit; outline: none; }
+.form-input::placeholder { color: rgba(255,255,255,0.3); font-weight: 500; }
+.bank-dropdown-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+.bank-dropdown-overlay.active { opacity: 1; visibility: visible; }
+.bank-dropdown-panel { background: linear-gradient(180deg, #0d1f0d 0%, #0a0f0a 100%); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px 24px 0 0; width: 100%; max-width: 500px; max-height: 75vh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
+.bank-dropdown-overlay.active .bank-dropdown-panel { transform: translateY(0); }
+.bank-dropdown-header { padding: 20px 24px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; }
+.bank-dropdown-title { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; color: white; }
+.bank-dropdown-close { width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 20px; transition: all 0.3s; }
+.bank-dropdown-close:hover { background: rgba(34,197,94,0.1); color: #22c55e; }
+.bank-search-wrap { padding: 12px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.bank-search-input { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; color: white; font-size: 15px; font-family: inherit; outline: none; }
+.bank-search-input:focus { border-color: rgba(34,197,94,0.3); }
+.bank-list { flex: 1; overflow-y: auto; padding: 8px 16px 20px; }
+.bank-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; cursor: pointer; transition: all 0.3s; border: 1px solid transparent; margin-bottom: 4px; }
+.bank-item:hover { background: rgba(34,197,94,0.05); border-color: rgba(34,197,94,0.1); }
+.bank-item.selected { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); }
+.bank-item-icon { width: 40px; height: 40px; background: linear-gradient(145deg, #0d3d0d, #1a5c1a); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #22c55e; flex-shrink: 0; border: 1px solid rgba(34,197,94,0.15); }
+.bank-item-name { font-size: 15px; font-weight: 600; color: white; }
+.bank-item-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(34,197,94,0.3); display: flex; align-items: center; justify-content: center; margin-left: auto; transition: all 0.3s; opacity: 0; }
+.bank-item.selected .bank-item-check { opacity: 1; background: #22c55e; border-color: #22c55e; }
+.bank-item-check svg { width: 12px; height: 12px; color: white; }
+.fee-box { padding: 20px; border-radius: 16px; background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); margin-bottom: 20px; }
+.fee-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.fee-top svg { width: 20px; height: 20px; color: #22c55e; }
+.fee-top-text { font-size: 14px; font-weight: 700; color: #22c55e; }
+.fee-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.fee-label { font-size: 14px; color: rgba(255,255,255,0.6); }
+.fee-value { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; color: #22c55e; }
+.fee-note { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.5; }
+.submit-btn { position: relative; z-index: 2; display: block; width: calc(100% - 32px); margin: 0 16px 16px; padding: 18px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.3s; font-family: inherit; box-shadow: 0 4px 20px rgba(34,197,94,0.3), 0 0 40px rgba(34,197,94,0.1); letter-spacing: 0.5px; }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(34,197,94,0.4), 0 0 50px rgba(34,197,94,0.15); }
+.submit-btn:active { transform: translateY(0) scale(0.98); }
+.security-badge { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.security-badge span { display: flex; align-items: center; gap: 6px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 20px; padding: 8px 16px; font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; }
+.security-badge svg { width: 14px; height: 14px; color: #22c55e; }
+.collateral-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 2000; display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s ease; }
+.collateral-overlay.active { opacity: 1; visibility: visible; }
+.collateral-panel { background: linear-gradient(180deg, #0d1f0d 0%, #050505 100%); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px 24px 0 0; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
+.collateral-overlay.active .collateral-panel { transform: translateY(0); }
+.collateral-header { text-align: center; margin-bottom: 24px; }
+.collateral-icon { width: 56px; height: 56px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.collateral-icon svg { width: 28px; height: 28px; color: #22c55e; }
+.collateral-title { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; color: white; margin-bottom: 4px; }
+.collateral-sub { font-size: 14px; color: rgba(255,255,255,0.5); }
+.pay-card { padding: 20px; border-radius: 20px; background: linear-gradient(135deg, #0d3d0d 0%, #1a5c1a 50%, #0d3d0d 100%); border: 1px solid rgba(34,197,94,0.2); text-align: center; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(34,197,94,0.1); }
+.pay-label { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+.pay-amount { font-family: 'Amaranth', sans-serif; font-size: 36px; font-weight: 700; color: #22c55e; text-shadow: 0 0 20px rgba(34,197,94,0.3); }
+.bank-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.bank-detail-row:last-child { border-bottom: none; }
+.bank-detail-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+.bank-detail-value { font-size: 15px; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px; }
+.copy-btn { width: 32px; height: 32px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22c55e; transition: all 0.3s; }
+.copy-btn:hover { background: rgba(34,197,94,0.2); }
+.copy-btn svg { width: 16px; height: 16px; }
+.upload-box { padding: 20px; border-radius: 16px; border: 2px dashed rgba(34,197,94,0.2); background: rgba(34,197,94,0.03); text-align: center; margin-bottom: 20px; cursor: pointer; transition: all 0.3s; }
+.upload-box:hover { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); }
+.upload-box svg { width: 24px; height: 24px; color: #22c55e; margin-bottom: 8px; }
+.upload-label { font-size: 14px; font-weight: 600; color: white; margin-bottom: 4px; }
+.upload-hint { font-size: 12px; color: rgba(255,255,255,0.4); }
+.upload-input { display: none; }
+.paid-btn { width: 100%; padding: 18px; border-radius: 16px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 16px; font-weight: 800; cursor: pointer; font-family: inherit; box-shadow: 0 4px 20px rgba(34,197,94,0.3); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.paid-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(34,197,94,0.4); }
+.loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+.loading-screen.active { display: flex; }
+.spinner { width: 70px; height: 70px; position: relative; margin-bottom: 30px; }
+.spinner-ring { position: absolute; width: 100%; height: 100%; border: 3px solid transparent; border-top-color: #22c55e; border-radius: 50%; animation: spin 1s linear infinite; }
+.spinner-ring:nth-child(2) { width: 70%; height: 70%; top: 15%; left: 15%; border-top-color: #4ade80; animation-direction: reverse; animation-duration: 0.8s; }
+.spinner-ring:nth-child(3) { width: 40%; height: 40%; top: 30%; left: 30%; border-top-color: #16a34a; animation-duration: 1.2s; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.loading-message { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.8); text-align: center; max-width: 300px; }
+.loading-shield { width: 48px; height: 48px; margin-bottom: 20px; color: #22c55e; animation: shieldFloat 2s ease-in-out infinite; }
+@keyframes shieldFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.receipt-page, .review-page { display: none; position: relative; z-index: 2; min-height: 100vh; flex-direction: column; align-items: center; padding: 40px 16px; }
+.receipt-page.active, .review-page.active { display: flex; }
+.receipt-icon { width: 80px; height: 80px; background: linear-gradient(145deg, #16a34a, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(34,197,94,0.4); animation: successPulse 2s infinite; }
+@keyframes successPulse { 0%,100% { transform: scale(1); box-shadow: 0 8px 32px rgba(34,197,94,0.4); } 50% { transform: scale(1.05); box-shadow: 0 8px 40px rgba(34,197,94,0.6); } }
+.receipt-icon svg { width: 40px; height: 40px; color: white; }
+.receipt-title { font-family: 'Amaranth', sans-serif; font-size: 28px; font-weight: 700; color: #22c55e; margin-bottom: 4px; text-align: center; }
+.receipt-subtitle { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 30px; text-align: center; }
+.receipt-card { width: 100%; max-width: 400px; background: linear-gradient(145deg, rgba(13,45,13,0.5) 0%, rgba(26,74,26,0.3) 100%); border: 1px solid rgba(34,197,94,0.15); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(34,197,94,0.1); backdrop-filter: blur(10px); }
+.receipt-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.receipt-row:last-child { border-bottom: none; }
+.receipt-label { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; }
+.receipt-value { font-size: 14px; font-weight: 700; color: white; text-align: right; }
+.receipt-value.amount { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; color: #22c55e; }
+.receipt-value.status { display: flex; align-items: center; gap: 6px; color: #22c55e; }
+.receipt-value.status svg { width: 16px; height: 16px; }
+.receipt-value.loan { color: #22c55e; }
+.receipt-value.balance { color: #22c55e; }
+.review-icon { width: 80px; height: 80px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.review-icon svg { width: 40px; height: 40px; color: #fbbf24; }
+.review-title { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; color: #fbbf24; margin-bottom: 8px; text-align: center; }
+.review-text { font-size: 14px; color: rgba(255,255,255,0.6); text-align: center; max-width: 300px; line-height: 1.6; margin-bottom: 30px; }
+.share-btn, .home-btn { width: 100%; max-width: 400px; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-family: inherit; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.share-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; }
+.share-btn:hover { background: rgba(255,255,255,0.08); }
+.home-btn { background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+.home-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34,197,94,0.4); }
+.popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.4s ease; }
+.popup-overlay.active { opacity: 1; visibility: visible; }
+.popup-card { width: 100%; max-width: 340px; background: linear-gradient(145deg, #0d1f0d 0%, #1a3a1a 100%); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(34,197,94,0.1); transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.popup-overlay.active .popup-card { transform: translateY(0) scale(1); }
+.popup-icon { width: 56px; height: 56px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+.popup-icon svg { width: 24px; height: 24px; color: #ef4444; }
+.popup-title { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; color: white; margin-bottom: 8px; }
+.popup-text { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 24px; }
+.popup-btn { width: 100%; padding: 14px; border-radius: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.3s; }
+.popup-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+@media (min-width: 768px) { .country-hero, .glass-card, .receipt-card, .country-grid { max-width: 500px; margin-left: auto; margin-right: auto; } .submit-btn { max-width: 500px; margin-left: auto; margin-right: auto; } }
+</style>
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-wave"></div><div class="aurora-wave"></div><div class="aurora-wave"></div></div>
+<div class="grid-bg"></div>
+<canvas id="particles-canvas"></canvas>
+
+<div id="phase1">
+<header class="header">
+    <button class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="header-title"><h1>Apply for Loan</h1><p>Select your country</p></div>
+</header>
+<div class="country-hero">
+    <div class="country-hero-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </div>
+    <div><div class="country-hero-title">Choose application country</div><div class="country-hero-sub">Nigeria &#8594; bank transfer &#183; Others &#8594; USDT (TRC20)</div></div>
+</div>
+<div class="country-grid" id="countryGrid">
+    <div class="country-card" data-country="Nigeria"><div class="country-flag">&#127475;&#127468;</div><div class="country-name">Nigeria</div><div class="country-pay">Pay in NGN (Bank)</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127482;&#127480;</div><div class="country-name">United States</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127468;&#127463;</div><div class="country-name">United Kingdom</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127464;&#127462;</div><div class="country-name">Canada</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127468;&#127469;</div><div class="country-name">Ghana</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127472;&#127486;</div><div class="country-name">Kenya</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127487;&#127462;</div><div class="country-name">South Africa</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127470;&#127475;</div><div class="country-name">India</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127462;&#127482;</div><div class="country-name">Australia</div><div class="country-pay">Pay in USDT</div></div>
+    <div class="country-card" data-country="other"><div class="country-flag">&#127465;&#127466;</div><div class="country-name">Germany</div><div class="country-pay">Pay in USDT</div></div>
+</div>
+</div>
+
+<div id="phase2" style="display:none">
+<header class="header">
+    <button class="back-btn" onclick="backToPhase1()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <div class="header-title"><h1>Apply for Loan</h1><p>&#127475;&#127468; Nigeria &#183; Bank Transfer</p></div>
+</header>
+<div class="glass-card">
+    <div class="form-group"><label class="form-label">Account Number</label><div class="form-input-wrap" id="accountWrap"><input type="tel" class="form-input" id="accountNumber" placeholder="Enter account number" maxlength="10" oninput="validateAccount(this)"></div></div>
+    <div class="form-group"><label class="form-label">Account Name</label><div class="form-input-wrap" id="accountNameWrap"><input type="text" class="form-input" id="accountName" placeholder="Enter account name"></div></div>
+    <div class="form-group"><label class="form-label">Select Bank</label><div class="form-input-wrap" id="bankWrap" onclick="openBankDropdown()" style="cursor:pointer"><input type="text" class="form-input" id="bankName" placeholder="Select your bank" readonly style="cursor:pointer"><svg id="bankArrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;color:rgba(255,255,255,0.4);transition:transform 0.3s;"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+    <div class="form-group"><label class="form-label">Loan Amount (&#8358;50,000 - &#8358;5,000,000)</label><div class="form-input-wrap" id="loanAmountWrap"><span style="font-size:18px;font-weight:700;color:#22c55e;margin-right:8px;">&#8358;</span><input type="tel" class="form-input" id="loanAmount" placeholder="Enter loan amount (50,000 - 5,000,000)" oninput="formatLoanAmount(this);updateFee()"></div></div>
+    <div class="fee-box" id="feeBox" style="display:none"><div class="fee-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div class="fee-top-text">Collateral Payback Fee (10%)</div></div><div class="fee-row"><div class="fee-label">You will pay:</div><div class="fee-value" id="feeAmount">&#8358;0</div></div><div class="fee-note">This fee is required to process your loan application and will be refunded with your loan.</div></div>
+</div>
+<div class="security-badge"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Secured Loan Processing</span></div>
+<button class="submit-btn" onclick="applyForLoan()">Apply for Loan</button>
+</div>
+
+<div class="collateral-overlay" id="collateralModal">
+    <div class="collateral-panel">
+        <div class="collateral-header"><div class="collateral-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div class="collateral-title">Pay Collateral Fee</div><div class="collateral-sub" id="collateralSub">10% of &#8358;50,000</div></div>
+        <div class="pay-card"><div class="pay-label">Amount to Pay</div><div class="pay-amount" id="payAmount">&#8358;5,000</div></div>
+        <div class="glass-card" style="margin:0 0 20px;padding:20px;">
+            <div class="bank-detail-row"><span class="bank-detail-label">Account Number</span><span class="bank-detail-value"><span id="payAccountNumber">194 974 0138</span><button class="copy-btn" onclick="copyAccount()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></span></div>
+            <div class="bank-detail-row"><span class="bank-detail-label">Bank</span><span class="bank-detail-value">Smartcash PSB</span></div>
+            <div class="bank-detail-row"><span class="bank-detail-label">Account Name</span><span class="bank-detail-value">OLUWAKEMI FOLOWOSELE</span></div>
+        </div>
+        <div class="upload-box" onclick="document.getElementById('collateralUpload').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div class="upload-label">Upload Screenshot</div><div class="upload-hint" id="uploadHint">Choose Image</div></div>
+        <input type="file" class="upload-input" id="collateralUpload" accept="image/*" onchange="showFileName(this)">
+        <button class="paid-btn" onclick="iHavePaid()">I Have Paid</button>
+    </div>
+</div>
+
+<div class="bank-dropdown-overlay" id="bankDropdown">
+    <div class="bank-dropdown-panel">
+        <div class="bank-dropdown-header"><div class="bank-dropdown-title">Select Bank</div><button class="bank-dropdown-close" onclick="closeBankDropdown()">&times;</button></div>
+        <div class="bank-search-wrap"><input type="text" class="bank-search-input" id="bankSearch" placeholder="Search banks..." oninput="filterBanks(this.value)"></div>
+        <div class="bank-list" id="bankList"></div>
+    </div>
+</div>
+
+<div class="loading-screen" id="loadingScreen">
+    <svg class="loading-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div class="spinner"><div class="spinner-ring"></div><div class="spinner-ring"></div><div class="spinner-ring"></div></div>
+    <div class="loading-message" id="loadingMessage">Processing loan application...</div>
+</div>
+
+<div class="receipt-page" id="receiptPage">
+    <div class="receipt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="receipt-title">Credit Alert</div>
+    <div class="receipt-subtitle">Your loan has been approved and disbursed</div>
+    <div class="receipt-card">
+        <div class="receipt-row"><span class="receipt-label">Reference ID</span><span class="receipt-value" id="refId">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Date</span><span class="receipt-value" id="transDate">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Time</span><span class="receipt-value" id="transTime">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Loan Amount</span><span class="receipt-value loan" id="transLoanAmount">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Collateral Fee</span><span class="receipt-value amount" id="transFee">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Net Credit</span><span class="receipt-value amount" id="transNet">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Balance Before</span><span class="receipt-value" id="balanceBefore">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Balance After</span><span class="receipt-value balance" id="balanceAfter">-</span></div>
+        <div class="receipt-row"><span class="receipt-label">Status</span><span class="receipt-value status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Successful</span></div>
+        <div class="receipt-row"><span class="receipt-label">Description</span><span class="receipt-value">Loan Disbursement</span></div>
+    </div>
+    <button class="share-btn" onclick="shareReceipt()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share Receipt</button>
+    <button class="home-btn" onclick="goToDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Back to Dashboard</button>
+</div>
+
+<div class="review-page" id="reviewPage">
+    <div class="review-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    <div class="review-title">Pending Admin Approval</div>
+    <div class="review-text">Your loan application is under review. Our admin team will verify your collateral payment and notify you once approved. Thank you for your patience.</div>
+    <button class="home-btn" onclick="goToDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Back to Dashboard</button>
+</div>
+
+<div class="popup-overlay" id="popupOverlay">
+    <div class="popup-card">
+        <div class="popup-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="popup-title">Not Available</div>
+        <div class="popup-text">This feature is not available for your country at the moment.</div>
+        <button class="popup-btn" onclick="closePopup()">Got it</button>
+    </div>
+</div>
+<script>
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+class Particle {
+    constructor() { this.reset(); }
+    reset() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 0.5; this.speedY = (Math.random() - 0.5) * 0.6; this.speedX = (Math.random() - 0.5) * 0.2; this.opacity = Math.random() * 0.4 + 0.2; this.glow = Math.random() * 15 + 10; this.pulseSpeed = Math.random() * 0.02 + 0.01; this.pulsePhase = Math.random() * Math.PI * 2; this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128'; }
+    update() { this.y += this.speedY; this.x += this.speedX; this.pulsePhase += this.pulseSpeed; if (this.y < -50) this.y = canvas.height + 50; if (this.y > canvas.height + 50) this.y = -50; if (this.x < -50) this.x = canvas.width + 50; if (this.x > canvas.width + 50) this.x = -50; }
+    draw() { const pulse = Math.sin(this.pulsePhase) * 0.3 + 0.7; const currentGlow = this.glow * pulse; const currentOpacity = this.opacity * pulse; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2); ctx.fillStyle = 'rgba(' + this.color + ',' + (currentOpacity * 0.1) + ')'; ctx.shadowBlur = currentGlow; ctx.shadowColor = 'rgba(' + this.color + ',0.5)'; ctx.fill(); ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = 'rgba(' + this.color + ',' + currentOpacity + ')'; ctx.shadowBlur = currentGlow * 0.3; ctx.shadowColor = 'rgba(' + this.color + ',0.8)'; ctx.fill(); ctx.shadowBlur = 0; }
+}
+for (let i = 0; i < 50; i++) { const p = new Particle(); particles.push(p); }
+function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(function(p) { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+animateParticles();
+
+function getEmailKey(baseKey) { var email = localStorage.getItem('fairmonie_user_email') || 'default'; return 'fairmonie_' + email + '_' + baseKey; }
+function loadData(key, fallback) { var val = localStorage.getItem(getEmailKey(key)); return val !== null ? val : fallback; }
+function saveData(key, value) { localStorage.setItem(getEmailKey(key), value); }
+
+var currentBalance = parseInt(loadData('balance', '0')) || 0;
+var selectedBank = '';
+var loanAmount = 0;
+var collateralFee = 0;
+
+const allowedEmails = ['folowoseleiyanu344@gmail.com','folowoseleiyanu19@gmail.com','eulaliabennett14@gmail.com','b2@gmail.com','drex@gmail.com','g3@gmail.com'];
+const allBanks = ['Access Bank','Citibank Nigeria','Ecobank Nigeria','Fidelity Bank','First Bank of Nigeria','First City Monument Bank (FCMB)','Globus Bank','Guaranty Trust Bank (GTBank)','Heritage Bank','Jaiz Bank','Keystone Bank','Kuda Bank','Lotus Bank','Moniepoint Microfinance Bank','Opay','Palmpay','Polaris Bank','Providus Bank','Stanbic IBTC Bank','Standard Chartered Bank','Sterling Bank','SunTrust Bank','Titan Trust Bank','Union Bank','United Bank for Africa (UBA)','Unity Bank','Wema Bank','Zenith Bank'];
+
+// ========== ATTACH CLICK EVENTS TO COUNTRY CARDS ==========
+document.addEventListener('DOMContentLoaded', function() {
+    var cards = document.querySelectorAll('#countryGrid .country-card');
+    for (var i = 0; i < cards.length; i++) {
+        cards[i].addEventListener('click', function() {
+            var country = this.getAttribute('data-country');
+            if (country === 'Nigeria') {
+                selectCountry('Nigeria');
+            } else {
+                showUnavailable();
+            }
+        });
+    }
+});
+
+// ========== SHOW FILE NAME WHEN UPLOADED ==========
+function showFileName(input) {
+    var hint = document.getElementById('uploadHint');
+    if (input.files && input.files.length > 0) {
+        hint.textContent = input.files[0].name;
+        hint.style.color = '#22c55e';
+    } else {
+        hint.textContent = 'Choose Image';
+        hint.style.color = 'rgba(255,255,255,0.4)';
+    }
+}
+
+function selectCountry(country) {
+    if (country !== 'Nigeria') { showUnavailable(); return; }
+    document.getElementById('phase1').style.display = 'none';
+    document.getElementById('phase2').style.display = 'block';
+}
+function backToPhase1() { document.getElementById('phase2').style.display = 'none'; document.getElementById('phase1').style.display = 'block'; }
+function showUnavailable() { document.getElementById('popupOverlay').classList.add('active'); }
+function closePopup() { document.getElementById('popupOverlay').classList.remove('active'); }
+function validateAccount(input) { input.value = input.value.replace(/\D/g, ''); if (input.value.length === 10) document.getElementById('accountWrap').classList.remove('error'); }
+function formatLoanAmount(input) { var val = input.value.replace(/\D/g, ''); if (val) input.value = parseInt(val).toLocaleString(); }
+function updateFee() { var val = document.getElementById('loanAmount').value.replace(/\D/g, ''); loanAmount = parseInt(val) || 0; collateralFee = Math.round(loanAmount * 0.1); var feeBox = document.getElementById('feeBox'); var feeAmount = document.getElementById('feeAmount'); if (loanAmount >= 50000) { feeBox.style.display = 'block'; feeAmount.textContent = '₦' + collateralFee.toLocaleString(); } else { feeBox.style.display = 'none'; } }
+function openBankDropdown() { renderBankList(); document.getElementById('bankDropdown').classList.add('active'); document.getElementById('bankArrow').style.transform = 'rotate(180deg)'; document.getElementById('bankSearch').value = ''; setTimeout(function() { document.getElementById('bankSearch').focus(); }, 300); }
+function closeBankDropdown() { document.getElementById('bankDropdown').classList.remove('active'); document.getElementById('bankArrow').style.transform = 'rotate(0deg)'; }
+function filterBanks(value) { renderBankList(value); }
+
+function renderBankList(filter) {
+    filter = filter || '';
+    var list = document.getElementById('bankList');
+    var term = filter.toLowerCase();
+    var html = '';
+    var filtered = allBanks.filter(function(b) { return b.toLowerCase().indexOf(term) !== -1; });
+    if (filtered.length > 0) {
+        filtered.forEach(function(bank) {
+            var isSelected = selectedBank === bank;
+            var initials = bank.split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
+            html += '<div class="bank-item ' + (isSelected ? 'selected' : '') + '" data-bank="' + bank + '">';
+            html += '<div class="bank-item-icon">' + initials + '</div>';
+            html += '<div class="bank-item-name">' + bank + '</div>';
+            html += '<div class="bank-item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>';
+            html += '</div>';
+        });
+    } else {
+        html = '<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.4);font-size:14px;">No banks found</div>';
+    }
+    list.innerHTML = html;
+    var items = list.querySelectorAll('.bank-item');
+    for (var i = 0; i < items.length; i++) {
+        items[i].onclick = function() {
+            var bank = this.getAttribute('data-bank');
+            if (bank) selectBank(bank);
+        };
+    }
+}
+
+function selectBank(bank) { selectedBank = bank; document.getElementById('bankName').value = bank; document.getElementById('bankWrap').classList.remove('error'); closeBankDropdown(); }
+document.getElementById('bankDropdown').addEventListener('click', function(e) { if (e.target === this) closeBankDropdown(); });
+
+function applyForLoan() {
+    var account = document.getElementById('accountNumber').value.trim();
+    var name = document.getElementById('accountName').value.trim();
+    var amountStr = document.getElementById('loanAmount').value.replace(/\D/g, '');
+    loanAmount = parseInt(amountStr) || 0;
+    collateralFee = Math.round(loanAmount * 0.1);
+    var hasError = false;
+    if (account.length !== 10) { document.getElementById('accountWrap').classList.add('error'); hasError = true; setTimeout(function() { document.getElementById('accountWrap').classList.remove('error'); }, 3000); }
+    if (!name) { document.getElementById('accountNameWrap').classList.add('error'); hasError = true; setTimeout(function() { document.getElementById('accountNameWrap').classList.remove('error'); }, 3000); }
+    if (!selectedBank) { document.getElementById('bankWrap').classList.add('error'); hasError = true; setTimeout(function() { document.getElementById('bankWrap').classList.remove('error'); }, 3000); }
+    if (loanAmount < 50000 || loanAmount > 5000000) { document.getElementById('loanAmountWrap').classList.add('error'); alert('Loan amount must be between ₦50,000 and ₦5,000,000'); hasError = true; setTimeout(function() { document.getElementById('loanAmountWrap').classList.remove('error'); }, 3000); }
+    if (hasError) return;
+    document.getElementById('collateralSub').textContent = '10% of ₦' + loanAmount.toLocaleString();
+    document.getElementById('payAmount').textContent = '₦' + collateralFee.toLocaleString();
+    document.getElementById('collateralModal').classList.add('active');
+}
+
+// ========== UPDATED ACCOUNT NUMBER AND NAME ==========
+function copyAccount() {
+    var accountNum = '1949740138';
+    navigator.clipboard.writeText(accountNum).then(function() { alert('Account number copied!'); }).catch(function() {
+        var textarea = document.createElement('textarea'); textarea.value = accountNum; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea); alert('Account number copied!');
+    });
+}
+
+function iHavePaid() {
+    var upload = document.getElementById('collateralUpload');
+    
+    if (!upload.files || upload.files.length === 0) {
+        alert('Please upload your payment screenshot first!');
+        return;
+    }
+    
+    var file = upload.files[0];
+    if (!file.type.match('image.*')) {
+        alert('Please upload a valid image file (PNG, JPG, JPEG)');
+        return;
+    }
+    
+    var userEmail = (localStorage.getItem('fairmonie_user_email') || '').trim().toLowerCase();
+    var isAllowed = allowedEmails.includes(userEmail);
+    document.getElementById('collateralModal').classList.remove('active');
+    document.getElementById('loadingScreen').classList.add('active');
+    
+    if (isAllowed) {
+        var messages = ['Verifying collateral payment...','Processing loan application...','Approving your loan...','Disbursing funds to your account...','Finalizing credit alert...','Almost done...'];
+        var msgIndex = 0; var msgElement = document.getElementById('loadingMessage');
+        var msgInterval = setInterval(function() { msgElement.style.opacity = '0'; setTimeout(function() { msgElement.textContent = messages[msgIndex % messages.length]; msgElement.style.opacity = '1'; msgIndex++; }, 300); }, 1800);
+        setTimeout(function() { clearInterval(msgInterval); document.getElementById('loadingScreen').classList.remove('active'); showCreditReceipt(); }, 6000);
+    } else {
+        var messages = ['Verifying collateral payment...','Checking transaction status...','Contacting admin team...','Finalizing review...'];
+        var msgIndex = 0; var msgElement = document.getElementById('loadingMessage');
+        var msgInterval = setInterval(function() { msgElement.style.opacity = '0'; setTimeout(function() { msgElement.textContent = messages[msgIndex % messages.length]; msgElement.style.opacity = '1'; msgIndex++; }, 300); }, 1800);
+        setTimeout(function() { clearInterval(msgInterval); document.getElementById('loadingScreen').classList.remove('active'); document.getElementById('reviewPage').classList.add('active'); saveNotification('loan','Loan Under Review','Your loan application of ₦' + loanAmount.toLocaleString() + ' is pending admin approval.','₦' + loanAmount.toLocaleString(),'debit'); }, 4000);
+    }
+}
+
+function showCreditReceipt() {
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    var timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var refId = '';
+    for (var i = 0; i < 10; i++) refId += chars.charAt(Math.floor(Math.random() * chars.length));
+    var balanceBefore = currentBalance;
+    var newBalance = currentBalance + loanAmount;
+    saveData('balance', newBalance.toString());
+    currentBalance = newBalance;
+    saveNotification('loan','Loan Approved','Your loan of ₦' + loanAmount.toLocaleString() + ' has been disbursed. Reference: ' + refId,'+₦' + loanAmount.toLocaleString(),'credit');
+    document.getElementById('refId').textContent = refId;
+    document.getElementById('transDate').textContent = dateStr;
+    document.getElementById('transTime').textContent = timeStr;
+    document.getElementById('transLoanAmount').textContent = '₦' + loanAmount.toLocaleString();
+    document.getElementById('transFee').textContent = '₦' + collateralFee.toLocaleString();
+    document.getElementById('transNet').textContent = '₦' + (loanAmount - collateralFee).toLocaleString();
+    document.getElementById('balanceBefore').textContent = '₦' + balanceBefore.toLocaleString();
+    document.getElementById('balanceAfter').textContent = '₦' + newBalance.toLocaleString();
+    document.getElementById('phase2').style.display = 'none';
+    document.getElementById('receiptPage').classList.add('active');
+}
+
+function saveNotification(type, title, message, amount, amountType) {
+    var notifications = JSON.parse(loadData('notifications', '[]'));
+    var notif = { id: Date.now(), type: type, title: title, message: message, amount: amount, amountType: amountType || 'credit', time: new Date().toISOString(), read: false };
+    notifications.unshift(notif);
+    saveData('notifications', JSON.stringify(notifications));
+}
+
+function shareReceipt() {
+    var refId = document.getElementById('refId').textContent;
+    var amount = document.getElementById('transLoanAmount').textContent;
+    var date = document.getElementById('transDate').textContent;
+    var text = 'Loan Credit Alert!\n\nAmount: ' + amount + '\nReference: ' + refId + '\nDate: ' + date + '\nStatus: Successful\n\nFairMonie Pay';
+    if (navigator.share) { navigator.share({ title: 'FairMonie Loan Receipt', text: text }); }
+    else { navigator.clipboard.writeText(text).then(function() { alert('Receipt copied to clipboard!'); }); }
+}
+
+function goBack() { window.location.href = 'dashboard.html'; }
+function goToDashboard() { window.location.href = 'dashboard.html'; }
+</script>
+</body>
+</html>

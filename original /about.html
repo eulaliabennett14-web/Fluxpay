@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>About FairMonie Pay</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+            background: #0f1a0f; 
+            color: white; 
+            overflow-x: hidden; 
+            min-height: 100vh;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .header { 
+            position: relative; 
+            z-index: 2; 
+            display: flex; 
+            align-items: center; 
+            padding: 16px 20px 12px; 
+            background: rgba(15, 26, 15, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+        }
+        .back-btn { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 12px; 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(34, 197, 94, 0.15); 
+            color: #22c55e; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            text-decoration: none; 
+            font-size: 20px; 
+            margin-right: 16px; 
+            font-weight: 900;
+        }
+        .back-btn:hover { 
+            background: rgba(34, 197, 94, 0.1); 
+            transform: translateX(-2px);
+        }
+        .header-text { flex: 1; }
+        .header h1 { 
+            font-size: 22px; 
+            font-weight: 900; 
+            color: white; 
+            letter-spacing: -0.3px; 
+        }
+        .header-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .container { 
+            position: relative; 
+            z-index: 2; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            padding: 20px 16px 40px; 
+        }
+
+        .about-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px;
+            padding: 32px 24px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .shield-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 32px;
+            color: #22c55e;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.15);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3); }
+            50% { box-shadow: 0 0 20px 5px rgba(34, 197, 94, 0.1); }
+        }
+
+        .brand-name {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .tagline {
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .about-text {
+            font-size: 15px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .about-text p {
+            margin-bottom: 14px;
+        }
+        .about-text .highlight {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #22c55e;
+            margin: 24px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .offer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .offer-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: rgba(34, 197, 94, 0.05);
+            border: 1px solid rgba(34, 197, 94, 0.1);
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+        .offer-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+        }
+
+        .trust-card {
+            background: rgba(34, 197, 94, 0.06);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+        .trust-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+        .trust-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+        }
+        .trust-item {
+            padding: 14px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .trust-item .icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+        .trust-item .label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+        }
+        .trust-item .value {
+            font-size: 15px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .bottom-badge {
+            text-align: center;
+            padding: 20px;
+            margin-top: 16px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        .version {
+            text-align: center;
+            padding: 30px 20px 10px;
+            color: rgba(255,255,255,0.25);
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="header">
+        <a href="more.html" class="back-btn">&#8592;</a>
+        <div class="header-text">
+            <h1>About FairMonie Pay</h1>
+            <p class="header-sub">Your Trusted Financial Partner</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="about-card">
+            <div class="shield-icon">&#128274;</div>
+            <div class="brand-name">FairMonie Pay</div>
+            <div class="tagline">Smart Banking. Instant Rewards. Real Loans.</div>
+
+            <div class="about-text">
+                <p>Welcome to <span class="highlight">FairMonie Pay</span> — your all-in-one financial platform designed to make money work for you.</p>
+                <p>Whether you need <span class="highlight">instant loans</span>, want to <span class="highlight">claim daily bonuses</span>, purchase <span class="highlight">airtime & data</span>, subscribe to <span class="highlight">cable TV</span>, fund your <span class="highlight">betting wallet</span>, or make <span class="highlight">secure withdrawals</span> — we've got you covered.</p>
+                <p>Our platform is built on <span class="highlight">bank-grade security</span> with 256-bit SSL encryption, ensuring your data and transactions are always protected.</p>
+                <p>FairMonie Pay is committed to <span class="highlight">financial inclusion</span> — giving every Nigerian access to fast, reliable, and transparent financial services.</p>
+            </div>
+
+            <div class="section-title">
+                <span>&#9889;</span> What We Offer
+            </div>
+            <div class="offer-grid">
+                <div class="offer-item"><div class="offer-dot"></div>Instant Loans</div>
+                <div class="offer-item"><div class="offer-dot"></div>Daily Bonuses</div>
+                <div class="offer-item"><div class="offer-dot"></div>Airtime Top-up</div>
+                <div class="offer-item"><div class="offer-dot"></div>Data Purchase</div>
+                <div class="offer-item"><div class="offer-dot"></div>Cable TV (DStv, GOtv)</div>
+                <div class="offer-item"><div class="offer-dot"></div>Betting Wallet</div>
+                <div class="offer-item"><div class="offer-dot"></div>Fast Withdrawals</div>
+                <div class="offer-item"><div class="offer-dot"></div>Referral Rewards</div>
+            </div>
+
+            <div class="section-title">
+                <span>&#128274;</span> Why Trust Us
+            </div>
+            <div class="trust-card">
+                <div class="trust-grid">
+                    <div class="trust-item">
+                        <div class="icon">&#128274;</div>
+                        <div class="value">256-bit SSL</div>
+                        <div class="label">Encryption</div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="icon">&#127975;</div>
+                        <div class="value">CBN Licensed</div>
+                        <div class="label">Regulated</div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="icon">&#128101;</div>
+                        <div class="value">10,000+</div>
+                        <div class="label">Happy Users</div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="icon">&#128640;</div>
+                        <div class="value">24/7</div>
+                        <div class="label">Support</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-badge">
+                &#9989; Licensed &bull; Regulated &bull; Secured &bull; Trusted
+            </div>
+        </div>
+
+        <div class="version">FairMonie Pay &bull; Version 2.0.1 &bull; Secured by 256-bit SSL</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#22c55e" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2, "random": true },
+                "size": { "value": 2, "random": true },
+                "line_linked": { "enable": false },
+                "move": {
+                    "enable": true,
+                    "speed": 0.5,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "bubble" },
+                    "onclick": { "enable": false },
+                    "resize": true
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+</body>
+</html>

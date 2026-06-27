@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Transaction History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Amaranth', sans-serif;
+            background: #ffffff;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            margin-bottom: 24px;
+        }
+
+        .back-btn {
+            color: #16a34a;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: 'Amaranth', sans-serif;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        /* User Info Card */
+        .user-card {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .user-phone {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .user-balance {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        /* Transaction Card */
+        .transaction-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            transition: transform 0.2s;
+        }
+
+        .transaction-card:active {
+            transform: scale(0.98);
+        }
+
+        .transaction-left {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .transaction-type {
+            font-size: 18px;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .transaction-date {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        .transaction-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .transaction-amount {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .transaction-amount.positive {
+            color: #16a34a;
+        }
+
+        .transaction-amount.negative {
+            color: #ef4444;
+        }
+
+        .transaction-status {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        /* Clear Button */
+        .clear-btn {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .clear-btn:active {
+            opacity: 0.7;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 320px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal-btn-cancel {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .modal-btn-confirm {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">← Back</button>
+            <h1 class="page-title">Transaction History</h1>
+            <button class="clear-btn" onclick="showClearModal()">Clear</button>
+        </div>
+
+        <!-- User Info Card -->
+        <div class="user-card">
+            <div class="user-phone" id="userPhone">Account: Loading...</div>
+            <div class="user-balance">Balance: <span id="userBalance">₦0</span></div>
+        </div>
+
+        <!-- Transaction List -->
+        <div id="transactionList"></div>
+
+        <!-- Empty State (hidden by default) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">No transactions yet</div>
+            <div class="empty-text" style="font-size: 12px; margin-top: 8px;">Start mining to see your history</div>
+        </div>
+    </div>
+
+    <!-- Clear History Modal -->
+    <div class="modal-overlay" id="clearModal">
+        <div class="modal">
+            <div class="modal-title">Clear History?</div>
+            <div class="modal-text">This will permanently delete all your transaction history. This action cannot be undone.</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeClearModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="clearHistory()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let currentUser = null;
+        let transactions = [];
+        let currentBalance = 0;
+
+        // ========== STORAGE KEYS (per phone number) ==========
+        function getHistoryKey() {
+            return `bankWallet_history_${currentUser}`;
+        }
+
+        function getMiningKey() {
+            return `bankWallet_mining_${currentUser}`;
+        }
+
+        // ========== LOAD DATA ==========
+        function loadUserData() {
+            currentUser = localStorage.getItem('bankWallet_currentUser');
+            
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            document.getElementById('userPhone').textContent = 'Account: ' + currentUser;
+            
+            // Load balance
+            const miningKey = getMiningKey();
+            const miningData = JSON.parse(localStorage.getItem(miningKey) || '{}');
+            currentBalance = miningData.balance || 0;
+            document.getElementById('userBalance').textContent = '₦' + currentBalance.toLocaleString();
+            
+            // Load transactions
+            const historyKey = getHistoryKey();
+            const saved = localStorage.getItem(historyKey);
+            transactions = saved ? JSON.parse(saved) : [];
+            
+            return true;
+        }
+
+        // ========== SAVE TRANSACTIONS ==========
+        function saveTransactions() {
+            const historyKey = getHistoryKey();
+            localStorage.setItem(historyKey, JSON.stringify(transactions));
+        }
+
+        // ========== RENDER TRANSACTIONS ==========
+        function renderTransactions() {
+            const list = document.getElementById('transactionList');
+            const empty = document.getElementById('emptyState');
+
+            if (transactions.length === 0) {
+                list.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            list.style.display = 'block';
+            empty.style.display = 'none';
+            
+            // Sort by date (newest first)
+            const sorted = [...transactions].reverse();
+            
+            list.innerHTML = sorted.map(tx => `
+                <div class="transaction-card">
+                    <div class="transaction-left">
+                        <div class="transaction-type">${tx.type}</div>
+                        <div class="transaction-date">${tx.date}</div>
+                    </div>
+                    <div class="transaction-right">
+                        <div class="transaction-amount ${tx.type === 'Withdrawal' ? 'negative' : 'positive'}">
+                            ${tx.type === 'Withdrawal' ? '-' : '+'}${tx.amount}
+                        </div>
+                        <div class="transaction-status">${tx.status}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ========== ADD NEW TRANSACTION ==========
+        function addTransaction(type, amount, status = 'Successful') {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-GB') + ', ' + now.toLocaleTimeString('en-GB');
+            
+            transactions.push({
+                type: type,
+                date: date,
+                amount: amount,
+                status: status
+            });
+            
+            saveTransactions();
+            renderTransactions();
+            
+            // Update balance display
+            if (type === 'Mining') {
+                currentBalance += parseInt(amount.replace(/[^0-9]/g, ''));
+            } else if (type === 'Withdrawal') {
+                currentBalance -= parseInt(amount.replace(/[^0-9]/g, ''));
+            }
+            document.getElementById('userBalance').textContent = '₦' + currentBalance.toLocaleString();
+        }
+
+        // ========== CLEAR HISTORY ==========
+        function clearHistory() {
+            transactions = [];
+            saveTransactions();
+            renderTransactions();
+            closeClearModal();
+        }
+
+        // ========== MODAL FUNCTIONS ==========
+        function showClearModal() {
+            document.getElementById('clearModal').classList.add('active');
+        }
+
+        function closeClearModal() {
+            document.getElementById('clearModal').classList.remove('active');
+        }
+
+        // ========== NAVIGATION ==========
+        function goBack() {
+            window.location.href = 'dashboard2.html';
+        }
+
+        // ========== MAKE ADD TRANSACTION AVAILABLE GLOBALLY ==========
+        window.addTransaction = addTransaction;
+
+        // ========== INITIALIZE ==========
+        if (loadUserData()) {
+            renderTransactions();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('clearModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeClearModal();
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>About Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --bg-card: #1a2332; --bg-card-hover: #1e293b;
+            --accent-green: #00d4aa; --accent-green-dark: #00a884; --accent-gold: #f59e0b;
+            --accent-gold-light: #fbbf24; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+            --accent-red: #ef4444; --accent-orange: #f97316; --accent-pink: #ec4899;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-border: rgba(0, 212, 170, 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(6,13,26,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .back-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .main-content { position: relative; z-index: 1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+
+        .about-hero { text-align: center; padding: 30px 20px; margin-bottom: 20px; }
+        .about-logo { width: 80px; height: 80px; border-radius: 24px; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 40px; box-shadow: 0 0 40px rgba(0,212,170,0.3); animation: logo-float 3s ease-in-out infinite; }
+        .about-logo svg { width: 40px; height: 40px; fill: #fff; }
+        @keyframes logo-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .about-hero h2 { font-family: 'Amaranth', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+        .about-hero p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; max-width: 400px; margin: 0 auto; }
+        .about-version { display: inline-block; margin-top: 12px; padding: 6px 16px; background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.15); border-radius: 20px; font-size: 12px; color: var(--accent-green); font-weight: 600; }
+
+        .feature-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 14px; position: relative; overflow: hidden; transition: var(--transition-smooth); }
+        .feature-card:hover { transform: translateY(-3px); border-color: rgba(0,212,170,0.2); }
+        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+        .feature-card.welcome::before { background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark)); }
+        .feature-card.fluxcore::before { background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); }
+        .feature-card.referral::before { background: linear-gradient(90deg, var(--accent-gold), var(--accent-orange)); }
+        .feature-card.invest::before { background: linear-gradient(90deg, var(--accent-pink), var(--accent-red)); }
+        .feature-card.withdraw::before { background: linear-gradient(90deg, var(--accent-green), var(--accent-gold)); }
+        .feature-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .feature-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .feature-icon svg { width: 24px; height: 24px; }
+        .feature-icon.welcome { background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,212,170,0.05)); border: 1px solid rgba(0,212,170,0.2); }
+        .feature-icon.welcome svg { fill: var(--accent-green); }
+        .feature-icon.fluxcore { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.05)); border: 1px solid rgba(59,130,246,0.2); }
+        .feature-icon.fluxcore svg { fill: var(--accent-blue); }
+        .feature-icon.referral { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(249,115,22,0.05)); border: 1px solid rgba(245,158,11,0.2); }
+        .feature-icon.referral svg { fill: var(--accent-gold); }
+        .feature-icon.invest { background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(239,68,68,0.05)); border: 1px solid rgba(236,72,153,0.2); }
+        .feature-icon.invest svg { fill: var(--accent-pink); }
+        .feature-icon.withdraw { background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(245,158,11,0.05)); border: 1px solid rgba(0,212,170,0.2); }
+        .feature-icon.withdraw svg { fill: var(--accent-green); }
+        .feature-title h3 { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; }
+        .feature-title span { font-size: 12px; color: var(--text-muted); }
+        .feature-amount { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .feature-amount.green { color: var(--accent-green); }
+        .feature-amount.blue { color: var(--accent-blue); }
+        .feature-amount.gold { color: var(--accent-gold); }
+        .feature-amount.pink { color: var(--accent-pink); }
+        .feature-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .feature-desc strong { color: var(--text-primary); }
+        .feature-highlight { display: inline-block; margin-top: 10px; padding: 6px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 12px; color: var(--accent-gold); font-weight: 600; }
+
+        .stats-section { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; text-align: center; }
+        .stats-section h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--text-secondary); }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .stat-box { padding: 16px; background: var(--bg-secondary); border-radius: 14px; border: 1px solid var(--border-color); }
+        .stat-box-value { font-family: 'Amaranth', sans-serif; font-size: 28px; font-weight: 700; color: var(--accent-gold); margin-bottom: 4px; }
+        .stat-box-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+        .how-it-works { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; }
+        .how-it-works h3 { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        .step-row { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .step-row:last-child { border-bottom: none; }
+        .step-num { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); display: flex; align-items: center; justify-content: center; font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 0 15px rgba(245,158,11,0.3); }
+        .step-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .step-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        .trust-section { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; text-align: center; }
+        .trust-section h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--text-secondary); }
+        .trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .trust-item { padding: 16px; background: var(--bg-secondary); border-radius: 14px; border: 1px solid var(--border-color); }
+        .trust-item svg { width: 24px; height: 24px; margin-bottom: 8px; stroke: var(--accent-green); fill: none; stroke-width: 2; }
+        .trust-item h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+        .trust-item p { font-size: 11px; color: var(--text-muted); }
+
+        .contact-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; text-align: center; }
+        .contact-card h3 { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+        .contact-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; border: none; border-radius: 14px; font-family: 'Amaranth', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 20px rgba(0,212,170,0.3); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,212,170,0.4); }
+        .contact-links { display: flex; gap: 10px; margin-top: 14px; }
+        .contact-link { flex: 1; padding: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-secondary); font-size: 12px; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; transition: var(--transition-smooth); }
+        .contact-link:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+        .about-footer { text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px; }
+        .about-footer a { color: var(--accent-gold); text-decoration: none; }
+        .about-footer a:hover { text-decoration: underline; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(0,212,170,0.2); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <canvas id="bg-particles"></canvas>
+    <div class="toast" id="toast"><span id="toastText">Message</span></div>
+
+    <header class="header">
+        <a href="dashboard.html" class="back-btn">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <h1>ℹ️ About</h1>
+    </header>
+
+    <div class="main-content">
+        <!-- Hero -->
+        <div class="about-hero">
+            <div class="about-logo">
+                <svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+            </div>
+            <h2>Flux Pay</h2>
+            <p>Premium fintech earning platform designed to help Nigerians build wealth through multiple income streams.</p>
+            <div class="about-version">Version 3.0.1</div>
+        </div>
+
+        <!-- Welcome Bonus -->
+        <div class="feature-card welcome">
+            <div class="feature-header">
+                <div class="feature-icon welcome">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>
+                </div>
+                <div class="feature-title"><h3>Welcome Bonus</h3><span>Instant reward</span></div>
+            </div>
+            <div class="feature-amount green">₦100,000</div>
+            <div class="feature-desc">Get <strong>₦100,000 instantly</strong> upon signup with FluxCore. No deposit required — just create your account and claim your welcome bonus to start earning right away!</div>
+            <div class="feature-highlight">✨ Free money to get started</div>
+        </div>
+
+        <!-- FluxCore -->
+        <div class="feature-card fluxcore">
+            <div class="feature-header">
+                <div class="feature-icon fluxcore">
+                    <svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+                </div>
+                <div class="feature-title"><h3>FluxCore Earnings</h3><span>Daily passive income</span></div>
+            </div>
+            <div class="feature-amount blue">₦5,000</div>
+            <div class="feature-desc">Earn <strong>₦5,000 every 24 hours</strong> with FluxCore. Claim your rewards daily — the countdown resets after each claim so you can keep earning!</div>
+            <div class="feature-highlight">🔄 Resets every 24 hours</div>
+        </div>
+
+        <!-- Referral -->
+        <div class="feature-card referral">
+            <div class="feature-header">
+                <div class="feature-icon referral">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg>
+                </div>
+                <div class="feature-title"><h3>Referral Earnings</h3><span>Invite & earn</span></div>
+            </div>
+            <div class="feature-amount gold">₦1,000</div>
+            <div class="feature-desc">Earn <strong>₦1,000 per referral</strong>. Share your referral code with friends and earn every time they sign up. No limit — invite as many people as you want!</div>
+            <div class="feature-highlight">🚀 Unlimited referrals</div>
+        </div>
+
+        <!-- Investment -->
+        <div class="feature-card invest">
+            <div class="feature-header">
+                <div class="feature-icon invest">
+                    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                </div>
+                <div class="feature-title"><h3>Investment Products</h3><span>High returns</span></div>
+            </div>
+            <div class="feature-amount pink">50-80%</div>
+            <div class="feature-desc">Invest from <strong>₦5,000 to ₦250,000</strong> in our VIP plans. Earn returns from <strong>50% up to 80%</strong> depending on your plan. VIP 1 starts at ₦5,000 → ₦7,750, VIP 7 at ₦250,000 → ₦450,000!</div>
+            <div class="feature-highlight">💎 7 VIP tiers available</div>
+        </div>
+
+        <!-- Withdrawals -->
+        <div class="feature-card withdraw">
+            <div class="feature-header">
+                <div class="feature-icon withdraw">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+                <div class="feature-title"><h3>Withdrawals</h3><span>Fast & secure</span></div>
+            </div>
+            <div class="feature-amount green">₦100,000</div>
+            <div class="feature-desc"><strong>Premium</strong> (₦6,350) unlocks <strong>one month</strong> of withdrawals. <strong>Lifetime</strong> (₦20,000) gives <strong>unlimited withdrawals</strong> forever. Minimum withdrawal is ₦100,000. Processed within 24-48 hours!</div>
+            <div class="feature-highlight">🔓 Lifetime = unlimited withdrawals</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-section">
+            <h3>Trusted by Thousands</h3>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-box-value">50K+</div><div class="stat-box-label">Active Users</div></div>
+                <div class="stat-box"><div class="stat-box-value">₦500M+</div><div class="stat-box-label">Paid Out</div></div>
+                <div class="stat-box"><div class="stat-box-value">99.9%</div><div class="stat-box-label">Uptime</div></div>
+                <div class="stat-box"><div class="stat-box-value">4.8★</div><div class="stat-box-label">User Rating</div></div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="how-it-works">
+            <h3>How It Works</h3>
+            <div class="step-row">
+                <div class="step-num">1</div>
+                <div class="step-content"><h4>Sign Up</h4><p>Create your free account in seconds. No credit card required.</p></div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">2</div>
+                <div class="step-content"><h4>Claim Welcome Bonus</h4><p>Get ₦100,000 instantly added to your wallet via FluxCore.</p></div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">3</div>
+                <div class="step-content"><h4>Earn Daily</h4><p>Claim ₦5,000 every 24 hours. Invite friends for ₦1,000 each.</p></div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">4</div>
+                <div class="step-content"><h4>Invest & Grow</h4><p>Choose a VIP plan and earn up to 80% returns on your investment.</p></div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">5</div>
+                <div class="step-content"><h4>Withdraw</h4><p>Upgrade to Premium or Lifetime to withdraw. Min ₦100,000.</p></div>
+            </div>
+        </div>
+
+        <!-- Trust -->
+        <div class="trust-section">
+            <h3>Why Trust Flux Pay?</h3>
+            <div class="trust-grid">
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <h4>Secure</h4><p>Bank-level encryption</p>
+                </div>
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <h4>Fast</h4><p>24-48hr withdrawals</p>
+                </div>
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+                    <h4>Support</h4><p>24/7 live chat</p>
+                </div>
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>
+                    <h4>Verified</h4><p>Registered & compliant</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="contact-card">
+            <h3>Need Help?</h3>
+            <button class="contact-btn" onclick="window.location.href='support.html'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                Live Chat Support
+            </button>
+            <div class="contact-links">
+                <a href="mailto:support@fluxpay.com" class="contact-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Email
+                </a>
+                <a href="https://whatsapp.com/channel/0029VbChXCg5a23zm42vXs0R" class="contact-link" target="_blank">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="about-footer">
+            <p>© 2026 Flux Pay. All rights reserved.</p>
+            <p><a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a></p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var canvas = document.getElementById('bg-particles');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var particles = [], w, h;
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            resize(); window.addEventListener('resize', resize);
+            function Particle() { this.reset(); }
+            Particle.prototype.reset = function() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.size = Math.random() * 3 + 1.5; this.speedY = -(Math.random() * 0.35 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.18; this.opacity = Math.random() * 0.4 + 0.2;
+                this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+            };
+            Particle.prototype.update = function() {
+                this.y += this.speedY; this.x += this.speedX; this.life--;
+                if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+                if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+            };
+            Particle.prototype.draw = function() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+                ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+            };
+            var count = window.innerWidth < 768 ? 25 : 40;
+            for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+            function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+            animate();
+        })();
+
+        function showToast(message) {
+            var toast = document.getElementById('toast');
+            document.getElementById('toastText').textContent = message;
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+
+        console.log('ℹ️ Flux Pay About — Updated with actual values & SVG icons');
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

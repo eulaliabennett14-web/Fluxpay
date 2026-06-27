@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Welcome - FairMonie Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1a0f; color: white; overflow-x: hidden; min-height: 100vh;
+        }
+
+        .aurora-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: #0f1a0f; overflow: hidden; }
+        .aurora-wave { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(ellipse at 30% 20%, rgba(34,197,94,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.04) 0%, transparent 60%); animation: auroraMove 15s ease-in-out infinite; }
+        .aurora-wave:nth-child(2) { animation-delay: -5s; animation-duration: 20s; background: radial-gradient(ellipse at 60% 30%, rgba(34,197,94,0.06) 0%, transparent 50%), radial-gradient(ellipse at 20% 70%, rgba(74,222,128,0.04) 0%, transparent 50%); }
+        .aurora-wave:nth-child(3) { animation-delay: -10s; animation-duration: 25s; background: radial-gradient(ellipse at 80% 60%, rgba(16,185,129,0.05) 0%, transparent 50%), radial-gradient(ellipse at 40% 40%, rgba(34,197,94,0.03) 0%, transparent 50%); }
+        @keyframes auroraMove { 0%,100% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(5%,5%) rotate(2deg); } 50% { transform: translate(-3%,8%) rotate(-1deg); } 75% { transform: translate(8%,-5%) rotate(1deg); } }
+
+        .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px); background-size: 50px 50px; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
+
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+        .onboarding-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px;
+            background: rgba(10, 25, 10, 0.5); backdrop-filter: blur(4px);
+        }
+
+        .onboarding-card {
+            width: 100%; max-width: 440px;
+            background: rgba(15, 30, 15, 0.9);
+            border: 1px solid rgba(34, 197, 94, 0.12);
+            border-radius: 28px; padding: 36px 24px 28px;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(34,197,94,0.06);
+            animation: cardSlideUp 0.7s ease-out;
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+
+        @keyframes cardSlideUp { 0% { opacity: 0; transform: translateY(40px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .onboarding-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; background: linear-gradient(90deg, #16a34a, #22c55e, #4ade80);
+        }
+
+        .step-content { display: none; }
+        .step-content.active { display: block; animation: fadeInStep 0.45s ease-out; }
+        @keyframes fadeInStep { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
+
+        .step-icon { font-size: 44px; margin-bottom: 14px; display: inline-block; }
+        .step-icon.bounce { animation: gentleBounce 2.5s ease-in-out infinite; }
+        @keyframes gentleBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+        .step-title { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; color: white; margin-bottom: 10px; line-height: 1.3; }
+        .step-title .green { color: #22c55e; }
+
+        .step-desc { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 24px; line-height: 1.7; }
+        .step-desc strong { color: #69f0ae; font-weight: 700; }
+
+        /* Features grid */
+        .feature-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; text-align: left; }
+        .feature-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px; padding: 14px 16px;
+        }
+        .feature-icon { font-size: 20px; min-width: 28px; margin-top: 1px; }
+        .feature-text h4 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 2px; }
+        .feature-text p { font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 500; }
+
+        /* Buttons */
+        .btn {
+            width: 100%; padding: 16px; border-radius: 15px; font-size: 15px; font-weight: 700;
+            cursor: pointer; font-family: inherit; transition: all 0.3s ease; border: none;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(145deg, #16a34a, #22c55e); color: white; box-shadow: 0 6px 25px rgba(34,197,94,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(34,197,94,0.4); }
+        .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-outline { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
+        .btn-outline:hover { border-color: rgba(34,197,94,0.3); color: white; }
+        .btn-joined { background: rgba(34,197,94,0.1); border: 2px solid #22c55e; color: #22c55e; cursor: default; }
+        .btn-joined:hover { transform: none; box-shadow: none; }
+        .btn-pulse { animation: btnGlow 2s ease-in-out infinite; }
+        @keyframes btnGlow { 0%,100% { box-shadow: 0 6px 25px rgba(34,197,94,0.3); } 50% { box-shadow: 0 6px 40px rgba(34,197,94,0.55); } }
+
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        .btn-row { display: flex; gap: 10px; }
+        .btn-row .btn { flex: 1; }
+
+        .status-text { font-size: 13px; color: rgba(255,255,255,0.5); min-height: 20px; }
+        .status-text.success { color: #22c55e; }
+
+        /* Referral */
+        .ref-amount { font-family: 'Amaranth', sans-serif; font-size: 42px; font-weight: 700; color: #22c55e; text-shadow: 0 0 25px rgba(34,197,94,0.25); }
+        .ref-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 18px; }
+        .ref-code-box {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            background: rgba(0,0,0,0.25); border: 1px solid rgba(34,197,94,0.15);
+            border-radius: 14px; padding: 16px; margin-bottom: 14px;
+        }
+        .ref-code { font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; color: #22c55e; letter-spacing: 1.5px; }
+        .copy-sm { padding: 8px 16px; border-radius: 10px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #22c55e; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.3s; }
+        .copy-sm.copied { background: #22c55e; color: white; }
+
+        .share-row { display: flex; gap: 8px; margin-bottom: 14px; }
+        .share-chip { flex: 1; padding: 11px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.025); color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; text-align: center; }
+        .share-chip:hover { border-color: rgba(34,197,94,0.25); background: rgba(34,197,94,0.04); color: white; }
+
+        /* Payment card */
+        .info-banner {
+            background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(22,163,74,0.06));
+            border: 1px solid rgba(34,197,94,0.15); border-radius: 14px;
+            padding: 14px 18px; display: flex; align-items: center; gap: 10px;
+            margin-bottom: 20px; font-size: 14px; font-weight: 700; color: #22c55e;
+        }
+
+        .checklist { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; text-align: left; }
+        .check-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.75); }
+        .check-dot { width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #22c55e; flex-shrink: 0; }
+
+        /* Progress */
+        .progress-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12); transition: all 0.4s; }
+        .dot.active { background: #22c55e; width: 22px; border-radius: 4px; box-shadow: 0 0 10px rgba(34,197,94,0.4); }
+        .dot.done { background: #22c55e; }
+        .step-label { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 8px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"><div class="aurora-wave"></div><div class="aurora-wave"></div><div class="aurora-wave"></div></div>
+    <div class="grid-bg"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="onboarding-overlay" id="onboardingOverlay">
+        <div class="onboarding-card">
+
+            <!-- STEP 1: WELCOME -->
+            <div class="step-content active" id="step1">
+                <div class="step-icon bounce">🌟</div>
+                <h1 class="step-title">Welcome to <span class="green">FairMonie Pay</span></h1>
+                <p class="step-desc">Your all-in-one platform for <strong>fast payments</strong>, <strong>instant rewards</strong>, and <strong>smart financial tools</strong> — designed to make your money work for you.</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-text"><h4>Bank-Grade Security</h4><p>256-bit SSL encryption protects every transaction</p></div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-text"><h4>Lightning Fast</h4><p>Instant processing on all payments and withdrawals</p></div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💰</div>
+                        <div class="feature-text"><h4>Earn Daily Rewards</h4><p>Check in, complete tasks, and watch your balance grow</p></div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="goToStep(2)">Continue</button>
+            </div>
+
+            <!-- STEP 2: WHATSAPP GROUP -->
+            <div class="step-content" id="step2">
+                <div class="step-icon bounce">💬</div>
+                <h1 class="step-title">Join Our Community</h1>
+                <p class="step-desc">Connect with thousands of FairMonie Pay users. Get <strong>exclusive updates</strong>, <strong>early access</strong> to new features, and <strong>direct support</strong> from our team.</p>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="joinBtn" onclick="handleJoin()">💬 Join WhatsApp Group</button>
+                    <div class="status-text" id="joinStatus"></div>
+                    <button class="btn btn-primary" id="step2Next" onclick="goToStep(3)" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: REFERRAL -->
+            <div class="step-content" id="step3">
+                <div class="step-icon bounce">🚀</div>
+                <h1 class="step-title">Share & Earn</h1>
+                <p class="step-desc">Invite friends to join FairMonie Pay and earn <strong>₦3,800</strong> for every successful referral. The more you share, the more you earn.</p>
+                <div class="ref-amount">₦3,800</div>
+                <div class="ref-label">per friend you refer</div>
+                <div class="ref-code-box">
+                    <span class="ref-code" id="referralCode">FMP12345</span>
+                    <button class="copy-sm" id="copyBtn" onclick="copyReferral()">Copy</button>
+                </div>
+                <div class="share-row">
+                    <div class="share-chip" onclick="shareVia('whatsapp')">💬 WhatsApp</div>
+                    <div class="share-chip" onclick="shareVia('sms')">📱 SMS</div>
+                    <div class="share-chip" onclick="shareVia('other')">🔗 More</div>
+                </div>
+                <button class="btn btn-primary" onclick="goToStep(4)">Continue</button>
+            </div>
+
+            <!-- STEP 4: PAYMENT UPGRADE -->
+            <div class="step-content" id="step4">
+                <div class="info-banner">⚡ Our payment system just got faster!</div>
+                <div class="step-icon">💳</div>
+                <h1 class="step-title">Payments Made <span class="green">Easy</span></h1>
+                <p class="step-desc">We've upgraded our payment infrastructure. Your transactions are now verified <strong>instantly</strong>, with <strong>real-time confirmations</strong> and zero delays.</p>
+                <div class="checklist">
+                    <div class="check-item"><div class="check-dot">✓</div> Instant payment verification</div>
+                    <div class="check-item"><div class="check-dot">✓</div> Faster processing on all transfers</div>
+                    <div class="check-item"><div class="check-dot">✓</div> Real-time transaction updates</div>
+                    <div class="check-item"><div class="check-dot">✓</div> Improved reliability & uptime</div>
+                </div>
+                <button class="btn btn-primary" onclick="goToStep(5)">Start Making Payments</button>
+            </div>
+
+            <!-- STEP 5: WELCOME ONBOARD -->
+            <div class="step-content" id="step5">
+                <div class="step-icon bounce">🏆</div>
+                <h1 class="step-title">You're <span class="green">All Set!</span></h1>
+                <p class="step-desc">Your account is fully activated. Here's everything you can do right now:</p>
+                <div class="checklist">
+                    <div class="check-item"><div class="check-dot">✓</div> Complete daily tasks and earn rewards</div>
+                    <div class="check-item"><div class="check-dot">✓</div> Refer friends and earn ₦3,800 each</div>
+                    <div class="check-item"><div class="check-dot">✓</div> Withdraw earnings instantly to your bank</div>
+                    <div class="check-item"><div class="check-dot">✓</div> Buy airtime, data, and pay bills seamlessly</div>
+                </div>
+                <button class="btn btn-primary btn-pulse" onclick="goToDashboard()">Go to Dashboard</button>
+            </div>
+
+            <!-- Progress Dots -->
+            <div class="progress-dots" id="progressDots">
+                <div class="dot active" data-step="1"></div>
+                <div class="dot" data-step="2"></div>
+                <div class="dot" data-step="3"></div>
+                <div class="dot" data-step="4"></div>
+                <div class="dot" data-step="5"></div>
+            </div>
+            <div class="step-label" id="stepLabel">Step 1 of 5</div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * canvas.width; this.y = canvas.height + Math.random() * 100; this.size = Math.random() * 2 + 0.5; this.speedY = Math.random() * 0.4 + 0.1; this.speedX = (Math.random() - 0.5) * 0.15; this.opacity = Math.random() * 0.4 + 0.2; this.glow = Math.random() * 15 + 10; this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128'; }
+            update() { this.y -= this.speedY; this.x += this.speedX; if (this.y < -50) this.reset(); }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fillStyle = `rgba(${this.color},${this.opacity})`; ctx.shadowBlur = this.glow; ctx.shadowColor = `rgba(${this.color},0.5)`; ctx.fill(); ctx.shadowBlur = 0; }
+        }
+        for (let i=0;i<50;i++) { const p=new Particle(); p.y=Math.random()*canvas.height; particles.push(p); }
+        function animateParticles() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animateParticles); }
+        animateParticles();
+
+        let currentStep = 1;
+        let hasJoinedGroup = false;
+
+        const referralCode = 'FMP' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        document.getElementById('referralCode').textContent = referralCode;
+        localStorage.setItem('fairmonie_referral_code', referralCode);
+
+        function goToStep(step) {
+            document.getElementById('step' + currentStep).classList.remove('active');
+            currentStep = step;
+            document.getElementById('step' + currentStep).classList.add('active');
+            updateProgress();
+            document.getElementById('stepLabel').textContent = 'Step ' + currentStep + ' of 5';
+        }
+
+        function updateProgress() {
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'done');
+                if (i + 1 === currentStep) dot.classList.add('active');
+                else if (i + 1 < currentStep) dot.classList.add('done');
+            });
+        }
+
+        function handleJoin() {
+            window.open('https://chat.whatsapp.com/JGXZkoViFIZGSG33NvutS6', '_blank');
+            hasJoinedGroup = true;
+            const btn = document.getElementById('joinBtn');
+            btn.classList.add('btn-joined');
+            btn.innerHTML = '✓ Joined Successfully';
+            btn.disabled = true;
+            document.getElementById('joinStatus').textContent = 'Excellent! You\'re now part of our community.';
+            document.getElementById('joinStatus').classList.add('success');
+            document.getElementById('step2Next').disabled = false;
+        }
+
+        function copyReferral() {
+            const code = document.getElementById('referralCode').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(showCopied);
+            } else {
+                const ta = document.createElement('textarea'); ta.value = code;
+                ta.style.position = 'fixed'; ta.style.left = '-9999px';
+                document.body.appendChild(ta); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                showCopied();
+            }
+        }
+
+        function showCopied() {
+            const btn = document.getElementById('copyBtn');
+            btn.textContent = 'Copied!'; btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+        }
+
+        function shareVia(platform) {
+            const code = document.getElementById('referralCode').textContent;
+            const msg = 'Join FairMonie Pay and start earning! Use my referral code: ' + code + ' and earn ₦3,800 per referral.';
+            if (platform === 'whatsapp') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+            else if (platform === 'sms') window.open('sms:?body=' + encodeURIComponent(msg));
+            else { if (navigator.share) navigator.share({ title: 'Join FairMonie Pay', text: msg }); else { copyReferral(); alert('Referral code copied! Share it anywhere.'); } }
+        }
+
+        function goToDashboard() {
+            document.getElementById('onboardingOverlay').style.transition = 'opacity 0.7s ease';
+            document.getElementById('onboardingOverlay').style.opacity = '0';
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
+        }
+    </script>
+</body>
+</html>

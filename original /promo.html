@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Buy Promo Code - FairMonie Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1a0f; color: white; overflow-x: hidden;
+            min-height: 100vh; padding-bottom: 20px;
+        }
+        .aurora-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: #0f1a0f; overflow: hidden; }
+        .aurora-wave { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(ellipse at 30% 20%, rgba(34,197,94,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.04) 0%, transparent 60%); animation: auroraMove 15s ease-in-out infinite; }
+        .aurora-wave:nth-child(2) { animation-delay: -5s; animation-duration: 20s; }
+        .aurora-wave:nth-child(3) { animation-delay: -10s; animation-duration: 25s; }
+        @keyframes auroraMove { 0%,100% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(5%,5%) rotate(2deg); } 50% { transform: translate(-3%,8%) rotate(-1deg); } 75% { transform: translate(8%,-5%) rotate(1deg); } }
+        .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px); background-size: 50px 50px; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        
+        .header { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { width: 40px; height: 40px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22c55e; transition: all 0.3s; }
+        .back-btn:hover { background: rgba(34,197,94,0.1); }
+        .back-btn svg { width: 20px; height: 20px; }
+        .header-title h1 { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; color: white; }
+        .header-title p { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+        .purchase-page { position: relative; z-index: 2; }
+        .purchase-card { margin: 0 16px 20px; padding: 28px 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; text-align: center; }
+        .purchase-card-icon { width: 56px; height: 56px; background: linear-gradient(145deg, #16a34a, #22c55e); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 4px 20px rgba(34,197,94,0.3); }
+        .purchase-card-icon svg { width: 28px; height: 28px; color: white; }
+        .purchase-card-title { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; color: white; margin-bottom: 8px; }
+        .purchase-card-sub { font-size: 13px; color: rgba(255,255,255,0.5); }
+        
+        .promo-list { position: relative; z-index: 2; padding: 0 16px; }
+        .promo-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; cursor: pointer; }
+        .promo-item:hover { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.15); transform: translateX(4px); }
+        .promo-info { flex: 1; }
+        .promo-name { font-size: 18px; font-weight: 700; color: white; margin-bottom: 4px; }
+        .promo-cost { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .promo-cost span { color: #22c55e; font-weight: 700; }
+        .promo-btn { padding: 12px 22px; border-radius: 14px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; box-shadow: 0 4px 15px rgba(34,197,94,0.25); }
+        .promo-btn:hover { transform: translateY(-2px); }
+
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f1a0f; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loading-screen.active { display: flex; }
+        .spinner { width: 70px; height: 70px; position: relative; margin-bottom: 30px; }
+        .spinner-ring { position: absolute; width: 100%; height: 100%; border: 3px solid transparent; border-top-color: #22c55e; border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner-ring:nth-child(2) { width: 70%; height: 70%; top: 15%; left: 15%; border-top-color: #4ade80; animation-direction: reverse; animation-duration: 0.8s; }
+        .spinner-ring:nth-child(3) { width: 40%; height: 40%; top: 30%; left: 30%; border-top-color: #16a34a; animation-duration: 1.2s; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-message { font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.8); text-align: center; max-width: 300px; min-height: 24px; transition: opacity 0.3s; }
+        
+        .payment-page { display: none; position: relative; z-index: 2; }
+        .payment-page.active { display: block; }
+        .bank-card { margin: 0 16px 20px; padding: 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; }
+        .bank-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .bank-row:last-child { border-bottom: none; }
+        .bank-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .bank-value { font-size: 16px; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px; }
+        .copy-btn { width: 32px; height: 32px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #22c55e; }
+        .copy-btn svg { width: 16px; height: 16px; }
+        .warning-box { margin: 0 16px 20px; padding: 16px; background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2); border-radius: 16px; display: flex; gap: 12px; align-items: flex-start; }
+        .warning-box svg { width: 20px; height: 20px; color: #fbbf24; flex-shrink: 0; margin-top: 2px; }
+        .warning-text { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+        .upload-section { margin: 0 16px 20px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; }
+        .upload-label { font-size: 14px; font-weight: 600; color: white; margin-bottom: 12px; }
+        .upload-input { width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; color: white; font-family: inherit; cursor: pointer; }
+        .upload-input::-webkit-file-upload-button { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 8px 16px; color: #22c55e; font-family: inherit; font-weight: 600; cursor: pointer; margin-right: 12px; }
+        .paid-btn { display: block; width: calc(100% - 32px); margin: 0 16px 20px; padding: 18px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 15px rgba(34,197,94,0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .paid-btn:hover { transform: translateY(-2px); }
+        .paid-btn svg { width: 20px; height: 20px; }
+        
+        .success-page { display: none; position: relative; z-index: 2; min-height: 100vh; flex-direction: column; align-items: center; padding: 40px 16px; }
+        .success-page.active { display: flex; }
+        .success-icon { width: 80px; height: 80px; background: linear-gradient(145deg, #16a34a, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(34,197,94,0.4); animation: successPulse 2s infinite; }
+        @keyframes successPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .success-icon svg { width: 40px; height: 40px; color: white; }
+        .success-title { font-family: 'Amaranth', sans-serif; font-size: 26px; font-weight: 700; color: #22c55e; margin-bottom: 4px; text-align: center; }
+        .success-name { font-size: 16px; font-weight: 600; color: white; margin-bottom: 4px; text-align: center; }
+        .success-subtitle { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 30px; text-align: center; }
+        .promocode-card { width: 100%; max-width: 400px; background: linear-gradient(145deg, #0d2d0d 0%, #1a4a1a 100%); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 28px 24px; margin-bottom: 24px; text-align: center; box-shadow: 0 8px 32px rgba(34,197,94,0.15); }
+        .promocode-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .promocode-value { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; color: #22c55e; letter-spacing: 2px; margin-bottom: 16px; word-break: break-all; }
+        .promocode-date { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+        .copy-code-btn { width: 100%; padding: 14px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; color: #22c55e; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .copy-code-btn:hover { background: rgba(34,197,94,0.2); }
+        .copy-code-btn svg { width: 18px; height: 18px; }
+        .copy-code-btn.copied { background: rgba(34,197,94,0.3); color: white; }
+        .expire-text { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 16px; text-align: center; }
+        .expire-text .timer { color: #fbbf24; font-weight: 600; }
+        .dashboard-btn { width: 100%; max-width: 400px; padding: 16px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; border-radius: 16px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 15px rgba(34,197,94,0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .dashboard-btn:hover { transform: translateY(-2px); }
+        .dashboard-btn svg { width: 20px; height: 20px; }
+
+        @media (min-width: 768px) { .purchase-card, .bank-card, .promocode-card { max-width: 500px; margin-left: auto; margin-right: auto; } .paid-btn, .dashboard-btn { max-width: 500px; margin-left: auto; margin-right: auto; } }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"><div class="aurora-wave"></div><div class="aurora-wave"></div><div class="aurora-wave"></div></div>
+    <div class="grid-bg"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- MAIN PAGE -->
+    <div class="purchase-page" id="purchasePage">
+        <header class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="goBack()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="header-title"><h1>Buy Promo Code</h1><p>Purchase & share rewards</p></div>
+            </div>
+        </header>
+
+        <div class="purchase-card">
+            <div class="purchase-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="purchase-card-title">Premium Promo Codes</div>
+            <div class="purchase-card-sub">Buy a code &bull; Share with anyone &bull; They redeem rewards</div>
+        </div>
+
+        <div class="promo-list">
+            <div class="promo-item" onclick="startPurchase(50000, 8000, '₦50,000 Promo Code')">
+                <div class="promo-info"><div class="promo-name">₦50,000 Code</div><div class="promo-cost">Price: <span>₦8,000</span></div></div>
+                <button class="promo-btn">Buy Now</button>
+            </div>
+            <div class="promo-item" onclick="startPurchase(100000, 16500, '₦100,000 Promo Code')">
+                <div class="promo-info"><div class="promo-name">₦100,000 Code</div><div class="promo-cost">Price: <span>₦16,500</span></div></div>
+                <button class="promo-btn">Buy Now</button>
+            </div>
+            <div class="promo-item" onclick="startPurchase(250000, 12000, '₦250,000 Promo Code')">
+                <div class="promo-info"><div class="promo-name">₦250,000 Code</div><div class="promo-cost">Price: <span>₦12,000</span></div></div>
+                <button class="promo-btn">Buy Now</button>
+            </div>
+            <div class="promo-item" onclick="startPurchase(450000, 20000, '₦450,000 Promo Code')">
+                <div class="promo-info"><div class="promo-name">₦450,000 Code</div><div class="promo-cost">Price: <span>₦20,000</span></div></div>
+                <button class="promo-btn">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6-SEC LOADER -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"><div class="spinner-ring"></div><div class="spinner-ring"></div><div class="spinner-ring"></div></div>
+        <div class="loading-message" id="loadingMessage">Preparing payment account...</div>
+    </div>
+
+    <!-- PAYMENT PAGE -->
+    <div class="payment-page" id="paymentPage">
+        <header class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="showMainPage()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="header-title"><h2 id="paymentTitle">Pay ₦8,000</h2><p>Bank Transfer &bull; Smartcash PSB</p></div>
+            </div>
+        </header>
+        <div class="bank-card">
+            <div class="bank-row"><span class="bank-label">Amount</span><span class="bank-value" style="color:#22c55e;font-size:20px;" id="payAmount">₦8,000</span></div>
+            <div class="bank-row"><span class="bank-label">Bank</span><span class="bank-value">Smartcash PSB</span></div>
+            <div class="bank-row"><span class="bank-label">Account Name</span><span class="bank-value" style="font-weight: 700; letter-spacing: 0.5px;">OLUWAKEMI FOLOWOSELE</span></div>
+            <div class="bank-row"><span class="bank-label">Account Number</span><span class="bank-value"><span id="acctNum" style="font-weight: 700; letter-spacing: 2px;">194 974 0138</span><button class="copy-btn" onclick="copyAccount()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></span></div>
+        </div>
+        <div class="warning-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="warning-text">Transfer the EXACT amount. After payment, upload your receipt below.</div>
+        </div>
+        <div class="upload-section">
+            <div class="upload-label">Upload Payment Receipt</div>
+            <input type="file" class="upload-input" id="receiptUpload" accept="image/*">
+        </div>
+        <button class="paid-btn" onclick="iHavePaid()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            I Have Paid
+        </button>
+    </div>
+
+    <!-- SUCCESS/RECEIPT PAGE -->
+    <div class="success-page" id="successPage">
+        <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="success-title" id="successTitle">Promo Code Ready!</div>
+        <div class="success-name" id="successName"></div>
+        <div class="success-subtitle" id="successSubtitle">Your promo code has been generated</div>
+        <div class="promocode-card">
+            <div class="promocode-label">Your Promo Code</div>
+            <div class="promocode-value" id="promocodeValue">------</div>
+            <div class="promocode-date" id="promocodeDate"></div>
+            <button class="copy-code-btn" id="copyCodeBtn" onclick="copyCode()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span id="copyBtnText">Copy Code</span>
+            </button>
+        </div>
+        <div class="expire-text">Expires in <span class="timer" id="expireTimer">20:00</span> minutes</div>
+        <button class="dashboard-btn" onclick="goToDashboard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Back to Dashboard
+        </button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * canvas.width; this.y = canvas.height + Math.random() * 100; this.size = Math.random() * 2 + 0.5; this.speedY = Math.random() * 0.4 + 0.1; this.speedX = (Math.random() - 0.5) * 0.15; this.opacity = Math.random() * 0.4 + 0.2; this.glow = Math.random() * 15 + 10; this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128'; }
+            update() { this.y -= this.speedY; this.x += this.speedX; if (this.y < -50) this.reset(); }
+            draw() { const pulse = Math.sin(this.pulsePhase||0) * 0.3 + 0.7; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fillStyle = `rgba(${this.color},${this.opacity})`; ctx.shadowBlur = this.glow; ctx.shadowColor = `rgba(${this.color},0.5)`; ctx.fill(); ctx.shadowBlur = 0; }
+        }
+        for (let i=0;i<50;i++) { const p=new Particle(); p.y=Math.random()*canvas.height; particles.push(p); }
+        function animateParticles() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animateParticles); }
+        animateParticles();
+
+        const allowedEmails = ['folowoseleiyanu344@gmail.com','folowoseleiyanu19@gmail.com','eulaliabennett14@gmail.com','b2@gmail.com','drex@gmail.com','g3@gmail.com'];
+        var currentReward = 0, currentPrice = 0, currentCode = '', expireInterval = null;
+
+        function startPurchase(reward, price, name) {
+            currentReward = reward; currentPrice = price;
+            document.getElementById('paymentTitle').innerHTML = 'Pay ₦' + price.toLocaleString();
+            document.getElementById('payAmount').textContent = '₦' + price.toLocaleString();
+            document.getElementById('purchasePage').style.display = 'none';
+            document.getElementById('loadingScreen').classList.add('active');
+            
+            var msgs = ['Preparing payment account...','Getting your account ready...','Securing transaction...','Almost ready...'];
+            var mi = 0;
+            var msgEl = document.getElementById('loadingMessage');
+            var msgInterval = setInterval(function() {
+                msgEl.style.opacity = '0';
+                setTimeout(function() { msgEl.textContent = msgs[mi % msgs.length]; msgEl.style.opacity = '1'; mi++; }, 300);
+            }, 1500);
+            
+            setTimeout(function() {
+                clearInterval(msgInterval);
+                document.getElementById('loadingScreen').classList.remove('active');
+                document.getElementById('paymentPage').classList.add('active');
+            }, 6000);
+        }
+
+        function showMainPage() {
+            document.getElementById('paymentPage').classList.remove('active');
+            document.getElementById('purchasePage').style.display = 'block';
+        }
+
+        function copyAccount() {
+            navigator.clipboard.writeText('1949740138').then(function() { alert('Account number copied!'); });
+        }
+
+        function iHavePaid() {
+            var upload = document.getElementById('receiptUpload');
+            if (!upload.files || upload.files.length === 0) { alert('Please upload your payment receipt first'); return; }
+            
+            var userEmail = (localStorage.getItem('fairmonie_user_email') || '').toLowerCase();
+            var isAllowed = allowedEmails.includes(userEmail);
+            
+            document.getElementById('paymentPage').classList.remove('active');
+            document.getElementById('loadingScreen').classList.add('active');
+            
+            if (isAllowed) {
+                var msgs = ['Processing your payment...','Verifying transaction...','Confirming transfer...','Generating code...','Finalizing...'];
+                var mi = 0; var msgEl = document.getElementById('loadingMessage');
+                var msgInterval = setInterval(function() {
+                    msgEl.style.opacity = '0';
+                    setTimeout(function() { msgEl.textContent = msgs[mi % msgs.length]; msgEl.style.opacity = '1'; mi++; }, 300);
+                }, 1500);
+                setTimeout(function() {
+                    clearInterval(msgInterval);
+                    document.getElementById('loadingScreen').classList.remove('active');
+                    showSuccessPage();
+                }, 8000);
+            } else {
+                var msgs = ['Processing payment...','Verifying details...','Submitting for review...','Please wait...'];
+                var mi = 0; var msgEl = document.getElementById('loadingMessage');
+                var msgInterval = setInterval(function() {
+                    msgEl.style.opacity = '0';
+                    setTimeout(function() { msgEl.textContent = msgs[mi % msgs.length]; msgEl.style.opacity = '1'; mi++; }, 300);
+                }, 1500);
+                setTimeout(function() {
+                    clearInterval(msgInterval);
+                    document.getElementById('loadingScreen').classList.remove('active');
+                    showReviewPage();
+                }, 6000);
+            }
+        }
+
+        function showSuccessPage() {
+            var now = new Date();
+            var dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+            var timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            var prefix = 'PROMO-' + (currentReward/1000) + 'K-';
+            var random = '';
+            for (var i = 0; i < 6; i++) random += chars.charAt(Math.floor(Math.random() * chars.length));
+            currentCode = prefix + random;
+
+            var promos = JSON.parse(localStorage.getItem('fairmonie_promo_codes') || '{}');
+            promos[currentCode] = { reward: currentReward, expires: now.getTime() + (20 * 60 * 1000), used: false, buyer: localStorage.getItem('fairmonie_user_email') || '', generated_at: now.getTime() };
+            localStorage.setItem('fairmonie_promo_codes', JSON.stringify(promos));
+            // Also save to global promo codes so any user can redeem
+            var globalPromos = JSON.parse(localStorage.getItem('fairmonie_global_promos') || '{}');
+            globalPromos[currentCode] = { reward: currentReward, expires: now.getTime() + (20 * 60 * 1000), used: false, generated_by: localStorage.getItem('fairmonie_user_email') || 'unknown' };
+            localStorage.setItem('fairmonie_global_promos', JSON.stringify(globalPromos));
+
+            document.getElementById('successTitle').textContent = 'Promo Code Ready!';
+            document.getElementById('successName').textContent = 'Share this code with anyone';
+            document.getElementById('successSubtitle').textContent = 'Recipient gets ₦' + currentReward.toLocaleString();
+            document.getElementById('promocodeValue').textContent = currentCode;
+            document.getElementById('promocodeValue').style.color = '#22c55e';
+            document.getElementById('promocodeDate').textContent = dateStr + ' at ' + timeStr;
+            document.getElementById('copyCodeBtn').style.display = 'flex';
+            document.querySelector('.expire-text').style.display = 'block';
+            
+            document.getElementById('successPage').classList.add('active');
+
+            var seconds = 1200;
+            var timerEl = document.getElementById('expireTimer');
+            if (expireInterval) clearInterval(expireInterval);
+            expireInterval = setInterval(function() {
+                seconds--;
+                var mins = Math.floor(seconds / 60);
+                var secs = seconds % 60;
+                timerEl.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+                if (seconds <= 0) { clearInterval(expireInterval); timerEl.textContent = 'EXPIRED'; timerEl.style.color = '#ef4444'; }
+            }, 1000);
+
+            saveNotification('Promo Code Purchased', 'You bought a ₦' + currentReward.toLocaleString() + ' promo code.', '₦' + currentReward.toLocaleString());
+        }
+
+        function showReviewPage() {
+            document.getElementById('successTitle').textContent = 'Payment Under Review';
+            document.getElementById('successName').textContent = '';
+            document.getElementById('successSubtitle').textContent = 'Admin will verify your payment';
+            document.getElementById('promocodeValue').textContent = 'PENDING';
+            document.getElementById('promocodeValue').style.color = '#fbbf24';
+            var now = new Date();
+            document.getElementById('promocodeDate').textContent = 'Submitted: ' + now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+            document.getElementById('copyCodeBtn').style.display = 'none';
+            document.querySelector('.expire-text').style.display = 'none';
+            
+            document.getElementById('successPage').classList.add('active');
+            saveNotification('Promo Under Review', 'Your ₦' + currentReward.toLocaleString() + ' promo code is under review.', 'Pending');
+        }
+
+        function copyCode() {
+            if (!currentCode) return;
+            navigator.clipboard.writeText(currentCode).then(function() {
+                var btn = document.getElementById('copyCodeBtn');
+                btn.classList.add('copied');
+                document.getElementById('copyBtnText').textContent = 'Copied!';
+                setTimeout(function() { btn.classList.remove('copied'); document.getElementById('copyBtnText').textContent = 'Copy Code'; }, 2000);
+            });
+        }
+
+        function saveNotification(title, message, amount) {
+            var emailKey = localStorage.getItem('fairmonie_user_email') || 'default';
+            var notifs = JSON.parse(localStorage.getItem('fairmonie_' + emailKey + '_notifications') || '[]');
+            notifs.unshift({ id: Date.now(), type: 'promo', title: title, message: message, amount: amount, amountType: 'credit', time: new Date().toISOString(), read: false });
+            localStorage.setItem('fairmonie_' + emailKey + '_notifications', JSON.stringify(notifs));
+        }
+
+        function goBack() { window.location.href = 'more.html'; }
+        function goToDashboard() { if (expireInterval) clearInterval(expireInterval); window.location.href = 'dashboard.html'; }
+    </script>
+</body>
+</html>

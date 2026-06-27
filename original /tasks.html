@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tasks & Earn - FairMonie Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Amaranth', sans-serif; 
+            background: #0f1a0f; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 40px;
+            font-weight: 800;
+        }
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; pointer-events: none; }
+        .header { position: relative; z-index: 2; display: flex; align-items: center; padding: 16px 20px 12px; }
+        .back-btn { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(34, 197, 94, 0.15); color: #22c55e; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; text-decoration: none; font-size: 20px; margin-right: 16px; font-weight: 900; }
+        .back-btn:hover { background: rgba(34, 197, 94, 0.1); transform: translateX(-2px); }
+        .header-text { flex: 1; }
+        .header h1 { font-size: 26px; font-weight: 900; color: white; letter-spacing: -0.5px; }
+        .header-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 2px; }
+        .container { position: relative; z-index: 2; max-width: 500px; margin: 0 auto; padding: 0 16px 40px; }
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-mini { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px 10px; text-align: center; }
+        .stat-mini .val { font-size: 20px; font-weight: 900; color: #22c55e; }
+        .stat-mini .lbl { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; font-weight: 600; }
+        .invite-banner { background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.15)); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: center; backdrop-filter: blur(10px); }
+        .invite-banner-title { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 12px; letter-spacing: 1px; }
+        .invite-code-box { background: rgba(34, 197, 94, 0.15); border-radius: 14px; padding: 14px 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+        .invite-code-text { font-size: 22px; font-weight: 900; color: #22c55e; letter-spacing: 2px; word-break: break-all; flex: 1; }
+        .copy-invite-btn { padding: 10px 24px; border-radius: 12px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 14px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2); transition: all 0.3s; white-space: nowrap; }
+        .copy-invite-btn:active { transform: scale(0.98); }
+        .invite-reward { font-size: 13px; color: #fbbf24; margin-top: 8px; }
+        .invite-reward strong { font-size: 18px; color: #22c55e; }
+        .promo-section { margin-bottom: 20px; }
+        .section-title { font-size: 20px; font-weight: 900; color: white; margin-bottom: 12px; }
+        .promo-box { display: flex; gap: 10px; }
+        .promo-input { flex: 1; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: white; font-size: 14px; font-weight: 800; font-family: inherit; outline: none; }
+        .promo-input:focus { border-color: rgba(34, 197, 94, 0.3); }
+        .promo-input::placeholder { color: rgba(255,255,255,0.3); }
+        .promo-btn { padding: 14px 24px; border-radius: 14px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 14px; font-weight: 900; cursor: pointer; white-space: nowrap; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+        .promo-btn:hover { transform: translateY(-2px); }
+        .task-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 18px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; backdrop-filter: blur(10px); transition: all 0.3s; position: relative; }
+        .task-card:hover { background: rgba(34, 197, 94, 0.04); border-color: rgba(34, 197, 94, 0.15); }
+        .task-icon-box { width: 48px; height: 48px; border-radius: 14px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #22c55e; flex-shrink: 0; }
+        .task-info { flex: 1; min-width: 0; }
+        .task-name { font-size: 16px; font-weight: 900; color: white; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
+        .task-desc { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 600; }
+        .task-reward { font-size: 13px; font-weight: 900; color: #22c55e; margin-top: 3px; }
+        .new-badge { display: inline-block; padding: 3px 8px; border-radius: 6px; background: #ef4444; color: white; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .task-btn { padding: 10px 18px; border-radius: 12px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2); transition: all 0.3s; }
+        .task-btn:hover { transform: translateY(-2px); }
+        .task-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; background: rgba(255,255,255,0.1); box-shadow: none; }
+        .countdown { font-size: 12px; color: #f59e0b; font-weight: 800; margin-top: 4px; }
+        .streak-dots { display: flex; gap: 6px; margin-top: 4px; }
+        .streak-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .streak-dot.done { background: #22c55e; border-color: #22c55e; color: white; }
+        .streak-dot.active { border-color: #22c55e; color: #22c55e; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { box-shadow: 0 0 10px 3px rgba(34,197,94,0.2); } }
+        .spin-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s; }
+        .spin-overlay.active { opacity: 1; visibility: visible; }
+        .spin-card { background: linear-gradient(145deg, #0d2d0d, #1a4a1a); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 30px 24px; text-align: center; max-width: 350px; width: 90%; }
+        .spin-title { font-size: 22px; font-weight: 900; color: #22c55e; margin-bottom: 20px; }
+        .spin-wheel { width: 180px; height: 180px; border-radius: 50%; background: conic-gradient(#22c55e 0% 3%, #4ade80 3% 10%, #22c55e 10% 25%, #f59e0b 25% 50%, #22c55e 50% 70%, #4ade80 70% 80%, #22c55e 80% 100%); margin: 0 auto 20px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 40px; transition: transform 3s cubic-bezier(0.17,0.67,0.12,0.99); }
+        .spin-arrow { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 30px; color: white; z-index: 2; }
+        .spin-result { font-size: 20px; font-weight: 900; color: white; margin: 16px 0; min-height: 30px; }
+        .spin-btn { padding: 14px 40px; border-radius: 14px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+        .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .spin-close { margin-top: 14px; background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 24px; border-radius: 12px; font-size: 14px; cursor: pointer; }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s; }
+        .popup-overlay.active { opacity: 1; visibility: visible; }
+        .popup-card { background: linear-gradient(145deg, #0d1f0d, #1a3a1a); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 28px 20px; text-align: center; max-width: 320px; width: 90%; }
+        .popup-icon { font-size: 48px; margin-bottom: 12px; }
+        .popup-title { font-size: 18px; font-weight: 900; color: white; margin-bottom: 6px; }
+        .popup-text { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+        .popup-btn { padding: 12px 30px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: white; font-size: 14px; font-weight: 800; cursor: pointer; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(145deg, #16a34a, #22c55e); color: white; padding: 14px 28px; border-radius: 16px; font-weight: 900; font-size: 14px; box-shadow: 0 10px 40px rgba(34,197,94,0.4); z-index: 1000; opacity: 0; transition: all 0.4s; display: flex; align-items: center; gap: 8px; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .recently-added { background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 20px; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .recently-added::before { content: "NEW"; position: absolute; top: 10px; right: -30px; background: #ef4444; color: white; padding: 4px 40px; font-size: 10px; font-weight: 900; transform: rotate(45deg); letter-spacing: 1px; }
+        .recently-title { font-size: 18px; font-weight: 900; color: #22c55e; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .recently-title::before { content: "✨"; }
+        .scratch-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s; }
+        .scratch-overlay.active { opacity: 1; visibility: visible; }
+        .scratch-card { background: linear-gradient(145deg, #0d2d0d, #1a4a1a); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 30px 24px; text-align: center; max-width: 350px; width: 90%; }
+        .scratch-title { font-size: 22px; font-weight: 900; color: #22c55e; margin-bottom: 20px; }
+        .scratch-area { width: 280px; height: 140px; margin: 0 auto 20px; position: relative; border-radius: 16px; overflow: hidden; background: #1a1a1a; }
+        .scratch-reveal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+        .scratch-cover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(145deg, #374151, #4b5563); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: white; cursor: pointer; transition: opacity 0.5s; }
+        .scratch-cover.scratched { opacity: 0; pointer-events: none; }
+        .scratch-cost { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+        .scratch-btn { padding: 14px 40px; border-radius: 14px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+        .scratch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .scratch-close { margin-top: 14px; background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 24px; border-radius: 12px; font-size: 14px; cursor: pointer; }
+        .quiz-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s; }
+        .quiz-overlay.active { opacity: 1; visibility: visible; }
+        .quiz-card { background: linear-gradient(145deg, #0d2d0d, #1a4a1a); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 30px 24px; text-align: center; max-width: 380px; width: 90%; }
+        .quiz-title { font-size: 22px; font-weight: 900; color: #22c55e; margin-bottom: 20px; }
+        .quiz-question { font-size: 16px; font-weight: 800; color: white; margin-bottom: 16px; line-height: 1.5; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .quiz-option { padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.3s; font-family: inherit; }
+        .quiz-option:hover { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); }
+        .quiz-option.correct { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; }
+        .quiz-option.wrong { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+        .quiz-progress { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+        .quiz-result { font-size: 20px; font-weight: 900; margin: 16px 0; }
+        .quiz-close { background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 24px; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="header">
+        <a href="more.html" class="back-btn">&#8592;</a>
+        <div class="header-text">
+            <h1>Tasks & Earn</h1>
+            <p class="header-sub">Complete tasks, earn rewards</p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-mini"><div class="val" id="taskBalance">₦0</div><div class="lbl">My Balance</div></div>
+            <div class="stat-mini"><div class="val" id="spinPoints">0</div><div class="lbl">Spin Points</div></div>
+        </div>
+        <div class="invite-banner">
+            <div class="invite-banner-title">🔗 REFER & EARN 🔗</div>
+            <div class="invite-code-box">
+                <div class="invite-code-text" id="inviteCodeDisplay">Loading...</div>
+                <button class="copy-invite-btn" onclick="copyInviteCode()">📋 Copy Code</button>
+            </div>
+            <div class="invite-reward">🎁 Get <strong>₦3,800</strong> for every friend who joins!</div>
+        </div>
+        <div class="promo-section">
+            <div class="section-title">Redeem Promo Code</div>
+            <div class="promo-box">
+                <input type="text" class="promo-input" id="promoInput" placeholder="Enter your promo code">
+                <button class="promo-btn" onclick="redeemPromo()">Redeem</button>
+            </div>
+        </div>
+        <div class="recently-added">
+            <div class="recently-title">Recently Added</div>
+            <div class="task-card">
+                <div class="task-icon-box">🎫</div>
+                <div class="task-info">
+                    <div class="task-name">Scratch & Win <span class="new-badge">NEW</span></div>
+                    <div class="task-desc">Scratch to reveal your reward! Costs 50 points</div>
+                    <div class="task-reward">Up to ₦5,000</div>
+                </div>
+                <button class="task-btn" onclick="openScratchCard()">Scratch</button>
+            </div>
+            <div class="task-card">
+                <div class="task-icon-box">🧠</div>
+                <div class="task-info">
+                    <div class="task-name">Daily Quiz <span class="new-badge">NEW</span></div>
+                    <div class="task-desc">3 hard questions. Answer all correct to win!</div>
+                    <div class="task-reward">₦1,000</div>
+                </div>
+                <button class="task-btn" id="quizBtn" onclick="openQuiz()">Start Quiz</button>
+            </div>
+
+            <!-- SHARE ON WHATSAPP STATUS (NEW TASK) -->
+            <div class="task-card" id="whatsappShareCard">
+                <div class="task-icon-box">💬</div>
+                <div class="task-info">
+                    <div class="task-name">Share on WhatsApp Status <span class="new-badge">NEW</span></div>
+                    <div class="task-desc">Share our website on your WhatsApp status & upload screenshot</div>
+                    <div class="task-reward">₦5,000</div>
+                    <div class="countdown" id="whatsappTimer" style="color:#f59e0b;"></div>
+                </div>
+                <button class="task-btn" id="whatsappBtn" onclick="startWhatsAppShare()">Share Now</button>
+            </div>
+
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📺</div>
+                <div class="task-info">
+                    <div class="task-name">Watch Ad & Earn</div>
+                    <div class="task-desc">Watch a short video advertisement</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦500</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Watch</button>
+            </div>
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📸</div>
+                <div class="task-info">
+                    <div class="task-name">Follow on Instagram</div>
+                    <div class="task-desc">Follow our Instagram page</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Follow</button>
+            </div>
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">🐦</div>
+                <div class="task-info">
+                    <div class="task-name">Follow on Twitter/X</div>
+                    <div class="task-desc">Follow our Twitter/X page</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Follow</button>
+            </div>
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">🎵</div>
+                <div class="task-info">
+                    <div class="task-name">Follow on TikTok</div>
+                    <div class="task-desc">Follow our TikTok page</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Follow</button>
+            </div>
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📺</div>
+                <div class="task-info">
+                    <div class="task-name">Subscribe on YouTube</div>
+                    <div class="task-desc">Subscribe to our YouTube channel</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦2,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Subscribe</button>
+            </div>
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📱</div>
+                <div class="task-info">
+                    <div class="task-name">Share on WhatsApp Status</div>
+                    <div class="task-desc">Share our app on your WhatsApp status</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦500</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Share</button>
+            </div>
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">⭐</div>
+                <div class="task-info">
+                    <div class="task-name">Rate App on Play Store</div>
+                    <div class="task-desc">Give us a 5-star rating</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Rate</button>
+            </div>
+        </div>
+        <div class="section-title" style="margin-bottom:12px;">Available Tasks</div>
+        <div class="task-card">
+            <div class="task-icon-box">⏰</div>
+            <div class="task-info">
+                <div class="task-name">2-Hour Check-in</div>
+                <div class="task-desc">Check in every 2 hours to earn</div>
+                <div class="task-reward">₦19,000 per check-in</div>
+                <div class="countdown" id="checkinTimer"></div>
+            </div>
+            <button class="task-btn" id="checkinBtn" onclick="doHourlyCheckin()">Claim</button>
+        </div>
+        <div class="task-card">
+            <div class="task-icon-box">🔥</div>
+            <div class="task-info">
+                <div class="task-name">Daily Login Streak</div>
+                <div class="task-desc">Login 7 days straight for bonus</div>
+                <div class="task-reward">₦25,000 on Day 7</div>
+                <div class="streak-dots" id="streakDots"></div>
+            </div>
+            <button class="task-btn" id="streakBtn" onclick="claimStreak()">Day 1</button>
+        </div>
+        <div class="task-card">
+            <div class="task-icon-box">📱</div>
+            <div class="task-info">
+                <div class="task-name">Join Telegram <span class="new-badge">NEW</span></div>
+                <div class="task-desc">Join our Telegram community</div>
+                <div class="task-reward">₦2,422</div>
+            </div>
+            <button class="task-btn" onclick="showNotAvailable()">Join</button>
+        </div>
+        <div class="task-card">
+            <div class="task-icon-box">💬</div>
+            <div class="task-info">
+                <div class="task-name">Join WhatsApp Group 1 <span class="new-badge">NEW</span></div>
+                <div class="task-desc">Join our WhatsApp community</div>
+                <div class="task-reward">₦5,000 one-time</div>
+            </div>
+            <button class="task-btn" id="wa1Btn" onclick="joinWhatsApp1()">Join</button>
+        </div>
+        <div class="task-card">
+            <div class="task-icon-box">💬</div>
+            <div class="task-info">
+                <div class="task-name">Join WhatsApp Group 2 <span class="new-badge">NEW</span></div>
+                <div class="task-desc">Join our second community</div>
+                <div class="task-reward">₦5,000 one-time</div>
+            </div>
+            <button class="task-btn" id="wa2Btn" onclick="joinWhatsApp2()">Join</button>
+        </div>
+        <div class="task-card">
+            <div class="task-icon-box">🎡</div>
+            <div class="task-info">
+                <div class="task-name">Spin the Wheel <span class="new-badge">NEW</span></div>
+                <div class="task-desc">100 points per spin. Win up to ₦10,000!</div>
+                <div class="task-reward">Random reward</div>
+            </div>
+            <button class="task-btn" onclick="openSpinWheel()">Spin (100pts)</button>
+        </div>
+        <div class="task-card" style="opacity:0.7;">
+            <div class="task-icon-box">📺</div>
+            <div class="task-info">
+                <div class="task-name">Watch Video & Earn</div>
+                <div class="task-desc">Watch short videos to earn rewards</div>
+                <div class="task-reward" style="color:#f59e0b;">Coming Soon</div>
+            </div>
+            <button class="task-btn" disabled>Soon</button>
+        </div>
+    </div>
+    <div class="spin-overlay" id="spinOverlay">
+        <div class="spin-card">
+            <div class="spin-title">🎡 Spin the Wheel</div>
+            <div style="position:relative;display:inline-block;">
+                <div class="spin-arrow">▼</div>
+                <div class="spin-wheel" id="spinWheel" style="display:flex;align-items:center;justify-content:center;font-size:60px;">🎰</div>
+            </div>
+            <div class="spin-result" id="spinResult"></div>
+            <button class="spin-btn" id="spinBtn" onclick="doSpin()">SPIN (100 pts)</button><br>
+            <button class="spin-close" onclick="closeSpin()">Close</button>
+        </div>
+    </div>
+    <div class="popup-overlay" id="notAvailPopup">
+        <div class="popup-card">
+            <div class="popup-icon">🌍</div>
+            <div class="popup-title">Not Available</div>
+            <div class="popup-text">This feature is not available for your country at the moment.</div>
+            <button class="popup-btn" onclick="closeNotAvail()">Got it</button>
+        </div>
+    </div>
+    <div class="scratch-overlay" id="scratchOverlay">
+        <div class="scratch-card">
+            <div class="scratch-title">🎫 Scratch & Win</div>
+            <div class="scratch-cost">Cost: 50 Spin Points</div>
+            <div class="scratch-area">
+                <div class="scratch-reveal" id="scratchReveal">?</div>
+                <div class="scratch-cover" id="scratchCover" onclick="doScratch()">TAP TO SCRATCH</div>
+            </div>
+            <div class="spin-result" id="scratchResult"></div>
+            <button class="scratch-btn" id="scratchBtn" onclick="openScratchCard()">Play Again (50 pts)</button><br>
+            <button class="scratch-close" onclick="closeScratch()">Close</button>
+        </div>
+    </div>
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-card">
+            <div class="quiz-title">🧠 Daily Quiz</div>
+            <div class="quiz-progress" id="quizProgress">Question 1 of 3</div>
+            <div class="quiz-question" id="quizQuestion">Loading...</div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult"></div>
+            <button class="quiz-close" id="quizCloseBtn" onclick="closeQuiz()">Close</button>
+        </div>
+    </div>
+    <div class="toast" id="toast"><span>✅</span> <span id="toastMsg">Done!</span></div>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#22c55e" }, "shape": { "type": "circle" }, "opacity": { "value": 0.3, "random": true }, "size": { "value": 2, "random": true }, "line_linked": { "enable": false }, "move": { "enable": true, "speed": 0.8, "direction": "none", "random": true, "straight": false, "out_mode": "out" } },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "bubble" }, "onclick": { "enable": false }, "resize": true } },
+            "retina_detect": true
+        });
+
+        function getEmailKey(k) { 
+            var e = localStorage.getItem('fairmonie_user_email') || localStorage.getItem('bankWallet_currentUser') || 'user';
+            return 'fairmonie_' + e + '_' + k; 
+        }
+        function loadData(k, f) { var v = localStorage.getItem(getEmailKey(k)); return v !== null ? v : f; }
+        function saveData(k, v) { localStorage.setItem(getEmailKey(k), v); }
+
+        // Get current user
+        var currentUser = localStorage.getItem('bankWallet_currentUser');
+        
+        // ===== FIXED: Load balances correctly from FairMonie dashboard =====
+        var email = localStorage.getItem('fairmonie_user_email') || currentUser || 'default';
+        
+        // Load task balance from storage
+        var taskBalance = parseInt(loadData('task_balance', '0')) || 0;
+        var spinPoints = parseInt(loadData('spin_points', '0')) || 0;
+        
+        // CRITICAL: Sync taskBalance with actual dashboard balance
+        var dashboardBalanceKey = 'fairmonie_' + email + '_balance';
+        var dashboardBalance = parseInt(localStorage.getItem(dashboardBalanceKey) || '0');
+        
+        // If dashboard has money but task balance doesn't, sync it
+        if (dashboardBalance > 0 && taskBalance === 0) {
+            taskBalance = dashboardBalance;
+            saveData('task_balance', taskBalance.toString());
+        }
+        // If task balance has money but dashboard doesn't, update dashboard
+        else if (taskBalance > 0 && dashboardBalance === 0) {
+            localStorage.setItem(dashboardBalanceKey, taskBalance.toString());
+        }
+        
+        console.log('💰 Balance synced - Task: ₦' + taskBalance + ', Dashboard: ₦' + dashboardBalance);
+
+        // HOURLY CHECK-IN
+        var lastCheckinTime = parseInt(loadData('last_checkin_time', '0')) || 0;
+
+        function updateCheckinTimer() {
+            var now = Date.now();
+            var diff = now - lastCheckinTime;
+            var twoHrs = 2 * 60 * 60 * 1000;
+            var remaining = twoHrs - diff;
+            var btn = document.getElementById('checkinBtn');
+            var timer = document.getElementById('checkinTimer');
+            if (remaining > 0) {
+                var hrs = Math.floor(remaining / (60 * 60 * 1000));
+                var mins = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                var secs = Math.floor((remaining % (60 * 1000)) / 1000);
+                timer.textContent = 'Next in: ' + hrs + 'h ' + mins + 'm ' + secs + 's';
+                if(btn) { btn.disabled = true; btn.textContent = 'Wait'; }
+                setTimeout(updateCheckinTimer, 1000);
+            } else {
+                timer.textContent = '';
+                if(btn) { btn.disabled = false; btn.textContent = 'Claim ₦19k'; }
+            }
+        }
+
+        function doHourlyCheckin() {
+            var now = Date.now();
+            var twoHrs = 2 * 60 * 60 * 1000;
+            if (now - lastCheckinTime < twoHrs) { showToast('Already checked in! Wait for timer.'); return; }
+            lastCheckinTime = now;
+            saveData('last_checkin_time', lastCheckinTime.toString());
+            addReward(19000, 'checkin', '2-Hour Check-in');
+        }
+
+        // DAILY LOGIN STREAK
+        var streakCount = parseInt(loadData('streak_count', '0')) || 0;
+        var lastStreakDate = loadData('last_streak_date', '');
+
+        function updateStreakUI() {
+            var dots = document.getElementById('streakDots');
+            var html = '';
+            for (var i = 1; i <= 7; i++) {
+                if (i <= streakCount) html += '<div class="streak-dot done">✓</div>';
+                else if (i === streakCount + 1) html += '<div class="streak-dot active">' + i + '</div>';
+                else html += '<div class="streak-dot">' + i + '</div>';
+            }
+            dots.innerHTML = html;
+            var btn = document.getElementById('streakBtn');
+            var today = new Date().toDateString();
+            if (lastStreakDate === today) { if(btn) { btn.textContent = 'Done Today'; btn.disabled = true; } }
+            else if (streakCount >= 7) { if(btn) { btn.textContent = 'Claim ₦25k!'; btn.disabled = false; } }
+            else { if(btn) { btn.textContent = 'Day ' + (streakCount + 1); btn.disabled = false; } }
+        }
+
+        function claimStreak() {
+            var today = new Date().toDateString();
+            if (lastStreakDate === today) { showToast('Already claimed today!'); return; }
+            var yesterday = new Date(Date.now() - 86400000).toDateString();
+            if (lastStreakDate === yesterday || lastStreakDate === '') {
+                streakCount++;
+                if (streakCount >= 7) { addReward(25000, 'streak', '7-Day Login Streak Bonus'); streakCount = 0; }
+                else { showToast('Day ' + streakCount + ' of 7! Keep going!'); }
+                lastStreakDate = today;
+                saveData('streak_count', streakCount.toString());
+                saveData('last_streak_date', lastStreakDate);
+            } else { streakCount = 1; lastStreakDate = today; saveData('streak_count', '1'); saveData('last_streak_date', lastStreakDate); showToast('Streak reset! Day 1 started.'); }
+            updateUI();
+        }
+
+        // WHATSAPP GROUPS
+        var wa1Done = loadData('wa1_done', 'false') === 'true';
+        var wa2Done = loadData('wa2_done', 'false') === 'true';
+
+        function joinWhatsApp1() {
+            if (wa1Done) { showToast('Already completed!'); return; }
+            wa1Done = true;
+            saveData('wa1_done', 'true');
+            addReward(5000, 'whatsapp', 'Joined WhatsApp Group 1');
+            window.open('https://chat.whatsapp.com/JGXZkoViFIZGSG33NvutS6', '_blank');
+        }
+
+        function joinWhatsApp2() {
+            if (wa2Done) { showToast('Already completed!'); return; }
+            wa2Done = true;
+            saveData('wa2_done', 'true');
+            addReward(5000, 'whatsapp', 'Joined WhatsApp Group 2');
+            window.open('https://chat.whatsapp.com/JGXZkoViFIZGSG33NvutS6', '_blank');
+        }
+
+        // INVITE CODE
+        var inviteCode = loadData('invite_code', '');
+        if (!inviteCode || inviteCode === '') {
+            var user = localStorage.getItem('bankWallet_currentUser') || localStorage.getItem('fairmonie_user_email') || 'USER';
+            inviteCode = 'FM' + user.replace(/[^0-9]/g, '').slice(-5) + Math.floor(Math.random() * 9999);
+            saveData('invite_code', inviteCode);
+        }
+        document.getElementById('inviteCodeDisplay').textContent = inviteCode;
+
+        function copyInviteCode() {
+            navigator.clipboard.writeText(inviteCode).then(function() {
+                showToast('✅ Invite code copied! Share with friends');
+            }).catch(function() {
+                showToast('Code: ' + inviteCode);
+            });
+        }
+
+        function updateUI() {
+            document.getElementById('taskBalance').textContent = '₦' + taskBalance.toLocaleString();
+            document.getElementById('spinPoints').textContent = spinPoints;
+            updateCheckinTimer();
+            updateStreakUI();
+            if (wa1Done) { var wa1 = document.getElementById('wa1Btn'); if(wa1) { wa1.textContent = 'Completed ✅'; wa1.disabled = true; } }
+            if (wa2Done) { var wa2 = document.getElementById('wa2Btn'); if(wa2) { wa2.textContent = 'Completed ✅'; wa2.disabled = true; } }
+        }
+
+        // ===== FULLY FIXED: addReward function that updates ALL balance locations =====
+        function addReward(amount, type, title) {
+            // Update task balance display
+            taskBalance += amount;
+            spinPoints += Math.floor(amount / 100);
+            saveData('task_balance', taskBalance.toString());
+            saveData('spin_points', spinPoints.toString());
+            
+            // Get current user
+            var currentUser = localStorage.getItem('bankWallet_currentUser');
+            var email = localStorage.getItem('fairmonie_user_email') || currentUser || 'default';
+            
+            // ===== UPDATE EVERY POSSIBLE BALANCE LOCATION =====
+            
+            // 1. Update FairMonie dashboard balance (fairmonie_ email)
+            var balanceKey = 'fairmonie_' + email + '_balance';
+            var currentDashboardBalance = parseInt(localStorage.getItem(balanceKey) || '0');
+            var newBalance = currentDashboardBalance + amount;
+            localStorage.setItem(balanceKey, newBalance.toString());
+            
+            // 2. Update mining balance (dashboard might read from here)
+            if (currentUser) {
+                var miningKey = 'bankWallet_mining_' + currentUser;
+                var miningData = JSON.parse(localStorage.getItem(miningKey) || '{}');
+                miningData.balance = (miningData.balance || 0) + amount;
+                miningData.lastUpdated = new Date().toISOString();
+                localStorage.setItem(miningKey, JSON.stringify(miningData));
+            }
+            
+            // 3. Also update bankWalletUser balance
+            var userData = JSON.parse(localStorage.getItem('bankWalletUser') || '{}');
+            userData.balance = (userData.balance || 0) + amount;
+            localStorage.setItem('bankWalletUser', JSON.stringify(userData));
+            
+            // 4. Update any generic balance keys
+            var genericKeys = ['balance', 'userBalance', 'walletBalance', 'currentBalance'];
+            for (var i = 0; i < genericKeys.length; i++) {
+                var existing = parseInt(localStorage.getItem(genericKeys[i]) || '0');
+                if (existing > 0 || genericKeys[i] === 'balance') {
+                    localStorage.setItem(genericKeys[i], (existing + amount).toString());
+                }
+            }
+            
+            // 5. Update taskBalance in fairmonie storage for consistency
+            var taskBalanceKey = 'fairmonie_' + email + '_task_balance';
+            var existingTaskBalance = parseInt(localStorage.getItem(taskBalanceKey) || '0');
+            localStorage.setItem(taskBalanceKey, (existingTaskBalance + amount).toString());
+            
+            console.log('💰 Added ₦' + amount + ' to ALL balance locations');
+            console.log('   New balance in fairmonie: ₦' + newBalance);
+            if (currentUser) {
+                var miningDataCheck = JSON.parse(localStorage.getItem('bankWallet_mining_' + currentUser) || '{}');
+                console.log('   New mining balance: ₦' + (miningDataCheck.balance || 0));
+            }
+            
+            // Save to history
+            var historyKey = 'bankWallet_history_' + (currentUser || email);
+            var history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            var now = new Date();
+            history.unshift({
+                type: title,
+                date: now.toLocaleDateString('en-GB') + ', ' + now.toLocaleTimeString('en-GB'),
+                amount: '+₦' + amount.toLocaleString(),
+                status: 'Successful'
+            });
+            if (history.length > 50) history.pop();
+            localStorage.setItem(historyKey, JSON.stringify(history));
+            
+            // Notification
+            var notifs = JSON.parse(localStorage.getItem(getEmailKey('notifications')) || '[]');
+            notifs.unshift({ 
+                id: Date.now(), 
+                type: type, 
+                title: title, 
+                message: 'You earned ₦' + amount.toLocaleString(), 
+                amount: '+₦' + amount.toLocaleString(), 
+                amountType: 'credit', 
+                time: new Date().toISOString(), 
+                read: false 
+            });
+            localStorage.setItem(getEmailKey('notifications'), JSON.stringify(notifs));
+            
+            updateUI();
+            showToast('+₦' + amount.toLocaleString() + ' added to your balance!');
+        }
+
+        // ===== FIXED: redeemPromo function that works with promo.html codes =====
+        function redeemPromo() {
+            var code = document.getElementById('promoInput').value.trim().toUpperCase();
+            if (!code) { showToast('Enter a promo code!'); return; }
+            
+            // Check hardcoded promo codes
+            if (code === 'FAIRMONIE10K') { addReward(10000, 'promo', 'Promo Code Redeemed'); document.getElementById('promoInput').value = ''; return; }
+            if (code === 'WELCOME5K') { addReward(5000, 'promo', 'Promo Code Redeemed'); document.getElementById('promoInput').value = ''; return; }
+            if (code === 'BONUS20K') { addReward(20000, 'promo', 'Promo Code Redeemed'); document.getElementById('promoInput').value = ''; return; }
+            
+            // Check global promo codes (from promo.html)
+            var globalPromos = JSON.parse(localStorage.getItem('fairmonie_global_promos') || '{}');
+            
+            // Also check old format
+            var oldPromos = JSON.parse(localStorage.getItem('fairmonie_promo_codes') || '{}');
+            
+            var promo = globalPromos[code] || oldPromos[code];
+            
+            if (!promo) {
+                showToast('Invalid promo code!');
+                document.getElementById('promoInput').value = '';
+                return;
+            }
+            
+            // Check if expired
+            var now = Date.now();
+            if (promo.expires && now > promo.expires) {
+                showToast('This promo code has expired!');
+                document.getElementById('promoInput').value = '';
+                return;
+            }
+            
+            // Check if already used
+            if (promo.used === true) {
+                showToast('This promo code has already been used!');
+                document.getElementById('promoInput').value = '';
+                return;
+            }
+            
+            // Mark as used in both storages
+            promo.used = true;
+            promo.redeemed_by = localStorage.getItem('fairmonie_user_email') || localStorage.getItem('bankWallet_currentUser') || 'user';
+            promo.redeemed_at = now;
+            
+            globalPromos[code] = promo;
+            localStorage.setItem('fairmonie_global_promos', JSON.stringify(globalPromos));
+            
+            // Also update old storage if exists
+            var oldPromosUpdated = JSON.parse(localStorage.getItem('fairmonie_promo_codes') || '{}');
+            if (oldPromosUpdated[code]) {
+                oldPromosUpdated[code].used = true;
+                localStorage.setItem('fairmonie_promo_codes', JSON.stringify(oldPromosUpdated));
+            }
+            
+            // Add reward
+            addReward(promo.reward, 'promo', 'Promo Code Redeemed: ' + code);
+            showToast('🎉 Promo code redeemed! +₦' + promo.reward.toLocaleString());
+            document.getElementById('promoInput').value = '';
+        }
+
+        // ===== WHATSAPP STATUS SHARE TASK (₦5,000, 12-hour auto-verify) =====
+        var whatsappShareKey = 'fairmonie_whatsapp_share_' + (localStorage.getItem('fairmonie_user_email') || currentUser || 'default');
+        
+        function checkWhatsAppShareStatus() {
+            var shareData = JSON.parse(localStorage.getItem(whatsappShareKey) || '{}');
+            var now = Date.now();
+            var btn = document.getElementById('whatsappBtn');
+            var timerDiv = document.getElementById('whatsappTimer');
+            
+            if (shareData.pending && shareData.expires) {
+                if (now >= shareData.expires) {
+                    // Time expired - auto verify and add reward
+                    if (!shareData.completed) {
+                        shareData.completed = true;
+                        shareData.status = 'completed';
+                        localStorage.setItem(whatsappShareKey, JSON.stringify(shareData));
+                        addReward(5000, 'whatsapp_share', 'WhatsApp Status Share');
+                        showToast('✅ Your WhatsApp share reward of ₦5,000 has been added!');
+                    }
+                    if (btn) { btn.disabled = false; btn.textContent = 'Share Now'; }
+                    if (timerDiv) timerDiv.textContent = '';
+                } else {
+                    // Still pending - show countdown
+                    var remaining = shareData.expires - now;
+                    var hours = Math.floor(remaining / (60 * 60 * 1000));
+                    var mins = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                    var secs = Math.floor((remaining % (60 * 1000)) / 1000);
+                    if (btn) { btn.disabled = true; btn.textContent = 'Under Review'; }
+                    if (timerDiv) timerDiv.textContent = '⏳ Payment under review: ' + hours + 'h ' + mins + 'm ' + secs + 's';
+                    setTimeout(checkWhatsAppShareStatus, 1000);
+                    return;
+                }
+            } else if (shareData.completed) {
+                var today = new Date().toDateString();
+                var lastCompletedDate = shareData.date ? new Date(shareData.date).toDateString() : '';
+                if (lastCompletedDate === today) {
+                    if (btn) { btn.disabled = true; btn.textContent = 'Completed ✅'; }
+                    if (timerDiv) timerDiv.textContent = 'Already completed today!';
+                } else {
+                    // Reset for new day
+                    localStorage.removeItem(whatsappShareKey);
+                    if (btn) { btn.disabled = false; btn.textContent = 'Share Now'; }
+                    if (timerDiv) timerDiv.textContent = '';
+                }
+            } else {
+                if (btn) { btn.disabled = false; btn.textContent = 'Share Now'; }
+                if (timerDiv) timerDiv.textContent = '';
+            }
+        }
+        
+        function startWhatsAppShare() {
+            var shareData = JSON.parse(localStorage.getItem(whatsappShareKey) || '{}');
+            var now = Date.now();
+            
+            // Check if already pending
+            if (shareData.pending && shareData.expires > now) {
+                showToast('You already have a pending share. Please wait for review.');
+                return;
+            }
+            
+            // Check if already completed today
+            if (shareData.completed) {
+                var today = new Date().toDateString();
+                var lastCompletedDate = shareData.date ? new Date(shareData.date).toDateString() : '';
+                if (lastCompletedDate === today) {
+                    showToast('You already completed this task today! Come back tomorrow.');
+                    return;
+                }
+            }
+            
+            // Prepare share message with website link
+            var websiteUrl = 'https://fairmonie-pay.name.ng';
+            var message = "🎉 *FAIRMONIE PAY* 🎉\n\nEarn money daily with FairMonie Pay!\n✅ Complete tasks\n✅ Mine daily\n✅ Instant withdrawals\n\nJoin now: " + websiteUrl + "\n\nUse my invite code: " + inviteCode;
+            
+            // Open WhatsApp
+            window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+            
+            // Show upload prompt after sharing
+            setTimeout(function() {
+                var uploadInput = document.createElement('input');
+                uploadInput.type = 'file';
+                uploadInput.accept = 'image/*';
+                uploadInput.onchange = function(e) {
+                    var file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        // Save screenshot and start 12-hour timer
+                        var reader = new FileReader();
+                        reader.onload = function(event) {
+                            var shareDataNew = {
+                                pending: true,
+                                status: 'pending',
+                                expires: Date.now() + (12 * 60 * 60 * 1000), // 12 hours
+                                screenshot: event.target.result,
+                                date: new Date().toISOString(),
+                                completed: false
+                            };
+                            localStorage.setItem(whatsappShareKey, JSON.stringify(shareDataNew));
+                            showToast('✅ Screenshot uploaded! Your ₦5,000 reward will be verified within 12 hours.');
+                            checkWhatsAppShareStatus();
+                            
+                            // Save to history as pending
+                            var historyKey = 'bankWallet_history_' + (currentUser || email);
+                            var history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+                            var nowDate = new Date();
+                            history.unshift({
+                                type: 'WhatsApp Share (Pending)',
+                                date: nowDate.toLocaleDateString('en-GB') + ', ' + nowDate.toLocaleTimeString('en-GB'),
+                                amount: '+₦5,000 (pending)',
+                                status: 'Under Review - 12 hours'
+                            });
+                            if (history.length > 50) history.pop();
+                            localStorage.setItem(historyKey, JSON.stringify(history));
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        showToast('Please upload an image file');
+                    }
+                };
+                uploadInput.click();
+            }, 2000);
+        }
+        
+        // Initialize WhatsApp share status check
+        setTimeout(function() {
+            checkWhatsAppShareStatus();
+            setInterval(checkWhatsAppShareStatus, 1000);
+        }, 100);
+
+        function showNotAvailable() { document.getElementById('notAvailPopup').classList.add('active'); }
+        function closeNotAvail() { document.getElementById('notAvailPopup').classList.remove('active'); }
+
+        // SCRATCH CARD
+        var scratchPrizes = [
+            { val: 5000, chance: 2 }, { val: 1000, chance: 8 }, { val: 500, chance: 20 },
+            { val: 200, chance: 30 }, { val: 100, chance: 25 }, { val: 0, chance: 15 }
+        ];
+        var lastScratchDate = loadData('last_scratch_date', '');
+        var todayStr = new Date().toDateString();
+
+        function openScratchCard() {
+            if (spinPoints < 50) { showToast('Not enough points! Need 50 points.'); return; }
+            if (lastScratchDate === todayStr) { showToast('Already scratched today! Come back tomorrow.'); return; }
+            document.getElementById('scratchOverlay').classList.add('active');
+            document.getElementById('scratchReveal').textContent = '?';
+            var cover = document.getElementById('scratchCover');
+            cover.classList.remove('scratched');
+            cover.textContent = 'TAP TO SCRATCH';
+            document.getElementById('scratchResult').textContent = '';
+            var scratchBtn = document.getElementById('scratchBtn');
+            if(scratchBtn) scratchBtn.style.display = 'none';
+        }
+
+        function closeScratch() { document.getElementById('scratchOverlay').classList.remove('active'); }
+
+        function doScratch() {
+            var cover = document.getElementById('scratchCover');
+            cover.classList.add('scratched');
+            spinPoints -= 50;
+            saveData('spin_points', spinPoints.toString());
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < scratchPrizes.length; i++) {
+                cum += scratchPrizes[i].chance;
+                if (rand <= cum) { prize = scratchPrizes[i].val; break; }
+            }
+            lastScratchDate = todayStr;
+            saveData('last_scratch_date', lastScratchDate);
+            var reveal = document.getElementById('scratchReveal');
+            var resultDiv = document.getElementById('scratchResult');
+            if (prize > 0) {
+                reveal.textContent = '₦' + prize.toLocaleString();
+                resultDiv.textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                addReward(prize, 'scratch', 'Scratch Card Win');
+            } else {
+                reveal.textContent = '😔';
+                resultDiv.textContent = 'Try again tomorrow!';
+            }
+            var scratchBtn = document.getElementById('scratchBtn');
+            if(scratchBtn) scratchBtn.style.display = 'inline-block';
+            updateUI();
+        }
+
+        // SPIN WHEEL
+        function openSpinWheel() {
+            if (spinPoints < 100) { showToast('Not enough points! Earn from tasks.'); return; }
+            document.getElementById('spinOverlay').classList.add('active');
+            document.getElementById('spinResult').textContent = '';
+            var spinBtn = document.getElementById('spinBtn');
+            if(spinBtn) spinBtn.disabled = false;
+        }
+        function closeSpin() { document.getElementById('spinOverlay').classList.remove('active'); }
+
+        function doSpin() {
+            if (spinPoints < 100) { showToast('Not enough points!'); return; }
+            spinPoints -= 100;
+            saveData('spin_points', spinPoints.toString());
+            var spinBtn = document.getElementById('spinBtn');
+            if(spinBtn) spinBtn.disabled = true;
+            var wheel = document.getElementById('spinWheel');
+            var spins = 5 + Math.floor(Math.random() * 5);
+            wheel.style.transform = 'rotate(' + (spins * 360 + Math.random() * 360) + 'deg)';
+            var prizes = [
+                { val: 10000, chance: 3 }, { val: 5000, chance: 7 }, { val: 2000, chance: 15 },
+                { val: 500, chance: 25 }, { val: 200, chance: 20 }, { val: 0, chance: 30 }
+            ];
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < prizes.length; i++) { cum += prizes[i].chance; if (rand <= cum) { prize = prizes[i].val; break; } }
+            setTimeout(function() {
+                if (prize > 0) {
+                    addReward(prize, 'spin', 'Spin Wheel Win');
+                    document.getElementById('spinResult').textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                } else {
+                    document.getElementById('spinResult').textContent = '😔 Try again! No win this time.';
+                }
+                if(spinBtn) spinBtn.disabled = false;
+                updateUI();
+            }, 3200);
+        }
+
+        // DAILY QUIZ
+        var quizQuestions = [
+            { q: "Who is the current Governor of the Central Bank of Nigeria (CBN)?", options: ["Yemi Cardoso", "Godwin Emefiele", "Sanusi Lamido", "Charles Soludo"], correct: 0 },
+            { q: "In what year did Nigeria become a republic?", options: ["1960", "1963", "1979", "1999"], correct: 1 },
+            { q: "What is the capital city of Australia?", options: ["Sydney", "Melbourne", "Canberra", "Brisbane"], correct: 2 },
+            { q: "Who wrote the novel 'Things Fall Apart'?", options: ["Wole Soyinka", "Chinua Achebe", "Chimamanda Adichie", "Ben Okri"], correct: 1 },
+            { q: "What is the largest ocean in the world?", options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"], correct: 3 },
+            { q: "Which Nigerian state is known as the 'Centre of Excellence'?", options: ["Abuja", "Lagos", "Kano", "Rivers"], correct: 1 },
+            { q: "What is the chemical symbol for Gold?", options: ["Go", "Gd", "Au", "Ag"], correct: 2 },
+            { q: "Who was the first President of the United States?", options: ["Thomas Jefferson", "John Adams", "George Washington", "Abraham Lincoln"], correct: 2 },
+            { q: "What is the longest river in Africa?", options: ["Congo River", "Niger River", "Zambezi River", "Nile River"], correct: 3 },
+            { q: "Which planet is known as the Red Planet?", options: ["Venus", "Mars", "Jupiter", "Saturn"], correct: 1 }
+        ];
+
+        var currentQuizIndex = 0;
+        var quizScore = 0;
+        var quizQuestionsToday = [];
+        var lastQuizDate = loadData('last_quiz_date', '');
+        var quizDoneToday = lastQuizDate === todayStr;
+
+        function openQuiz() {
+            if (quizDoneToday) { showToast('Already completed today\'s quiz!'); return; }
+            quizScore = 0;
+            currentQuizIndex = 0;
+            quizQuestionsToday = [];
+            var indices = [];
+            while (indices.length < 3) {
+                var r = Math.floor(Math.random() * quizQuestions.length);
+                if (indices.indexOf(r) === -1) indices.push(r);
+            }
+            for (var i = 0; i < indices.length; i++) { quizQuestionsToday.push(quizQuestions[indices[i]]); }
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizResult').textContent = '';
+            var closeBtn = document.getElementById('quizCloseBtn');
+            if(closeBtn) closeBtn.textContent = 'Close';
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            var q = quizQuestionsToday[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = 'Question ' + (currentQuizIndex + 1) + ' of 3';
+            document.getElementById('quizQuestion').textContent = q.q;
+            var html = '';
+            for (var i = 0; i < q.options.length; i++) {
+                html += '<button class="quiz-option" onclick="answerQuiz(' + i + ')">' + q.options[i] + '</button>';
+            }
+            document.getElementById('quizOptions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            var q = quizQuestionsToday[currentQuizIndex];
+            var buttons = document.querySelectorAll('.quiz-option');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) buttons[i].classList.add('correct');
+                else if (i === index && i !== q.correct) buttons[i].classList.add('wrong');
+            }
+            if (index === q.correct) quizScore++;
+            setTimeout(function() {
+                currentQuizIndex++;
+                if (currentQuizIndex < 3) { showQuizQuestion(); }
+                else { showQuizResult(); }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizProgress').textContent = 'Quiz Complete!';
+            document.getElementById('quizQuestion').textContent = '';
+            document.getElementById('quizOptions').innerHTML = '';
+            var reward = 0;
+            var resultText = '';
+            if (quizScore === 3) { reward = 1000; resultText = '🎉 Perfect! 3/3 correct! +₦1,000!'; }
+            else if (quizScore === 2) { reward = 500; resultText = '👍 Good! 2/3 correct! +₦500!'; }
+            else if (quizScore === 1) { reward = 200; resultText = '😊 1/3 correct! +₦200!'; }
+            else { resultText = '😔 0/3 correct! Try again tomorrow!'; }
+            if (reward > 0) { addReward(reward, 'quiz', 'Daily Quiz'); }
+            document.getElementById('quizResult').textContent = resultText;
+            var closeBtn = document.getElementById('quizCloseBtn');
+            if(closeBtn) closeBtn.textContent = 'Done';
+            lastQuizDate = todayStr;
+            saveData('last_quiz_date', lastQuizDate);
+            quizDoneToday = true;
+            updateUI();
+        }
+
+        function closeQuiz() { document.getElementById('quizOverlay').classList.remove('active'); }
+
+        function showToast(msg) { var t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.classList.add('show'); setTimeout(function() { t.classList.remove('show'); }, 3000); }
+
+        // ===== SYNC BALANCE FROM DASHBOARD (ADDED) =====
+        function syncBalanceFromDashboard() {
+            var currentUser = localStorage.getItem('bankWallet_currentUser');
+            var email = localStorage.getItem('fairmonie_user_email') || currentUser || 'default';
+            
+            // Try multiple sources
+            var sources = [
+                { key: 'fairmonie_' + email + '_balance', name: 'fairmonie balance' },
+                { key: 'bankWallet_mining_' + currentUser, name: 'mining balance', isObject: true },
+                { key: 'balance', name: 'generic balance' }
+            ];
+            
+            var maxBalance = 0;
+            var bestKey = null;
+            
+            for (var i = 0; i < sources.length; i++) {
+                var source = sources[i];
+                var value = 0;
+                if (source.isObject) {
+                    var data = JSON.parse(localStorage.getItem(source.key) || '{}');
+                    value = data.balance || 0;
+                } else {
+                    value = parseInt(localStorage.getItem(source.key) || '0');
+                }
+                if (value > maxBalance) {
+                    maxBalance = value;
+                    bestKey = source.key;
+                }
+            }
+            
+            if (maxBalance > 0 && taskBalance < maxBalance) {
+                taskBalance = maxBalance;
+                saveData('task_balance', taskBalance.toString());
+                document.getElementById('taskBalance').textContent = '₦' + taskBalance.toLocaleString();
+                console.log('🔄 Synced balance from: ' + bestKey + ' = ₦' + taskBalance);
+            }
+        }
+
+        // INITIALIZE
+        updateUI();
+        syncBalanceFromDashboard();
+        setInterval(updateCheckinTimer, 1000);
+    </script>
+</body>
+</html>

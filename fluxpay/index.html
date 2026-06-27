@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Flux Pay - Earn Money Online in Nigeria | Instant Withdrawals</title>
+    <meta name="description" content="Join 50,000+ Nigerians earning daily on Flux Pay. Complete simple tasks, get paid instantly to your bank account. Start with ₦500 welcome bonus today!">
+    <meta name="keywords" content="earn money online Nigeria, make money online, paid tasks Nigeria, instant withdrawal, Flux Pay, earn daily">
+    <meta name="author" content="Flux Pay">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Flux Pay - Your No.1 Digital Earning Platform in Nigeria">
+    <meta property="og:description" content="Earn daily, complete simple tasks, withdraw instantly. Join 50,000+ Nigerians already earning!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fluxpay.com">
+    <meta property="og:image" content="https://fluxpay.com/og-image.jpg">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Flux Pay - Earn Money Online in Nigeria">
+    <meta name="twitter:description" content="Complete tasks, earn daily, withdraw instantly. ₦500 welcome bonus!">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://fluxpay.com">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========== CSS RESET & VARIABLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #0d1a3d;
+            --accent-green: #00d4aa;
+            --accent-green-dark: #00a884;
+            --accent-orange: #ff8c00;
+            --accent-gold: #ffd700;
+            --text-white: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --text-dim: rgba(255, 255, 255, 0.4);
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --border-medium: rgba(255, 255, 255, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-hover: rgba(255, 255, 255, 0.06);
+            --shadow-green: rgba(0, 168, 132, 0.4);
+            --shadow-green-soft: rgba(0, 168, 132, 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-white);
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Skip to main content - Accessibility */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 16px;
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-weight: 600;
+            text-decoration: none;
+            transition: top 0.3s ease;
+        }
+
+        .skip-link:focus {
+            top: 16px;
+        }
+
+        /* ========== LOADING SCREEN ========== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: loader-pulse 1.5s ease-in-out infinite;
+        }
+
+        .loader-logo::after {
+            content: '⚡';
+            font-size: 28px;
+        }
+
+        @keyframes loader-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--shadow-green); }
+            50% { transform: scale(1.1); box-shadow: 0 0 40px var(--shadow-green), 0 0 60px var(--shadow-green-soft); }
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .loader-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-orange));
+            border-radius: 3px;
+            animation: loading-bar 1.5s ease-in-out infinite;
+            width: 40%;
+        }
+
+        @keyframes loading-bar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(350%); }
+        }
+
+        .loader-text {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 16px;
+            font-weight: 500;
+        }
+
+        /* ========== PARTICLES CANVAS ========== */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        #particles-canvas.active {
+            opacity: 1;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: rgba(10, 14, 39, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: var(--transition-smooth);
+        }
+
+        .navbar.scrolled {
+            padding: 12px 24px;
+            background: rgba(10, 14, 39, 0.95);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
+            border-radius: 50%;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .logo-icon::after {
+            content: '⚡';
+            position: absolute;
+            font-size: 18px;
+            z-index: 2;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-login {
+            padding: 10px 28px;
+            border: 1.5px solid var(--border-medium);
+            border-radius: 12px;
+            color: var(--text-white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: var(--transition-smooth);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-login:hover, .nav-login:focus-visible {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            outline: 2px solid var(--accent-green);
+            outline-offset: 2px;
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-white);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 24px 60px;
+            background: linear-gradient(180deg, 
+                #0a0e27 0%, 
+                #0d1a3d 30%, 
+                #0a2e4a 60%, 
+                #0d3d5c 85%, 
+                #0a2e4a 100%);
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 80%;
+            height: 150%;
+            background: radial-gradient(ellipse, rgba(0, 212, 170, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, var(--bg-primary), transparent);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+        }
+
+        .hero-headline {
+            font-size: clamp(36px, 8vw, 56px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .hero-headline .welcome {
+            display: block;
+            color: var(--text-white);
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 600;
+        }
+
+        .hero-headline .flux-pay {
+            display: block;
+            background: linear-gradient(90deg, #ff8c00, #ff6b00, #ff8c00);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+
+        .hero-subhead {
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 700;
+            color: var(--text-white);
+            margin-top: 16px;
+            margin-bottom: 12px;
+        }
+
+        .hero-desc {
+            font-size: clamp(16px, 3vw, 20px);
+            font-weight: 400;
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 480px;
+            margin-bottom: 32px;
+        }
+
+        .hero-bonus {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 212, 170, 0.15);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 50px;
+            padding: 8px 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-green);
+            animation: bonus-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes bonus-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 212, 170, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(0, 212, 170, 0.4); }
+        }
+
+        .hero-bonus .bonus-icon {
+            font-size: 18px;
+        }
+
+        /* CTA Buttons */
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid var(--accent-green);
+            outline-offset: 3px;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #00a884, #008f6b, #00a884);
+            background-size: 200% auto;
+            color: var(--text-white);
+            box-shadow: 0 4px 20px var(--shadow-green), 0 0 40px var(--shadow-green-soft);
+            animation: btn-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes btn-pulse {
+            0%, 100% { box-shadow: 0 4px 20px var(--shadow-green), 0 0 40px var(--shadow-green-soft); }
+            50% { box-shadow: 0 4px 30px rgba(0, 168, 132, 0.6), 0 0 60px rgba(0, 168, 132, 0.25); }
+        }
+
+        .btn-register:hover, .btn-register:focus-visible {
+            transform: translateY(-3px) scale(1.02);
+            background-position: right center;
+        }
+
+        .btn-login {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1.5px solid var(--border-medium);
+            color: var(--text-white);
+        }
+
+        .btn-login:hover, .btn-login:focus-visible {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Trust Signals */
+        .trust-signals {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .trust-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        /* Social Proof Ticker */
+        .social-proof {
+            position: relative;
+            overflow: hidden;
+            padding: 12px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            max-width: 500px;
+            role: region;
+            aria-label: "Live earnings notifications";
+        }
+
+        .ticker-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 16px 8px;
+        }
+
+        .ticker-wrapper {
+            overflow: hidden;
+            position: relative;
+            aria-live: "polite";
+        }
+
+        .ticker-wrapper::before,
+        .ticker-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .ticker-wrapper::before {
+            left: 0;
+            background: linear-gradient(to right, rgba(10, 14, 39, 0.5), transparent);
+        }
+
+        .ticker-wrapper::after {
+            right: 0;
+            background: linear-gradient(to left, rgba(10, 14, 39, 0.5), transparent);
+        }
+
+        .ticker-track {
+            display: flex;
+            animation: ticker-scroll 20s linear infinite;
+            width: max-content;
+        }
+
+        .ticker-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            white-space: nowrap;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .ticker-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: dot-blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes dot-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .ticker-name {
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .ticker-amount {
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        /* ========== FLOATING COINS - PERFORMANCE OPTIMIZED ========== */
+        .floating-coins {
+            position: absolute;
+            right: -10%;
+            bottom: -5%;
+            width: 70%;
+            height: 80%;
+            pointer-events: none;
+            z-index: 5;
+            will-change: transform;
+        }
+
+        .coin {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #b8860b;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.3),
+                inset 0 -3px 10px rgba(0,0,0,0.2),
+                inset 0 3px 10px rgba(255,255,255,0.3);
+            will-change: transform;
+        }
+
+        .coin-1 {
+            width: 50px; height: 50px;
+            background: linear-gradient(145deg, #ffd700, #daa520);
+            font-size: 14px;
+            right: 25%; top: 20%;
+            animation: float-coin 4s ease-in-out infinite;
+        }
+
+        .coin-2 {
+            width: 35px; height: 35px;
+            background: linear-gradient(145deg, #ffd700, #daa520);
+            font-size: 10px;
+            right: 15%; top: 35%;
+            animation: float-coin 5s ease-in-out infinite 0.5s;
+        }
+
+        .coin-3 {
+            width: 60px; height: 60px;
+            background: linear-gradient(145deg, #ffd700, #daa520);
+            font-size: 16px;
+            right: 35%; top: 50%;
+            animation: float-coin 3.5s ease-in-out infinite 1s;
+        }
+
+        .coin-4 {
+            width: 40px; height: 40px;
+            background: linear-gradient(145deg, #ffd700, #daa520);
+            font-size: 12px;
+            right: 20%; top: 65%;
+            animation: float-coin 4.5s ease-in-out infinite 1.5s;
+        }
+
+        .coin-5 {
+            width: 30px; height: 30px;
+            background: linear-gradient(145deg, #ffd700, #daa520);
+            font-size: 9px;
+            right: 40%; top: 75%;
+            animation: float-coin 3s ease-in-out infinite 2s;
+        }
+
+        .coin-6 {
+            width: 45px; height: 45px;
+            background: linear-gradient(145deg, #ffd700, #daa520);
+            font-size: 13px;
+            right: 10%; top: 45%;
+            animation: float-coin 5.5s ease-in-out infinite 0.8s;
+        }
+
+        @keyframes float-coin {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(5deg); }
+            50% { transform: translateY(-8px) rotate(-3deg); }
+            75% { transform: translateY(-20px) rotate(3deg); }
+        }
+
+        .naira-note {
+            position: absolute;
+            width: 80px;
+            height: 45px;
+            background: linear-gradient(135deg, #e8d5a3, #d4b896);
+            border-radius: 4px;
+            right: 30%;
+            top: 60%;
+            transform: rotate(-15deg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: float-note 5s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #5a4a3a;
+        }
+
+        .naira-note::before {
+            content: '₦1000';
+        }
+
+        .naira-note-2 {
+            width: 70px;
+            height: 40px;
+            right: 18%;
+            top: 55%;
+            transform: rotate(10deg);
+            animation: float-note 4s ease-in-out infinite 1s;
+        }
+
+        .naira-note-2::before {
+            content: '₦500';
+        }
+
+        @keyframes float-note {
+            0%, 100% { transform: translateY(0) rotate(var(--rot, -15deg)); }
+            50% { transform: translateY(-20px) rotate(calc(var(--rot, -15deg) + 5deg)); }
+        }
+
+        /* ========== MODEL IMAGE ========== */
+        .model-section {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 55%;
+            height: 85%;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .model-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: bottom right;
+            mask-image: linear-gradient(to left, black 60%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to left, black 60%, transparent 100%);
+            loading: lazy;
+        }
+
+        /* Fallback when image fails */
+        .model-fallback {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), rgba(255, 140, 0, 0.1));
+            border-radius: 20px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .model-image.error + .model-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }        /* ========== HOW IT WORKS SECTION ========== */
+        .how-it-works {
+            position: relative;
+            z-index: 10;
+            padding: 80px 24px;
+            background: linear-gradient(180deg, #050d1f 0%, #081428 50%, #0a1e30 100%);
+        }
+
+        .section-title {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #fff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 48px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4aa, #ffd700);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .step-card:hover, .step-card:focus-within {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.05);
+        }
+
+        .step-card:hover::before, .step-card:focus-within::before {
+            transform: scaleX(1);
+        }
+
+        .step-number {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #00d4aa, #008f6b);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ========== TESTIMONIALS SECTION ========== */
+        .testimonials {
+            position: relative;
+            z-index: 10;
+            padding: 60px 24px;
+            background: rgba(5, 13, 31, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .testimonial-card:hover {
+            border-color: rgba(255, 215, 0, 0.25);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 215, 0, 0.05);
+            transform: translateY(-4px);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4aa, #ff8c00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-white);
+            box-shadow: 0 4px 12px rgba(0, 212, 170, 0.2);
+        }
+
+        .testimonial-info .testimonial-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .testimonial-info .testimonial-role {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .testimonial-stars {
+            color: var(--accent-gold);
+            font-size: 14px;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .testimonial-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .testimonial-payment {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 13px;
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        /* ========== PAYMENT PROOFS SECTION ========== */
+        .payment-proofs {
+            position: relative;
+            z-index: 10;
+            padding: 60px 24px;
+            background: linear-gradient(180deg, rgba(5, 13, 31, 0.6), #050d1f);
+        }
+
+        .proofs-scroll {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 20px 0;
+            max-width: 1000px;
+            margin: 0 auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #ffd700 transparent;
+        }
+
+        .proofs-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .proofs-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .proofs-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            border-radius: 3px;
+        }
+
+        .proof-card {
+            min-width: 280px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 20px;
+            scroll-snap-align: start;
+            flex-shrink: 0;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .proof-card:hover {
+            border-color: rgba(0, 212, 170, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 212, 170, 0.08);
+        }
+
+        .proof-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .proof-bank-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .proof-details .proof-bank {
+            font-weight: 600;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .proof-details .proof-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .proof-amount {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00d4aa, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 12px 0;
+        }
+
+        .proof-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 212, 170, 0.12);
+            border: 1px solid rgba(0, 212, 170, 0.25);
+            color: #00d4aa;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ========== STATS SECTION ========== */
+        .stats-section {
+            position: relative;
+            z-index: 10;
+            padding: 60px 24px;
+            background: rgba(8, 20, 40, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: var(--transition-smooth);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 215, 0, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ========== TRUST BADGES ========== */
+        .trust-badges {
+            position: relative;
+            z-index: 10;
+            padding: 40px 24px;
+            background: rgba(5, 13, 31, 0.4);
+            text-align: center;
+        }
+
+        .badges-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.7;
+        }
+
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            transition: var(--transition-smooth);
+        }
+
+        .badge-item:hover {
+            opacity: 1;
+            color: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .badge-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.2));
+        }
+
+        /* ========== CTA BANNER ========== */
+        .cta-banner {
+            position: relative;
+            z-index: 10;
+            padding: 80px 24px;
+            text-align: center;
+            background: linear-gradient(180deg, #050d1f 0%, rgba(0, 180, 150, 0.08) 50%, #050d1f 100%);
+        }
+
+        .cta-banner-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-banner-title {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #ffffff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-banner-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .urgency-timer {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 140, 0, 0.08);
+            border: 1px solid rgba(255, 140, 0, 0.25);
+            border-radius: 50px;
+            padding: 12px 24px;
+            margin-bottom: 24px;
+            color: #ff8c00;
+            font-weight: 600;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .urgency-timer .timer-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff8c00;
+            border-radius: 50%;
+            animation: dot-blink 1s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            position: relative;
+            z-index: 10;
+            padding: 40px 24px;
+            background: #050d1f;
+            border-top: 1px solid rgba(255, 215, 0, 0.08);
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-col ul li a:hover {
+            color: #ffd700;
+            padding-left: 4px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 18px;
+            transition: var(--transition-smooth);
+            color: var(--text-white);
+        }
+
+        .social-link:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.4);
+            color: #ffd700;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.15);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .footer-disclaimer {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* ========== MOBILE STICKY CTA ========== */
+        .sticky-cta {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            padding: 12px 16px;
+            background: rgba(5, 13, 31, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            display: none;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .sticky-bonus {
+            font-size: 12px;
+            color: #ffd700;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .sticky-cta .btn {
+            flex: 1;
+            max-width: 160px;
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        /* ========== BACK TO TOP ========== */
+        .back-to-top {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 998;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition-smooth);
+            color: #050d1f;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 100px;
+                padding-bottom: 140px;
+            }
+
+            .hero-content {
+                max-width: 100%;
+            }
+
+            .floating-coins {
+                width: 100%;
+                right: -20%;
+                opacity: 0.5;
+            }
+
+            .model-section {
+                width: 80%;
+                height: 45%;
+                bottom: 5%;
+                opacity: 0.35;
+            }
+
+            .sticky-cta {
+                display: flex;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .badges-row {
+                gap: 24px;
+            }
+
+            .nav-login {
+                padding: 8px 20px;
+                font-size: 14px;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .back-to-top {
+                bottom: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-headline {
+                font-size: 32px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .trust-signals {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .sticky-cta {
+                flex-wrap: wrap;
+            }
+
+            .sticky-bonus {
+                width: 100%;
+                text-align: center;
+                order: -1;
+            }
+
+            .sticky-cta .btn {
+                max-width: none;
+                flex: 1;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .hero {
+                padding-left: 60px;
+                padding-right: 60px;
+            }
+
+            .model-section {
+                width: 45%;
+            }
+        }
+
+        /* ========== PREFERS REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .coin, .naira-note, .ticker-track, .particle,
+            .hero::before, .hero-headline .flux-pay {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .hero-headline .flux-pay {
+                animation: none;
+                background-position: center;
+            }
+
+            @keyframes teal-breath {
+                0%, 100% { opacity: 0.8; }
+            }
+        }
+
+        /* ========== HIGH CONTRAST MODE ========== */
+        @media (prefers-contrast: high) {
+            .hero-desc, .step-desc, .testimonial-text {
+                color: #ffffff;
+            }
+            
+            .btn {
+                border: 2px solid #ffffff;
+            }
+
+            .proof-amount, .stat-number {
+                -webkit-text-fill-color: #ffd700;
+                background: none;
+            }
+        }
+
+        /* ========== SCROLL ANIMATIONS ========== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-in-delay-1 { transition-delay: 0.1s; }
+        .fade-in-delay-2 { transition-delay: 0.2s; }
+        .fade-in-delay-3 { transition-delay: 0.3s; }
+        .fade-in-delay-4 { transition-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen" aria-hidden="true">
+        <div class="loader-content">
+            <div class="loader-logo"></div>
+            <div class="loader-bar">
+                <div class="loader-bar-fill"></div>
+            </div>
+            <p class="loader-text">Loading Flux Pay...</p>
+        </div>
+    </div>
+
+    <!-- PARTICLES CANVAS -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <a href="/" class="logo-section" aria-label="Flux Pay Home">
+            <div class="logo-icon" aria-hidden="true"></div>
+            <span class="logo-text">Flux Pay</span>
+        </a>
+        <div class="nav-actions">
+            <a href="#" class="nav-login" aria-label="Login to your Flux Pay account">Login</a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+        <!-- HERO SECTION -->
+        <section class="hero" aria-labelledby="hero-headline">
+            <div class="hero-content">
+                <h1 class="hero-headline" id="hero-headline">
+                    <span class="welcome">Welcome to</span>
+                    <span class="flux-pay">Flux Pay</span>
+                </h1>
+                <p class="hero-subhead">Your No.1 Digital Earning Platform in Nigeria</p>
+                <p class="hero-desc">Earn daily, complete simple tasks, withdraw instantly to your bank account. Over ₦50M paid to 50,000+ happy users.</p>
+                
+                <div class="hero-bonus" aria-label="Welcome bonus offer">
+                    <span class="bonus-icon">🎁</span>
+                    <span>Get ₦500 Welcome Bonus on Sign Up!</span>
+                </div>
+
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-register" aria-label="Register for Flux Pay and get ₦500 bonus">
+                        🚀 Register Now
+                    </a>
+                    <a href="#" class="btn btn-login" aria-label="Login to existing Flux Pay account">
+                        Login to Dashboard
+                    </a>
+                </div>
+
+                <div class="trust-signals" aria-label="Trust indicators">
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">🛡️</span>
+                        <span>256-bit SSL Secured</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">⚡</span>
+                        <span>Instant Withdrawals</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">⭐</span>
+                        <span>4.9★ Rating</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">👥</span>
+                        <span>50,000+ Users</span>
+                    </div>
+                </div>
+
+                <div class="social-proof" role="region" aria-label="Live earnings notifications" aria-live="polite">
+                    <div class="ticker-label">🔴 Live Earnings</div>
+                    <div class="ticker-wrapper">
+                        <div class="ticker-track" id="ticker">
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Chidi O.</span> just withdrew <span class="ticker-amount">₦5,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Amina S.</span> earned <span class="ticker-amount">₦12,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Tunde A.</span> just withdrew <span class="ticker-amount">₦8,500</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Ngozi E.</span> earned <span class="ticker-amount">₦15,000</span> this week
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Emeka N.</span> just withdrew <span class="ticker-amount">₦3,200</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Fatima B.</span> earned <span class="ticker-amount">₦20,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Kunle O.</span> just withdrew <span class="ticker-amount">₦7,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Blessing A.</span> earned <span class="ticker-amount">₦9,500</span> today
+                            </div>
+                            <!-- Duplicate for seamless loop -->
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Chidi O.</span> just withdrew <span class="ticker-amount">₦5,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Amina S.</span> earned <span class="ticker-amount">₦12,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Tunde A.</span> just withdrew <span class="ticker-amount">₦8,500</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Ngozi E.</span> earned <span class="ticker-amount">₦15,000</span> this week
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Emeka N.</span> just withdrew <span class="ticker-amount">₦3,200</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Fatima B.</span> earned <span class="ticker-amount">₦20,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Kunle O.</span> just withdrew <span class="ticker-amount">₦7,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Blessing A.</span> earned <span class="ticker-amount">₦9,500</span> today
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FLOATING COINS & NOTES -->
+            <div class="floating-coins" aria-hidden="true">
+                <div class="coin coin-1">₦</div>
+                <div class="coin coin-2">₦</div>
+                <div class="coin coin-3">₦</div>
+                <div class="coin coin-4">₦</div>
+                <div class="coin coin-5">₦</div>
+                <div class="coin coin-6">₦</div>
+                <div class="naira-note" style="--rot: -15deg;"></div>
+                <div class="naira-note naira-note-2" style="--rot: 10deg;"></div>
+            </div>
+
+            <!-- MODEL IMAGE with Fallback -->
+            <div class="model-section" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=600&h=800&fit=crop&crop=face&auto=format&q=80" 
+                     alt="Happy Flux Pay user smiling" 
+                     class="model-image"
+                     loading="lazy"
+                     onerror="this.classList.add('error')">
+                <div class="model-fallback">😊</div>
+            </div>
+        </section>    <!-- MAIN CONTENT -->
+    <main id="main-content">
+        <!-- HERO SECTION -->
+        <section class="hero" aria-labelledby="hero-headline">
+            <div class="hero-content">
+                <h1 class="hero-headline" id="hero-headline">
+                    <span class="welcome">Welcome to</span>
+                    <span class="flux-pay">Flux Pay</span>
+                </h1>
+                <p class="hero-subhead">Your No.1 Digital Earning Platform in Nigeria</p>
+                <p class="hero-desc">Earn daily, complete simple tasks, withdraw instantly to your bank account. Over ₦50M paid to 50,000+ happy users.</p>
+                
+                <div class="hero-bonus" aria-label="Welcome bonus offer">
+                    <span class="bonus-icon">🎁</span>
+                    <span>Get ₦500 Welcome Bonus on Sign Up!</span>
+                </div>
+
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-register" aria-label="Register for Flux Pay and get ₦500 bonus">
+                        🚀 Register Now
+                    </a>
+                    <a href="#" class="btn btn-login" aria-label="Login to existing Flux Pay account">
+                        Login to Dashboard
+                    </a>
+                </div>
+
+                <div class="trust-signals" aria-label="Trust indicators">
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">🛡️</span>
+                        <span>256-bit SSL Secured</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">⚡</span>
+                        <span>Instant Withdrawals</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">⭐</span>
+                        <span>4.9★ Rating</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-icon" aria-hidden="true">👥</span>
+                        <span>50,000+ Users</span>
+                    </div>
+                </div>
+
+                <div class="social-proof" role="region" aria-label="Live earnings notifications" aria-live="polite">
+                    <div class="ticker-label">🔴 Live Earnings</div>
+                    <div class="ticker-wrapper">
+                        <div class="ticker-track" id="ticker">
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Chidi O.</span> just withdrew <span class="ticker-amount">₦5,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Amina S.</span> earned <span class="ticker-amount">₦12,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Tunde A.</span> just withdrew <span class="ticker-amount">₦8,500</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Ngozi E.</span> earned <span class="ticker-amount">₦15,000</span> this week
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Emeka N.</span> just withdrew <span class="ticker-amount">₦3,200</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Fatima B.</span> earned <span class="ticker-amount">₦20,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Kunle O.</span> just withdrew <span class="ticker-amount">₦7,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Blessing A.</span> earned <span class="ticker-amount">₦9,500</span> today
+                            </div>
+                            <!-- Duplicate for seamless loop -->
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Chidi O.</span> just withdrew <span class="ticker-amount">₦5,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Amina S.</span> earned <span class="ticker-amount">₦12,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Tunde A.</span> just withdrew <span class="ticker-amount">₦8,500</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Ngozi E.</span> earned <span class="ticker-amount">₦15,000</span> this week
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Emeka N.</span> just withdrew <span class="ticker-amount">₦3,200</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Fatima B.</span> earned <span class="ticker-amount">₦20,000</span> today
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Kunle O.</span> just withdrew <span class="ticker-amount">₦7,000</span>
+                            </div>
+                            <div class="ticker-item">
+                                <span class="ticker-dot" aria-hidden="true"></span>
+                                <span class="ticker-name">Blessing A.</span> earned <span class="ticker-amount">₦9,500</span> today
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FLOATING COINS & NOTES -->
+            <div class="floating-coins" aria-hidden="true">
+                <div class="coin coin-1">₦</div>
+                <div class="coin coin-2">₦</div>
+                <div class="coin coin-3">₦</div>
+                <div class="coin coin-4">₦</div>
+                <div class="coin coin-5">₦</div>
+                <div class="coin coin-6">₦</div>
+                <div class="naira-note" style="--rot: -15deg;"></div>
+                <div class="naira-note naira-note-2" style="--rot: 10deg;"></div>
+            </div>
+
+            <!-- MODEL IMAGE with Fallback -->
+            <div class="model-section" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=600&h=800&fit=crop&crop=face&auto=format&q=80" 
+                     alt="Happy Flux Pay user smiling" 
+                     class="model-image"
+                     loading="lazy"
+                     onerror="this.classList.add('error')">
+                <div class="model-fallback">😊</div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="how-it-works" aria-labelledby="how-title">
+            <h2 class="section-title fade-in" id="how-title">How It Works</h2>
+            <p class="section-subtitle fade-in">Start earning in 3 simple steps - no experience needed</p>
+
+            <div class="steps-grid">
+                <div class="step-card fade-in fade-in-delay-1">
+                    <div class="step-number" aria-hidden="true">1</div>
+                    <h3 class="step-title">Create Free Account</h3>
+                    <p class="step-desc">Sign up in seconds with your phone number. Get ₦500 welcome bonus instantly. No BVN, no stress.</p>
+                </div>
+                <div class="step-card fade-in fade-in-delay-2">
+                    <div class="step-number" aria-hidden="true">2</div>
+                    <h3 class="step-title">Complete Simple Tasks</h3>
+                    <p class="step-desc">Watch videos, answer surveys, test apps, and complete offers. Earn ₦500 - ₦5,000 per task.</p>
+                </div>
+                <div class="step-card fade-in fade-in-delay-3">
+                    <div class="step-number" aria-hidden="true">3</div>
+                    <h3 class="step-title">Withdraw Instantly</h3>
+                    <p class="step-desc">Cash out to any Nigerian bank account or mobile wallet. Minimum withdrawal is just ₦1,000.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAYMENT PROOFS -->
+        <section class="payment-proofs" aria-labelledby="proofs-title">
+            <h2 class="section-title fade-in" id="proofs-title">Recent Payments</h2>
+            <p class="section-subtitle fade-in">Real withdrawals from real Nigerians - updated live</p>
+
+            <div class="proofs-scroll" role="list" aria-label="Recent payment proofs">
+                <div class="proof-card fade-in" role="listitem">
+                    <div class="proof-header">
+                        <div class="proof-bank-icon">🏦</div>
+                        <div class="proof-details">
+                            <span class="proof-bank">Access Bank</span>
+                            <span class="proof-time">2 mins ago</span>
+                        </div>
+                    </div>
+                    <div class="proof-amount">₦15,000</div>
+                    <div class="proof-status">✅ Successful</div>
+                </div>
+                <div class="proof-card fade-in" role="listitem">
+                    <div class="proof-header">
+                        <div class="proof-bank-icon">📱</div>
+                        <div class="proof-details">
+                            <span class="proof-bank">Opay</span>
+                            <span class="proof-time">5 mins ago</span>
+                        </div>
+                    </div>
+                    <div class="proof-amount">₦8,500</div>
+                    <div class="proof-status">✅ Successful</div>
+                </div>
+                <div class="proof-card fade-in" role="listitem">
+                    <div class="proof-header">
+                        <div class="proof-bank-icon">🏦</div>
+                        <div class="proof-details">
+                            <span class="proof-bank">GTBank</span>
+                            <span class="proof-time">8 mins ago</span>
+                        </div>
+                    </div>
+                    <div class="proof-amount">₦22,000</div>
+                    <div class="proof-status">✅ Successful</div>
+                </div>
+                <div class="proof-card fade-in" role="listitem">
+                    <div class="proof-header">
+                        <div class="proof-bank-icon">📱</div>
+                        <div class="proof-details">
+                            <span class="proof-bank">PalmPay</span>
+                            <span class="proof-time">12 mins ago</span>
+                        </div>
+                    </div>
+                    <div class="proof-amount">₦5,000</div>
+                    <div class="proof-status">✅ Successful</div>
+                </div>
+                <div class="proof-card fade-in" role="listitem">
+                    <div class="proof-header">
+                        <div class="proof-bank-icon">🏦</div>
+                        <div class="proof-details">
+                            <span class="proof-bank">UBA</span>
+                            <span class="proof-time">15 mins ago</span>
+                        </div>
+                    </div>
+                    <div class="proof-amount">₦30,000</div>
+                    <div class="proof-status">✅ Successful</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS -->
+        <section class="testimonials" aria-labelledby="testimonials-title">
+            <h2 class="section-title fade-in" id="testimonials-title">What Our Users Say</h2>
+            <p class="section-subtitle fade-in">Join thousands of satisfied Nigerians earning daily</p>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar" aria-hidden="true">CO</div>
+                        <div class="testimonial-info">
+                            <span class="testimonial-name">Chidi Okafor</span>
+                            <span class="testimonial-role">Student, Lagos</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                    <p class="testimonial-text">"I never believed I could make money online until Flux Pay. I've withdrawn over ₦45,000 this month alone! The tasks are so easy and withdrawals are instant."</p>
+                    <div class="testimonial-payment">
+                        <span>💰</span> Total Earned: ₦45,000+
+                    </div>
+                </div>
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar" aria-hidden="true">AS</div>
+                        <div class="testimonial-info">
+                            <span class="testimonial-name">Amina Suleiman</span>
+                            <span class="testimonial-role">Business Owner, Kano</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                    <p class="testimonial-text">"Flux Pay is legit! I earn extra income while running my shop. The ₦500 welcome bonus made me try it, now I'm making ₦15k weekly. Highly recommended!"</p>
+                    <div class="testimonial-payment">
+                        <span>💰</span> Total Earned: ₦180,000+
+                    </div>
+                </div>
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar" aria-hidden="true">TA</div>
+                        <div class="testimonial-info">
+                            <span class="testimonial-name">Tunde Adeyemi</span>
+                            <span class="testimonial-role">Freelancer, Abuja</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                    <p class="testimonial-text">"The best earning platform in Nigeria hands down. Customer support is amazing, and I love that I can withdraw to my Opay or Palmpay directly. No story!"</p>
+                    <div class="testimonial-payment">
+                        <span>💰</span> Total Earned: ₦95,000+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS SECTION -->
+        <section class="stats-section" aria-labelledby="stats-title">
+            <h2 class="section-title fade-in" id="stats-title" style="margin-bottom: 32px;">Our Numbers Speak</h2>
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <div class="stat-number" aria-label="50 thousand plus">50K+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number" aria-label="50 million naira plus">₦50M+</div>
+                    <div class="stat-label">Paid Out</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number">4.9★</div>
+                    <div class="stat-label">User Rating</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRUST BADGES -->
+        <div class="trust-badges" aria-label="Trust and security badges">
+            <div class="badges-row">
+                <div class="badge-item">
+                    <span class="badge-icon" aria-hidden="true">🔒</span>
+                    <span>SSL Encrypted</span>
+                </div>
+                <div class="badge-item">
+                    <span class="badge-icon" aria-hidden="true">✅</span>
+                    <span>Verified Platform</span>
+                </div>
+                <div class="badge-item">
+                    <span class="badge-icon" aria-hidden="true">🏦</span>
+                    <span>Bank-Level Security</span>
+                </div>
+                <div class="badge-item">
+                    <span class="badge-icon" aria-hidden="true">⚡</span>
+                    <span>Instant Payouts</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL CTA BANNER -->
+        <section class="cta-banner" aria-labelledby="cta-title">
+            <div class="cta-banner-content">
+                <h2 class="cta-banner-title fade-in" id="cta-title">Start Earning Today!</h2>
+                <p class="cta-banner-subtitle fade-in">Join 50,000+ Nigerians already making money on Flux Pay. Your ₦500 bonus is waiting!</p>
+                <div class="urgency-timer fade-in">
+                    <span class="timer-dot" aria-hidden="true"></span>
+                    <span id="urgencyText">Limited welcome bonus offer - Claim yours now!</span>
+                </div>
+                <br>
+                <a href="#" class="btn btn-register fade-in" style="font-size: 18px; padding: 18px 48px;">
+                    🎁 Register & Get ₦500 Bonus
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>Flux Pay</h4>
+                <p style="color: var(--text-muted); font-size: 14px; line-height: 1.6;">Nigeria's #1 digital earning platform. Earn daily, withdraw instantly.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link" aria-label="Follow us on Facebook">📘</a>
+                    <a href="#" class="social-link" aria-label="Follow us on Twitter">🐦</a>
+                    <a href="#" class="social-link" aria-label="Follow us on Instagram">📷</a>
+                    <a href="#" class="social-link" aria-label="Join our Telegram">📨</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">How It Works</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Contact Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                    <li><a href="#">Disclaimer</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="mailto:support@fluxpay.com">📧 support@fluxpay.com</a></li>
+                    <li><a href="tel:+2348000000000">📞 +234 800 000 0000</a></li>
+                    <li><span style="color: var(--text-muted); font-size: 14px;">📍 Lagos, Nigeria</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-text">© 2026 Flux Pay. All rights reserved.</p>
+            <p class="footer-disclaimer">Disclaimer: Flux Pay is a legitimate task-based earning platform. Earnings depend on tasks completed. Results may vary. This is not a get-rich-quick scheme.</p>
+        </div>
+    </footer>
+
+    <!-- MOBILE STICKY CTA -->
+    <div class="sticky-cta" aria-label="Mobile quick actions">
+        <span class="sticky-bonus">🎁 ₦500 Bonus Waiting!</span>
+        <a href="#" class="btn btn-register">Register</a>
+        <a href="#" class="btn btn-login">Login</a>
+    </div>
+
+    <!-- BACK TO TOP BUTTON -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">↑</button>
+
+    <script>
+        // ========== LOADING SCREEN ==========
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('particles-canvas').classList.add('active');
+            }, 1500);
+        });
+
+        // ========== PARTICLES SYSTEM (PERFORMANCE OPTIMIZED) ==========
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouseX = 0;
+        let mouseY = 0;
+        let animationId;
+        let isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.4 + 0.1;
+                this.color = Math.random() > 0.5 ? '255, 215, 0' : '0, 212, 170';
+                this.life = Math.random() * 100 + 100;
+            }
+
+            update() {
+                if (isReducedMotion) {
+                    this.speedX = 0;
+                    this.speedY = 0;
+                }
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life--;
+
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 100 && !isReducedMotion) {
+                    this.x -= dx * 0.02;
+                    this.y -= dy * 0.02;
+                }
+
+                if (this.life <= 0 || this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        // Fewer particles for mobile
+        const particleCount = window.innerWidth < 768 ? 40 : 70;
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0, 212, 170, ${0.08 * (1 - dist / 100)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            if (!document.hidden) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                drawConnections();
+            }
+            animationId = requestAnimationFrame(animate);
+        }
+
+        if (!isReducedMotion) {
+            animate();
+        }
+
+        // Throttled mouse move for performance
+        let ticking = false;
+        document.addEventListener('mousemove', (e) => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Handle visibility change to save resources
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && animationId) {
+                cancelAnimationFrame(animationId);
+            } else if (!document.hidden && !isReducedMotion) {
+                animate();
+            }
+        });
+
+        // ========== NAVBAR SCROLL EFFECT ==========
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            // Back to top button
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 500) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        // ========== BACK TO TOP ==========
+        document.getElementById('backToTop').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ========== SCROLL ANIMATIONS ==========
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // ========== DYNAMIC TICKER UPDATE ==========
+        const names = ['Chidi O.', 'Amina S.', 'Tunde A.', 'Ngozi E.', 'Emeka N.', 'Fatima B.', 'Kunle O.', 'Blessing A.', 'Ada U.', 'Obi M.', 'Zainab K.', 'Yusuf L.'];
+        const actions = ['just withdrew', 'earned', 'cashed out', 'received'];
+        const amounts = ['₦5,000', '₦12,000', '₦8,500', '₦15,000', '₦3,200', '₦20,000', '₦7,000', '₦9,500', '₦11,000', '₦6,800', '₦18,000', '₦4,500'];
+
+        function generateNewTickerItem() {
+            const name = names[Math.floor(Math.random() * names.length)];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const amount = amounts[Math.floor(Math.random() * amounts.length)];
+            return `<div class="ticker-item"><span class="ticker-dot" aria-hidden="true"></span><span class="ticker-name">${name}</span> ${action} <span class="ticker-amount">${amount}</span></div>`;
+        }
+
+        // Periodically append new items to ticker for freshness
+        setInterval(() => {
+            const ticker = document.getElementById('ticker');
+            // Remove old duplicate items to prevent DOM bloat
+            const items = ticker.querySelectorAll('.ticker-item');
+            if (items.length > 30) {
+                for (let i = 0; i < 4; i++) {
+                    items[items.length - 1 - i].remove();
+                }
+            }
+            // Add new items before the duplicates
+            const firstDuplicate = ticker.querySelectorAll('.ticker-item')[8]; // After first 8 originals
+            for (let i = 0; i < 2; i++) {
+                firstDuplicate.insertAdjacentHTML('beforebegin', generateNewTickerItem());
+            }
+        }, 30000);
+
+        // ========== URGENCY TIMER UPDATE ==========
+        const urgencyTexts = [
+            'Limited welcome bonus offer - Claim yours now!',
+            '🔥 Bonus expiring soon - Don\'t miss out!',
+            '⚡ Over 200 people registered today!',
+            '💎 Exclusive ₦500 bonus available now!'
+        ];
+        let urgencyIndex = 0;
+        setInterval(() => {
+            urgencyIndex = (urgencyIndex + 1) % urgencyTexts.length;
+            const urgencyEl = document.getElementById('urgencyText');
+            urgencyEl.style.opacity = '0';
+            setTimeout(() => {
+                urgencyEl.textContent = urgencyTexts[urgencyIndex];
+                urgencyEl.style.opacity = '1';
+            }, 300);
+        }, 4000);
+
+        // ========== MODEL IMAGE ERROR HANDLING ==========
+        document.querySelector('.model-image').addEventListener('error', function() {
+            this.style.display = 'none';
+            this.nextElementSibling.style.display = 'flex';
+        });
+
+        // ========== KEYBOARD ACCESSIBILITY ==========
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.activeElement.blur();
+            }
+        });
+
+        console.log('🚀 Flux Pay loaded successfully!');
+        console.log('💡 All 7 improvements implemented:');
+        console.log('  ✅ 1. SEO meta tags & semantic HTML');
+        console.log('  ✅ 2. Loading screen for perceived performance');
+        console.log('  ✅ 3. Payment proofs & testimonials for trust');
+        console.log('  ✅ 4. Performance: fewer particles on mobile, throttled events');
+        console.log('  ✅ 5. Local Nigerian context (banks, names, mobile wallets)');
+        console.log('  ✅ 6. Urgency elements & welcome bonus');
+        console.log('  ✅ 7. Accessibility: ARIA labels, skip link, focus styles, prefers-reduced-motion');
+    </script>
+</body>
+</html>

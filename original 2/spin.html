@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Flux Spin - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --bg-card: #1a2332; --bg-card-hover: #1e293b;
+            --accent-green: #00d4aa; --accent-green-dark: #00a884; --accent-gold: #f59e0b;
+            --accent-gold-light: #fbbf24; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+            --accent-red: #ef4444; --accent-orange: #f97316; --accent-pink: #ec4899;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-border: rgba(0, 212, 170, 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(6,13,26,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .main-content { position: relative; z-index: 1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px 10px; text-align: center; transition: var(--transition-smooth); }
+        .stat-card:hover { transform: translateY(-2px); border-color: rgba(0,212,170,0.2); }
+        .stat-value { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .stat-value.spins-used { color: var(--accent-gold); }
+        .stat-value.total-won { color: var(--accent-green); }
+        .stat-value.spins-left { color: var(--accent-blue); }
+        .stat-label { font-size: 10px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+
+        .wheel-container { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .wheel-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); opacity: 0.6; }
+        .wheel-wrapper { position: relative; width: 100%; max-width: 340px; margin: 0 auto; aspect-ratio: 1; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.3); }
+        .wheel-segment { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; left: 0; top: 0; border-radius: 0 0 100% 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); padding-left: 20%; }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary)); border: 3px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Amaranth', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent-gold); z-index: 10; box-shadow: 0 0 20px rgba(245,158,11,0.3); }
+        .wheel-pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 24px solid var(--accent-gold); z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+        .wheel-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; height: 90%; border-radius: 50%; border: 2px solid rgba(245,158,11,0.1); pointer-events: none; }
+
+        .spin-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #fff; border: none; border-radius: 16px; font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 20px rgba(245,158,11,0.3); margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .spin-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
+        .spin-btn:active { transform: translateY(0); }
+        .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .spin-btn.ready { animation: pulse-glow 2s ease-in-out infinite; }
+        @keyframes pulse-glow { 0%,100% { box-shadow: 0 4px 20px rgba(245,158,11,0.3); } 50% { box-shadow: 0 4px 35px rgba(245,158,11,0.6), 0 0 60px rgba(245,158,11,0.2); } }
+        .spin-btn i { font-size: 20px; }
+
+        .spin-info { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-muted); }
+        .spin-info span { color: var(--accent-gold); font-weight: 600; }
+
+        .prize-legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px; }
+        .prize-item { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px 12px; }
+        .prize-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .prize-text { font-size: 11px; color: var(--text-secondary); }
+        .prize-text strong { color: var(--text-primary); }
+
+        .recent-wins { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-top: 16px; }
+        .recent-wins h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--accent-gold); }
+        .win-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); animation: fadeSlide 0.4s ease; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .win-item:last-child { border-bottom: none; }
+        .win-user { display: flex; align-items: center; gap: 10px; }
+        .win-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-blue)); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .win-name { font-size: 13px; font-weight: 600; }
+        .win-time { font-size: 10px; color: var(--text-muted); }
+        .win-amount { font-family: 'Amaranth', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent-green); }
+
+        .win-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.4s ease; }
+        .win-modal-overlay.active { opacity: 1; visibility: visible; }
+        .win-modal { background: linear-gradient(135deg, rgba(26,35,50,0.98) 0%, rgba(17,24,39,0.99) 100%); border: 1px solid rgba(245,158,11,0.3); border-radius: 24px; padding: 40px 24px; width: 100%; max-width: 360px; text-align: center; position: relative; overflow: hidden; transform: scale(0.8) translateY(20px); transition: transform 0.5s cubic-bezier(0.68,-0.55,0.265,1.55); }
+        .win-modal-overlay.active .win-modal { transform: scale(1) translateY(0); }
+        .win-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); }
+        .win-trophy { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 2px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 36px; animation: trophy-bounce 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); }
+        @keyframes trophy-bounce { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .win-title { font-family: 'Amaranth', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; color: var(--accent-gold); }
+        .win-amount-display { font-family: 'Amaranth', sans-serif; font-size: 42px; font-weight: 700; color: var(--accent-gold); margin: 16px 0; text-shadow: 0 0 30px rgba(245,158,11,0.3); }
+        .win-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; }
+        .win-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #fff; border: none; border-radius: 14px; font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 20px rgba(245,158,11,0.3); }
+        .win-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
+
+        .no-spins-modal .win-modal { border-color: rgba(239,68,68,0.3); }
+        .no-spins-modal .win-modal::before { background: linear-gradient(90deg, var(--accent-red), #f87171, var(--accent-red)); }
+        .no-spins-icon { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05)); border: 2px solid rgba(239,68,68,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
+        .no-spins-btn { background: linear-gradient(135deg, var(--accent-red), #f87171); box-shadow: 0 4px 20px rgba(239,68,68,0.3); }
+
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1999; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { border-color: rgba(239,68,68,0.4); }
+        .toast.success { border-color: rgba(0,212,170,0.4); }
+
+        /* Auth check overlay */
+        .auth-check-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .auth-check-overlay.hidden { display: none; }
+        .auth-check-spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(0,212,170,0.15);
+            border-top-color: var(--accent-green); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .auth-check-text { font-size: 14px; color: var(--text-muted); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- Auth Check Overlay -->
+    <div class="auth-check-overlay" id="authCheckOverlay">
+        <div class="auth-check-spinner"></div>
+        <div class="auth-check-text">Checking your account...</div>
+    </div>
+
+    <canvas id="bg-particles"></canvas>
+    <canvas id="confetti-canvas"></canvas>
+    <div class="toast" id="toast"><span id="toastText">Message</span></div>
+
+    <!-- Win Modal -->
+    <div class="win-modal-overlay" id="winModal">
+        <div class="win-modal">
+            <div class="win-trophy">🏆</div>
+            <h2 class="win-title">🎉 You Won!</h2>
+            <div class="win-amount-display" id="winAmount">₦0</div>
+            <p class="win-subtitle" id="winSubtitle">Added to your wallet balance</p>
+            <button class="win-btn" onclick="closeWinModal()">Continue Spinning 🎰</button>
+        </div>
+    </div>
+
+    <!-- No Spins Modal -->
+    <div class="win-modal-overlay no-spins-modal" id="noSpinsModal">
+        <div class="win-modal">
+            <div class="no-spins-icon">⏰</div>
+            <h2 class="win-title" style="color:var(--text-secondary);">No Spins Left!</h2>
+            <p class="win-subtitle">You've used all 10 spins for today.<br>Come back tomorrow for more!</p>
+            <button class="win-btn no-spins-btn" onclick="closeNoSpinsModal()">Got it</button>
+        </div>
+    </div>
+
+    <header class="header">
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <h1>🎰 Flux Spin</h1>
+    </header>
+
+    <div class="main-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value spins-used" id="spinsUsed">0/10</div>
+                <div class="stat-label">Spins Used</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value total-won" id="totalWon">₦0</div>
+                <div class="stat-label">Today's Wins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value spins-left" id="spinsLeft">10</div>
+                <div class="stat-label">Spins Left</div>
+            </div>
+        </div>
+
+        <div class="wheel-container">
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
+                <div class="wheel-glow"></div>
+                <div class="wheel" id="wheel"></div>
+                <div class="wheel-center">SPIN</div>
+            </div>
+            <button class="spin-btn ready" id="spinBtn" onclick="spinWheel()">
+                <i class="fas fa-sync-alt"></i> Spin Now (<span id="btnSpinsLeft">10</span> left)
+            </button>
+            <p class="spin-info">Spins reset daily — <span>come back every day!</span></p>
+
+            <div class="prize-legend">
+                <div class="prize-item"><div class="prize-dot" style="background:#22c55e"></div><div class="prize-text"><strong>₦10,000</strong> — Jackpot</div></div>
+                <div class="prize-item"><div class="prize-dot" style="background:#3b82f6"></div><div class="prize-text"><strong>₦5,000</strong> — Big Win</div></div>
+                <div class="prize-item"><div class="prize-dot" style="background:#a855f7"></div><div class="prize-text"><strong>₦2,500</strong> — Medium</div></div>
+                <div class="prize-item"><div class="prize-dot" style="background:#f59e0b"></div><div class="prize-text"><strong>₦1,000</strong> — Small</div></div>
+                <div class="prize-item"><div class="prize-dot" style="background:#64748b"></div><div class="prize-text"><strong>Try Again</strong> — No luck</div></div>
+                <div class="prize-item"><div class="prize-dot" style="background:#ef4444"></div><div class="prize-text"><strong>₦500</strong> — Consolation</div></div>
+            </div>
+        </div>
+
+        <div class="recent-wins">
+            <h3><i class="fas fa-trophy"></i> Recent Wins</h3>
+            <div id="recentWinsList">
+                <div class="win-item"><div class="win-user"><div class="win-avatar">C</div><div><div class="win-name">Chinedu O.</div><div class="win-time">2 min ago</div></div></div><div class="win-amount">+₦5,000</div></div>
+                <div class="win-item"><div class="win-user"><div class="win-avatar">A</div><div><div class="win-name">Amina K.</div><div class="win-time">5 min ago</div></div></div><div class="win-amount">+₦10,000</div></div>
+                <div class="win-item"><div class="win-user"><div class="win-avatar">T</div><div><div class="win-name">Tunde B.</div><div class="win-time">12 min ago</div></div></div><div class="win-amount">+₦2,500</div></div>
+                <div class="win-item"><div class="win-user"><div class="win-avatar">F</div><div><div class="win-name">Fatima S.</div><div class="win-time">18 min ago</div></div></div><div class="win-amount">+₦1,000</div></div>
+                <div class="win-item"><div class="win-user"><div class="win-avatar">E</div><div><div class="win-name">Emeka N.</div><div class="win-time">25 min ago</div></div></div><div class="win-amount">+₦5,000</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ========== SUPABASE CONFIG ==========
+    const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase connected');
+    } catch (e) {
+        console.error('❌ Supabase connection failed:', e);
+    }
+
+    // ========== GLOBAL STATE ==========
+    let currentUser = null;
+    let userProfile = null;
+    let balance = 0;
+
+    // ========== DOM ELEMENTS ==========
+    const authCheckOverlay = document.getElementById('authCheckOverlay');
+
+    // ========== AUTH CHECK ==========
+    async function checkAuth() {
+        if (!supabase) {
+            showToast('Connection error. Please refresh.', true);
+            return;
+        }
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+            console.log('Logged in as:', currentUser.email);
+            await loadUserProfile();
+            authCheckOverlay.classList.add('hidden');
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'login.html';
+        }
+    }
+
+    // ========== LOAD USER PROFILE FROM SUPABASE ==========
+    async function loadUserProfile() {
+        try {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error) {
+                console.error('Profile fetch error:', error);
+                return;
+            }
+
+            userProfile = profile;
+            balance = profile.wallet_balance || 0;
+            console.log('Profile loaded, balance:', balance);
+            init();
+
+        } catch (e) {
+            console.error('Load profile error:', e);
+        }
+    }
+
+    // ========== SAVE PROFILE TO SUPABASE ==========
+    async function saveProfile(updates) {
+        if (!currentUser || !supabase) return false;
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', currentUser.id);
+
+            if (error) {
+                console.error('Save profile error:', error);
+                return false;
+            }
+            return true;
+        } catch (e) {
+            console.error('Save profile error:', e);
+            return false;
+        }
+    }
+
+    // ========== FLOATING PARTICLES ==========
+    (function() {
+        var canvas = document.getElementById('bg-particles');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var particles = [], w, h;
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function Particle() { this.reset(); }
+        Particle.prototype.reset = function() {
+            this.x = Math.random() * w; this.y = Math.random() * h;
+            this.size = Math.random() * 3 + 1.5; this.speedY = -(Math.random() * 0.35 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.18; this.opacity = Math.random() * 0.4 + 0.2;
+            this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+        };
+        Particle.prototype.update = function() {
+            this.y += this.speedY; this.x += this.speedX; this.life--;
+            if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+            if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+        };
+        Particle.prototype.draw = function() {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+            ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+        };
+        var count = window.innerWidth < 768 ? 25 : 40;
+        for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+        function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+        animate();
+    })();
+
+    // ========== WHEEL SETUP (6 WIN, 4 LOSE) ==========
+    var segments = [
+        { label: '₦10,000', color: '#22c55e', value: 10000, type: 'win' },
+        { label: '₦5,000', color: '#3b82f6', value: 5000, type: 'win' },
+        { label: 'Try Again', color: '#64748b', value: 0, type: 'lose' },
+        { label: '₦2,500', color: '#a855f7', value: 2500, type: 'win' },
+        { label: '₦1,000', color: '#f59e0b', value: 1000, type: 'win' },
+        { label: 'Try Again', color: '#64748b', value: 0, type: 'lose' },
+        { label: '₦5,000', color: '#3b82f6', value: 5000, type: 'win' },
+        { label: '₦500', color: '#ef4444', value: 500, type: 'win' },
+        { label: 'Try Again', color: '#64748b', value: 0, type: 'lose' },
+        { label: 'Try Again', color: '#64748b', value: 0, type: 'lose' }
+    ];
+
+    var wheel = document.getElementById('wheel');
+    var segmentAngle = 360 / segments.length;
+
+    function createWheel() {
+        var html = '';
+        for (var i = 0; i < segments.length; i++) {
+            var seg = segments[i];
+            var rotation = i * segmentAngle;
+            html += '<div class="wheel-segment" style="transform: rotate(' + rotation + 'deg); background: ' + seg.color + ';">' + seg.label + '</div>';
+        }
+        wheel.innerHTML = html;
+    }
+    createWheel();
+
+    // ========== STATE ==========
+    var maxSpins = 10;
+    var spinsUsed = parseInt(localStorage.getItem('fluxspin_used') || '0');
+    var totalWon = parseInt(localStorage.getItem('fluxspin_won') || '0');
+    var lifetimeWon = parseInt(localStorage.getItem('fluxspin_lifetime_won') || '0');
+    var lastSpinDate = localStorage.getItem('fluxspin_date');
+    var today = new Date().toDateString();
+    var isSpinning = false;
+
+    if (lastSpinDate !== today) {
+        spinsUsed = 0;
+        totalWon = 0;
+        localStorage.setItem('fluxspin_date', today);
+        localStorage.setItem('fluxspin_used', '0');
+        localStorage.setItem('fluxspin_won', '0');
+    }
+
+    function init() {
+        updateStats();
+    }
+
+    function updateStats() {
+        var left = maxSpins - spinsUsed;
+        document.getElementById('spinsUsed').textContent = spinsUsed + '/' + maxSpins;
+        document.getElementById('spinsLeft').textContent = left;
+        document.getElementById('btnSpinsLeft').textContent = left;
+        document.getElementById('totalWon').textContent = '₦' + formatNumber(totalWon + lifetimeWon);
+    }
+
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    async function spinWheel() {
+        if (isSpinning) return;
+        if (spinsUsed >= maxSpins) {
+            document.getElementById('noSpinsModal').classList.add('active');
+            return;
+        }
+
+        isSpinning = true;
+        var btn = document.getElementById('spinBtn');
+        btn.classList.remove('ready');
+        btn.disabled = true;
+
+        var winningIndex = Math.floor(Math.random() * segments.length);
+        var winningSegment = segments[winningIndex];
+
+        var extraSpins = 5 + Math.floor(Math.random() * 3);
+        var landingAngle = (winningIndex * segmentAngle) + (segmentAngle / 2);
+        var totalRotation = (extraSpins * 360) + (360 - landingAngle);
+
+        wheel.style.transform = 'rotate(' + totalRotation + 'deg)';
+
+        setTimeout(async function() {
+            isSpinning = false;
+            spinsUsed++;
+            localStorage.setItem('fluxspin_used', spinsUsed.toString());
+
+            if (winningSegment.type === 'win') {
+                // Update Supabase balance
+                var newBalance = balance + winningSegment.value;
+                console.log('Spin win:', winningSegment.value, 'Old balance:', balance, 'New balance:', newBalance);
+                
+                var saved = await saveProfile({ wallet_balance: newBalance });
+                if (saved) {
+                    balance = newBalance;
+                    
+                    // Update daily + lifetime
+                    totalWon += winningSegment.value;
+                    lifetimeWon += winningSegment.value;
+                    localStorage.setItem('fluxspin_won', totalWon.toString());
+                    localStorage.setItem('fluxspin_lifetime_won', lifetimeWon.toString());
+
+                    // Log transaction
+                    await logTransaction('claim', winningSegment.value, 'Flux Spin Win', 'completed');
+
+                    showWinModal(winningSegment.value);
+                    fireConfetti();
+                    showToast('₦' + formatNumber(winningSegment.value) + ' won!', 'success');
+                } else {
+                    showToast('Error saving win. Try again.', 'error');
+                }
+            } else {
+                showToast('No luck this time — try again! 🎲', 'error');
+            }
+
+            updateStats();
+            btn.disabled = false;
+            btn.classList.add('ready');
+
+            setTimeout(function() {
+                wheel.style.transition = 'none';
+                wheel.style.transform = 'rotate(0deg)';
+                setTimeout(function() {
+                    wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+                }, 50);
+            }, 500);
+        }, 4000);
+    }
+
+    // ========== LOG TRANSACTION TO SUPABASE ==========
+    async function logTransaction(type, amt, description, status) {
+        if (!currentUser) return;
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .insert([{
+                    user_id: currentUser.id,
+                    type: type,
+                    amount: amt,
+                    description: description,
+                    status: status
+                }]);
+            if (error) console.error('Transaction log error:', error);
+        } catch (e) {
+            console.error('Log transaction error:', e);
+        }
+    }
+
+    // ========== MODALS ==========
+    function showWinModal(amount) {
+        document.getElementById('winAmount').textContent = '+₦' + formatNumber(amount);
+        document.getElementById('winSubtitle').textContent = 'Added to your wallet balance';
+        document.getElementById('winModal').classList.add('active');
+    }
+
+    function closeWinModal() {
+        document.getElementById('winModal').classList.remove('active');
+    }
+
+    function closeNoSpinsModal() {
+        document.getElementById('noSpinsModal').classList.remove('active');
+    }
+
+    // ========== CONFETTI ==========
+    function fireConfetti() {
+        var canvas = document.getElementById('confetti-canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        var particles = [];
+        var colors = ['#f59e0b', '#fbbf24', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#ef4444'];
+
+        for (var i = 0; i < 150; i++) {
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 20,
+                vy: (Math.random() - 0.5) * 20 - 5,
+                size: Math.random() * 8 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 10,
+                gravity: 0.3,
+                drag: 0.98,
+                life: 1
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            var alive = false;
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                if (p.life <= 0) continue;
+                alive = true;
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.vx *= p.drag;
+                p.vy *= p.drag;
+                p.rotation += p.rotationSpeed;
+                p.life -= 0.015;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctx.restore();
+            }
+            if (alive) requestAnimationFrame(animate);
+            else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        animate();
+    }
+
+    // ========== DYNAMIC RECENT WINS ==========
+    var recentNames = ['Chinedu O.', 'Amina K.', 'Tunde B.', 'Fatima S.', 'Emeka N.', 'Grace O.', 'David E.', 'Blessing A.', 'Kunle M.', 'Zainab U.'];
+    var recentAmounts = [1000, 2500, 5000, 10000, 500, 2500, 5000, 1000, 2500, 5000];
+
+    function updateRecentWins() {
+        var list = document.getElementById('recentWinsList');
+        var items = list.querySelectorAll('.win-item');
+        if (items.length >= 5) {
+            items[items.length - 1].remove();
+        }
+        var name = recentNames[Math.floor(Math.random() * recentNames.length)];
+        var amount = recentAmounts[Math.floor(Math.random() * recentAmounts.length)];
+        var initials = name.charAt(0);
+        var times = ['Just now', '1 min ago', '2 min ago', '3 min ago', '5 min ago'];
+
+        var newItem = document.createElement('div');
+        newItem.className = 'win-item';
+        newItem.innerHTML = '<div class="win-user"><div class="win-avatar">' + initials + '</div><div><div class="win-name">' + name + '</div><div class="win-time">' + times[Math.floor(Math.random() * times.length)] + '</div></div></div><div class="win-amount">+₦' + formatNumber(amount) + '</div>';
+        list.insertBefore(newItem, list.firstChild);
+    }
+
+    setInterval(updateRecentWins, 8000);
+
+    // ========== TOAST ==========
+    function showToast(message, type) {
+        var toast = document.getElementById('toast');
+        var toastText = document.getElementById('toastText');
+        toastText.textContent = message;
+        toast.className = 'toast';
+        if (type === 'success') toast.classList.add('success');
+        if (type === 'error') toast.classList.add('error');
+        toast.classList.add('show');
+        setTimeout(function() { toast.classList.remove('show', 'success', 'error'); }, 3000);
+    }
+
+    // ========== INIT ==========
+    async function initApp() {
+        await checkAuth();
+        console.log('🎰 Flux Spin 2.0 — Supabase Connected');
+    }
+
+    initApp();
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

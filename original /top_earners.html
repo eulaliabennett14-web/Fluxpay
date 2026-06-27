@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Top Earners Worldwide - FairMonie Pay</title>
+<link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0f0a; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 40px;
+}
+.aurora-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; background: #0a0f0a; overflow: hidden;
+}
+.aurora-wave {
+    position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(34,197,94,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.03) 0%, transparent 60%);
+    animation: auroraMove 15s ease-in-out infinite;
+}
+.aurora-wave:nth-child(2) {
+    animation-delay: -5s; animation-duration: 20s;
+    background: radial-gradient(ellipse at 60% 30%, rgba(34,197,94,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 70%, rgba(74,222,128,0.03) 0%, transparent 50%);
+}
+.aurora-wave:nth-child(3) {
+    animation-delay: -10s; animation-duration: 25s;
+    background: radial-gradient(ellipse at 80% 60%, rgba(16,185,129,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 40%, rgba(34,197,94,0.02) 0%, transparent 50%);
+}
+@keyframes auroraMove {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(5%,5%) rotate(2deg); }
+    50% { transform: translate(-3%,8%) rotate(-1deg); }
+    75% { transform: translate(8%,-5%) rotate(1deg); }
+}
+.grid-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    background: linear-gradient(rgba(34,197,94,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34,197,94,0.02) 1px, transparent 1px);
+    background-size: 50px 50px; animation: gridMove 20s linear infinite;
+}
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
+#particles-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+}
+
+.header {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px 12px;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.back-btn {
+    width: 40px; height: 40px; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #22c55e; transition: all 0.3s;
+}
+.back-btn:hover { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.2); }
+.back-btn svg { width: 20px; height: 20px; }
+.header-title h1 { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; color: white; }
+.header-title p { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+.hero-card {
+    position: relative; z-index: 2;
+    margin: 0 16px 24px; padding: 32px 24px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    text-align: center; transition: all 0.4s ease;
+    overflow: hidden;
+}
+.hero-card::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(34,197,94,0.08) 0%, transparent 60%);
+    animation: heroGlow 8s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes heroGlow {
+    0%,100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+.globe-icon {
+    width: 72px; height: 72px; background: linear-gradient(145deg, rgba(34,197,94,0.15), rgba(16,185,129,0.1));
+    border: 1px solid rgba(34,197,94,0.25); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; position: relative; z-index: 1;
+    box-shadow: 0 0 30px rgba(34,197,94,0.2), inset 0 0 20px rgba(34,197,94,0.05);
+    animation: globePulse 3s ease-in-out infinite;
+}
+@keyframes globePulse {
+    0%,100% { box-shadow: 0 0 30px rgba(34,197,94,0.2), inset 0 0 20px rgba(34,197,94,0.05); transform: scale(1); }
+    50% { box-shadow: 0 0 50px rgba(34,197,94,0.35), inset 0 0 30px rgba(34,197,94,0.1); transform: scale(1.05); }
+}
+.globe-icon svg { width: 36px; height: 36px; color: #22c55e; }
+.hero-title {
+    font-family: 'Amaranth', sans-serif; font-size: 26px; font-weight: 700;
+    color: white; margin-bottom: 10px; position: relative; z-index: 1;
+    text-shadow: 0 0 20px rgba(34,197,94,0.2);
+}
+.hero-subtitle {
+    font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.5;
+    position: relative; z-index: 1; max-width: 280px; margin: 0 auto;
+}
+
+.section-header {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 16px 16px; padding: 0 4px;
+}
+.section-icon {
+    width: 32px; height: 32px; background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.15); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #22c55e; flex-shrink: 0;
+}
+.section-icon svg { width: 18px; height: 18px; }
+.section-title {
+    font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; color: white;
+}
+
+.earner-card {
+    position: relative; z-index: 2;
+    margin: 0 16px 12px; padding: 20px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+.earner-card:hover {
+    border-color: rgba(34,197,94,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2), 0 0 30px rgba(34,197,94,0.06), inset 0 1px 0 rgba(255,255,255,0.04);
+    transform: translateY(-2px);
+}
+.earner-card:nth-child(1) { animation-delay: 0.05s; }
+.earner-card:nth-child(2) { animation-delay: 0.1s; }
+.earner-card:nth-child(3) { animation-delay: 0.15s; }
+.earner-card:nth-child(4) { animation-delay: 0.2s; }
+.earner-card:nth-child(5) { animation-delay: 0.25s; }
+.earner-card:nth-child(6) { animation-delay: 0.3s; }
+.earner-card:nth-child(7) { animation-delay: 0.35s; }
+.earner-card:nth-child(8) { animation-delay: 0.4s; }
+.earner-card:nth-child(9) { animation-delay: 0.45s; }
+.earner-card:nth-child(10) { animation-delay: 0.5s; }
+.earner-card:nth-child(11) { animation-delay: 0.55s; }
+.earner-card:nth-child(12) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.earner-top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px;
+}
+.earner-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
+.earner-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(145deg, #1a3a1a, #0d2d0d);
+    border: 2px solid rgba(34,197,94,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: #22c55e; flex-shrink: 0;
+    overflow: hidden; position: relative;
+    box-shadow: 0 0 15px rgba(34,197,94,0.1);
+}
+.earner-avatar img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+}
+.earner-info { flex: 1; min-width: 0; }
+.earner-name {
+    font-size: 17px; font-weight: 700; color: white; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.earner-location {
+    font-size: 13px; color: rgba(255,255,255,0.5);
+    display: flex; align-items: center; gap: 6px;
+}
+.flag { font-size: 16px; line-height: 1; }
+.earner-right { text-align: right; flex-shrink: 0; }
+.earner-amount {
+    font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700;
+    color: #22c55e; text-shadow: 0 0 15px rgba(34,197,94,0.25);
+    white-space: nowrap;
+}
+.earner-stars {
+    display: flex; gap: 2px; margin-top: 4px; justify-content: flex-end;
+}
+.earner-stars svg { width: 14px; height: 14px; color: #fbbf24; fill: #fbbf24; }
+
+.earner-quote {
+    font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6;
+    padding-left: 70px; font-style: italic;
+}
+.earner-quote::before { content: '"'; color: rgba(34,197,94,0.4); font-size: 18px; }
+.earner-quote::after { content: '"'; color: rgba(34,197,94,0.4); font-size: 18px; }
+
+.rising-section { margin-top: 32px; }
+.rising-section .section-icon {
+    background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.12);
+}
+
+.scroll-top {
+    position: fixed; bottom: 24px; right: 24px; z-index: 100;
+    width: 48px; height: 48px; background: rgba(255,255,255,0.95);
+    border: none; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 15px rgba(34,197,94,0.2);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none;
+}
+.scroll-top.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.scroll-top:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 25px rgba(0,0,0,0.5), 0 0 20px rgba(34,197,94,0.3); }
+.scroll-top:active { transform: scale(0.95); }
+.scroll-top svg { width: 22px; height: 22px; color: #0a0f0a; stroke-width: 2.5; }
+
+.security-footer {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 32px; padding: 0 16px;
+}
+.security-footer span {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 20px; padding: 8px 16px;
+    font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500;
+}
+.security-footer svg { width: 14px; height: 14px; color: #22c55e; }
+
+@media (min-width: 768px) {
+    .hero-card, .earner-card { max-width: 600px; margin-left: auto; margin-right: auto; }
+    .section-header { max-width: 600px; margin-left: auto; margin-right: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aurora-wave, .grid-bg, .globe-icon, .hero-card::before { animation: none; }
+    .earner-card { animation: none; opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-wave"></div><div class="aurora-wave"></div><div class="aurora-wave"></div></div>
+<div class="grid-bg"></div>
+<canvas id="particles-canvas"></canvas>
+
+<header class="header">
+    <div class="header-left">
+        <button class="back-btn" onclick="goBack()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="header-title">
+            <h1>Top Earners Worldwide</h1>
+            <p>Real users, real money — across the globe</p>
+        </div>
+    </div>
+</header>
+
+<div class="hero-card">
+    <div class="globe-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+    </div>
+    <div class="hero-title">Global FairMonie Pay Earners</div>
+    <div class="hero-subtitle">Members from 15+ countries earning daily in their local currency</div>
+</div>
+
+<div class="section-header">
+    <div class="section-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+    </div>
+    <div class="section-title">Top Global Earners</div>
+</div>
+
+<div id="topEarners"></div>
+
+<div class="section-header rising-section">
+    <div class="section-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+    </div>
+    <div class="section-title">Rising Earners</div>
+</div>
+
+<div id="risingEarners"></div>
+
+<div class="security-footer">
+    <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Bank-Grade Security
+    </span>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="scrollToTop()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+// ===== PARTICLES =====
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+    constructor() { this.reset(); }
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 100;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedY = Math.random() * 0.4 + 0.1;
+        this.speedX = (Math.random() - 0.5) * 0.15;
+        this.opacity = Math.random() * 0.4 + 0.2;
+        this.glow = Math.random() * 15 + 10;
+        this.pulseSpeed = Math.random() * 0.02 + 0.01;
+        this.pulsePhase = Math.random() * Math.PI * 2;
+        this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128';
+    }
+    update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        this.pulsePhase += this.pulseSpeed;
+        if (this.y < -50) this.reset();
+    }
+    draw() {
+        const pulse = Math.sin(this.pulsePhase) * 0.3 + 0.7;
+        const currentGlow = this.glow * pulse;
+        const currentOpacity = this.opacity * pulse;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + this.color + ',' + (currentOpacity * 0.1) + ')';
+        ctx.shadowBlur = currentGlow;
+        ctx.shadowColor = 'rgba(' + this.color + ',0.5)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + this.color + ',' + currentOpacity + ')';
+        ctx.shadowBlur = currentGlow * 0.3;
+        ctx.shadowColor = 'rgba(' + this.color + ',0.8)';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+}
+for (let i = 0; i < 50; i++) { const p = new Particle(); p.y = Math.random() * canvas.height; particles.push(p); }
+function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(function(p) { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+animateParticles();
+
+// ===== DATA =====
+const topEarnersData = [
+    { name: "Adebayo M.", location: "Lagos, Nigeria", flag: "🇳🇬", amount: "₦30,200,000", quote: "FairMonie Pay made me a millionaire! Daily bonuses & referrals built my fortune. Withdrawals are always fast.", initials: "AM", color: "#22c55e" },
+    { name: "James Carter", location: "New York, USA", flag: "🇺🇸", amount: "$24,800", quote: "Best earning platform I have used in the US. The crypto withdrawals via USDT come through instantly!", initials: "JC", color: "#22c55e" },
+    { name: "Sophie Laurent", location: "Paris, France", flag: "🇫🇷", amount: "€18,650", quote: "I withdraw weekly to my Euro bank without any issue. The currency switch keeps everything in Euros — magnifique!", initials: "SL", color: "#22c55e" },
+    { name: "Ngozi I.", location: "Abuja, Nigeria", flag: "🇳🇬", amount: "₦22,500,000", quote: "Life completely transformed since I joined. The referral system alone earned me millions.", initials: "NI", color: "#22c55e" },
+    { name: "Oliver Smith", location: "London, UK", flag: "🇬🇧", amount: "£15,400", quote: "From £0 to £15K in months. The British pound conversion is spot-on. Brilliant platform!", initials: "OS", color: "#22c55e" },
+    { name: "Kwame Mensah", location: "Accra, Ghana", flag: "🇬🇭", amount: "₵42,300", quote: "FairMonie pays directly in cedis. I have withdrawn over ₵40K in 6 months — life-changing in Ghana.", initials: "KM", color: "#22c55e" },
+    { name: "Chukwuemeka O.", location: "Owerri, Nigeria", flag: "🇳🇬", amount: "₦18,750,000", quote: "Most reliable earning app in Nigeria. The withdrawals never fail.", initials: "CO", color: "#22c55e" },
+    { name: "Wanjiru Kamau", location: "Nairobi, Kenya", flag: "🇰🇪", amount: "KSh 1,820,000", quote: "I cash out to M-Pesa every week. FairMonie is the real deal in Kenya!", initials: "WK", color: "#22c55e" },
+    { name: "Thabo Nkosi", location: "Johannesburg, SA", flag: "🇿🇦", amount: "R 218,500", quote: "Earning rands consistently from referrals & daily tasks. Highly recommended in South Africa.", initials: "TN", color: "#22c55e" },
+    { name: "Fatima B.", location: "Kano, Nigeria", flag: "🇳🇬", amount: "₦12,400,000", quote: "As a stay-at-home mom, I gained financial independence. Recommended to every Nigerian!", initials: "FB", color: "#22c55e" },
+    { name: "Liam O'Connor", location: "Toronto, Canada", flag: "🇨🇦", amount: "C$ 19,750", quote: "Crypto payouts to my BTC wallet land in minutes. Fantastic experience from Canada.", initials: "LO", color: "#22c55e" },
+    { name: "Priya Sharma", location: "Mumbai, India", flag: "🇮🇳", amount: "₹14,80,000", quote: "FairMonie supports rupees natively. I have earned more here than my full-time salary!", initials: "PS", color: "#22c55e" }
+];
+
+const risingEarnersData = [
+    { name: "Segun A.", location: "Ibadan, Nigeria", flag: "🇳🇬", amount: "₦8,900,000", quote: "Daily bonuses add up fast. Best platform ever!", initials: "SA", color: "#22c55e" },
+    { name: "Emily Rose", location: "Sydney, Australia", flag: "🇦🇺", amount: "A$ 8,650", quote: "Withdraws in AUD without conversion fees. Love it!", initials: "ER", color: "#22c55e" },
+    { name: "Carlos Vega", location: "Madrid, Spain", flag: "🇪🇸", amount: "€6,420", quote: "Excelente! Easy euros every week from referrals.", initials: "CV", color: "#22c55e" },
+    { name: "Amaka U.", location: "Enugu, Nigeria", flag: "🇳🇬", amount: "₦5,200,000", quote: "Truly life-changing! Earned ₦5M just from daily claims & referrals.", initials: "AU", color: "#22c55e" },
+    { name: "Yusuf H.", location: "Kaduna, Nigeria", flag: "🇳🇬", amount: "₦3,800,000", quote: "Consistent earnings every single day.", initials: "YH", color: "#22c55e" },
+    { name: "Aisha Mohamed", location: "Cairo, Egypt", flag: "🇪🇬", amount: "E£ 142,000", quote: "The first app that actually pays in Egypt. Withdrawal in pounds is smooth!", initials: "AM", color: "#22c55e" },
+    { name: "Mary Johnson", location: "Chicago, USA", flag: "🇺🇸", amount: "$9,250", quote: "Switched to USD currency and earnings make perfect sense now. Brilliant!", initials: "MJ", color: "#22c55e" },
+    { name: "Grace O.", location: "Benin, Nigeria", flag: "🇳🇬", amount: "₦2,500,000", quote: "Started 3 months ago and already earning big. This is real!", initials: "GO", color: "#22c55e" },
+    { name: "Pierre Dubois", location: "Lyon, France", flag: "🇫🇷", amount: "€4,180", quote: "Reference! Tres bien gere, paiements rapides en euros.", initials: "PD", color: "#22c55e" },
+    { name: "Ibrahim Diallo", location: "Dakar, Senegal", flag: "🇸🇳", amount: "CFA 2,850,000", quote: "FairMonie supports CFA franc — paye bien et vite!", initials: "ID", color: "#22c55e" },
+    { name: "David E.", location: "Warri, Nigeria", flag: "🇳🇬", amount: "₦1,900,000", quote: "Referral bonuses paid for my school fees. Thank you!", initials: "DE", color: "#22c55e" },
+    { name: "Hannah Muller", location: "Berlin, Germany", flag: "🇩🇪", amount: "€3,920", quote: "Sehr gut! Solid euro earnings & quick SEPA withdrawals.", initials: "HM", color: "#22c55e" },
+    { name: "Kemi S.", location: "Abeokuta, Nigeria", flag: "🇳🇬", amount: "₦1,200,000", quote: "Simple, easy and it pays. What more could you ask for?", initials: "KS", color: "#22c55e" },
+    { name: "Brian Otieno", location: "Mombasa, Kenya", flag: "🇰🇪", amount: "KSh 540,000", quote: "Reliable shilling payouts straight to M-Pesa.", initials: "BO", color: "#22c55e" },
+    { name: "Ibrahim T.", location: "Jos, Nigeria", flag: "🇳🇬", amount: "₦850,000", quote: "Just started and already seeing results!", initials: "IT", color: "#22c55e" },
+    { name: "Lucia Romano", location: "Rome, Italy", flag: "🇮🇹", amount: "€2,180", quote: "Fantastico! Daily euro earnings plus cashback bonuses.", initials: "LR", color: "#22c55e" },
+    { name: "Chioma N.", location: "Aba, Nigeria", flag: "🇳🇬", amount: "₦620,000", quote: "Even as a student, I am earning consistently!", initials: "CN", color: "#22c55e" },
+    { name: "Tunde Bello", location: "Lagos, Nigeria", flag: "🇳🇬", amount: "₦4,150,000", quote: "FairMonie changed my finances. Withdrew this week!", initials: "TB", color: "#22c55e" }
+];
+
+function renderStars() {
+    var s = '<svg viewBox="0 0 24 24" fill="#fbbf24" stroke="none" style="width:14px;height:14px;">';
+    s += '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>';
+    s += '</svg>';
+    return s + s + s + s + s;
+}
+
+function renderEarner(earner) {
+    var stars = renderStars();
+    var html = '<div class="earner-card">';
+    html += '<div class="earner-top">';
+    html += '<div class="earner-left">';
+    html += '<div class="earner-avatar"><span style="color:' + earner.color + '">' + earner.initials + '</span></div>';
+    html += '<div class="earner-info">';
+    html += '<div class="earner-name">' + earner.name + '</div>';
+    html += '<div class="earner-location"><span class="flag">' + earner.flag + '</span><span>' + earner.location + '</span></div>';
+    html += '</div></div>';
+    html += '<div class="earner-right">';
+    html += '<div class="earner-amount">' + earner.amount + '</div>';
+    html += '<div class="earner-stars">' + stars + '</div>';
+    html += '</div></div>';
+    html += '<div class="earner-quote">' + earner.quote + '</div>';
+    html += '</div>';
+    return html;
+}
+
+var topHTML = "";
+for (var i = 0; i < topEarnersData.length; i++) {
+    topHTML += renderEarner(topEarnersData[i]);
+}
+document.getElementById("topEarners").innerHTML = topHTML;
+
+var risingHTML = "";
+for (var i = 0; i < risingEarnersData.length; i++) {
+    risingHTML += renderEarner(risingEarnersData[i]);
+}
+document.getElementById("risingEarners").innerHTML = risingHTML;
+
+// ===== SCROLL TO TOP =====
+var scrollTopBtn = document.getElementById("scrollTop");
+window.addEventListener("scroll", function() {
+    if (window.scrollY > 400) {
+        scrollTopBtn.classList.add("visible");
+    } else {
+        scrollTopBtn.classList.remove("visible");
+    }
+});
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ===== NAVIGATION =====
+function goBack() {
+    window.location.href = "dashboard.html";
+}
+</script>
+</body>
+</html>

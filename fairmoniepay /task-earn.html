@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tasks & Earn - FairMonie Pay</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+            background: #0f1a0f; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 40px;
+            font-weight: 800;
+        }
+
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; pointer-events: none; }
+
+        .header { position: relative; z-index: 2; display: flex; align-items: center; padding: 16px 20px 12px; }
+        .back-btn { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(34, 197, 94, 0.15); color: #22c55e; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; text-decoration: none; font-size: 20px; margin-right: 16px; font-weight: 900; }
+        .back-btn:hover { background: rgba(34, 197, 94, 0.1); transform: translateX(-2px); }
+        .header-text { flex: 1; }
+        .header h1 { font-size: 26px; font-weight: 900; color: white; letter-spacing: -0.5px; }
+        .header-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 2px; }
+
+        .container { position: relative; z-index: 2; max-width: 500px; margin: 0 auto; padding: 0 16px 40px; }
+
+        /* STATS ROW */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-mini { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 16px 10px; text-align: center; }
+        .stat-mini .val { font-size: 20px; font-weight: 900; color: #22c55e; }
+        .stat-mini .lbl { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; font-weight: 600; }
+
+        /* EARNED CARD */
+        .earned-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px; padding: 24px 20px; margin-bottom: 20px; text-align: center;
+            backdrop-filter: blur(10px); position: relative; overflow: hidden;
+        }
+        .earned-label { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; margin-bottom: 6px; }
+        .earned-amount { font-size: 42px; font-weight: 900; color: #22c55e; letter-spacing: -1px; }
+
+        /* PROMO SECTION */
+        .promo-section { margin-bottom: 20px; }
+        .section-title { font-size: 20px; font-weight: 900; color: white; margin-bottom: 12px; }
+        .promo-box { display: flex; gap: 10px; }
+        .promo-input { flex: 1; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: white; font-size: 14px; font-weight: 800; font-family: inherit; outline: none; }
+        .promo-input:focus { border-color: rgba(34, 197, 94, 0.3); }
+        .promo-input::placeholder { color: rgba(255,255,255,0.3); }
+        .promo-btn { padding: 14px 24px; border-radius: 14px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 14px; font-weight: 900; cursor: pointer; white-space: nowrap; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+        .promo-btn:hover { transform: translateY(-2px); }
+
+        /* TASK CARD */
+        .task-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 18px; padding: 16px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 14px;
+            backdrop-filter: blur(10px); transition: all 0.3s; position: relative;
+        }
+        .task-card:hover { background: rgba(34, 197, 94, 0.04); border-color: rgba(34, 197, 94, 0.15); }
+
+        .task-icon-box { width: 48px; height: 48px; border-radius: 14px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #22c55e; flex-shrink: 0; }
+        .task-info { flex: 1; min-width: 0; }
+        .task-name { font-size: 16px; font-weight: 900; color: white; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
+        .task-desc { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 600; }
+        .task-reward { font-size: 13px; font-weight: 900; color: #22c55e; margin-top: 3px; }
+
+        .new-badge {
+            display: inline-block; padding: 3px 8px; border-radius: 6px;
+            background: #ef4444; color: white; font-size: 10px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 0.5px; animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .task-btn {
+            padding: 10px 18px; border-radius: 12px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: none; color: white; font-size: 13px; font-weight: 900;
+            cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+            transition: all 0.3s;
+        }
+        .task-btn:hover { transform: translateY(-2px); }
+        .task-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; background: rgba(255,255,255,0.1); box-shadow: none; }
+
+        .countdown { font-size: 12px; color: #f59e0b; font-weight: 800; margin-top: 4px; }
+
+        /* STREAK */
+        .streak-dots { display: flex; gap: 6px; margin-top: 4px; }
+        .streak-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .streak-dot.done { background: #22c55e; border-color: #22c55e; color: white; }
+        .streak-dot.active { border-color: #22c55e; color: #22c55e; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { box-shadow: 0 0 10px 3px rgba(34,197,94,0.2); } }
+
+        /* SPIN WHEEL */
+        .spin-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s; }
+        .spin-overlay.active { opacity: 1; visibility: visible; }
+        .spin-card { background: linear-gradient(145deg, #0d2d0d, #1a4a1a); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 30px 24px; text-align: center; max-width: 350px; width: 90%; }
+        .spin-title { font-size: 22px; font-weight: 900; color: #22c55e; margin-bottom: 20px; }
+        .spin-wheel { width: 180px; height: 180px; border-radius: 50%; background: conic-gradient(#22c55e 0% 3%, #4ade80 3% 10%, #22c55e 10% 25%, #f59e0b 25% 50%, #22c55e 50% 70%, #4ade80 70% 80%, #22c55e 80% 100%); margin: 0 auto 20px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 40px; transition: transform 3s cubic-bezier(0.17,0.67,0.12,0.99); }
+        .spin-arrow { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 30px; color: white; z-index: 2; }
+        .spin-result { font-size: 20px; font-weight: 900; color: white; margin: 16px 0; min-height: 30px; }
+        .spin-btn { padding: 14px 40px; border-radius: 14px; background: linear-gradient(145deg, #16a34a, #22c55e); border: none; color: white; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+        .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .spin-close { margin-top: 14px; background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 24px; border-radius: 12px; font-size: 14px; cursor: pointer; }
+
+        /* POPUP */
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s; }
+        .popup-overlay.active { opacity: 1; visibility: visible; }
+        .popup-card { background: linear-gradient(145deg, #0d1f0d, #1a3a1a); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; padding: 28px 20px; text-align: center; max-width: 320px; width: 90%; }
+        .popup-icon { font-size: 48px; margin-bottom: 12px; }
+        .popup-title { font-size: 18px; font-weight: 900; color: white; margin-bottom: 6px; }
+        .popup-text { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+        .popup-btn { padding: 12px 30px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: white; font-size: 14px; font-weight: 800; cursor: pointer; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(145deg, #16a34a, #22c55e); color: white; padding: 14px 28px; border-radius: 16px; font-weight: 900; font-size: 14px; box-shadow: 0 10px 40px rgba(34,197,94,0.4); z-index: 1000; opacity: 0; transition: all 0.4s; display: flex; align-items: center; gap: 8px; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    
+        /* RECENTLY ADDED SECTION */
+        .recently-added {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recently-added::before {
+            content: "NEW";
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background: #ef4444;
+            color: white;
+            padding: 4px 40px;
+            font-size: 10px;
+            font-weight: 900;
+            transform: rotate(45deg);
+            letter-spacing: 1px;
+        }
+
+        .recently-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recently-title::before {
+            content: "✨";
+        }
+
+        /* INVITE SECTION */
+        .invite-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .invite-code-box {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px dashed rgba(34, 197, 94, 0.3);
+            border-radius: 14px;
+            padding: 16px;
+            margin: 12px 0;
+            font-size: 24px;
+            font-weight: 900;
+            color: #22c55e;
+            letter-spacing: 2px;
+            word-break: break-all;
+        }
+
+        .invite-count {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 8px;
+        }
+
+        .invite-count strong {
+            color: #22c55e;
+            font-size: 20px;
+        }
+
+        .copy-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* SCRATCH CARD */
+        .scratch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s;
+        }
+
+        .scratch-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scratch-card {
+            background: linear-gradient(145deg, #0d2d0d, #1a4a1a);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 24px;
+            padding: 30px 24px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+        }
+
+        .scratch-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+
+        .scratch-area {
+            width: 280px;
+            height: 140px;
+            margin: 0 auto 20px;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+
+        .scratch-reveal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 900;
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .scratch-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #374151, #4b5563);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 900;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.5s;
+        }
+
+        .scratch-cover.scratched {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scratch-cost {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+
+        .scratch-btn {
+            padding: 14px 40px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(34,197,94,0.3);
+        }
+
+        .scratch-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .scratch-close {
+            margin-top: 14px;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* QUIZ OVERLAY */
+        .quiz-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s;
+        }
+
+        .quiz-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .quiz-card {
+            background: linear-gradient(145deg, #0d2d0d, #1a4a1a);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 24px;
+            padding: 30px 24px;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+        }
+
+        .quiz-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+
+        .quiz-question {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-option {
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .quiz-option:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .quiz-option.correct {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+        }
+
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        .quiz-progress {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+        }
+
+        .quiz-result {
+            font-size: 20px;
+            font-weight: 900;
+            margin: 16px 0;
+        }
+
+        .quiz-close {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <!-- Floating particles background added -->
+    <div id="particles-bg" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></div>
+
+    <div class="header">
+        <a href="more.html" class="back-btn">&#8592;</a>
+        <div class="header-text">
+            <h1>Tasks & Earn</h1>
+            <p class="header-sub">Complete tasks, earn rewards</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-mini"><div class="val" id="taskBalance">₦0</div><div class="lbl">Task Balance</div></div>
+            <div class="stat-mini"><div class="val" id="spinPoints">0</div><div class="lbl">Spin Points</div></div>
+            <div class="stat-mini"><div class="val" id="streakDays">0/7</div><div class="lbl">Login Streak</div></div>
+        </div>
+
+        <!-- PROMO CODE -->
+        <div class="promo-section">
+            <div class="section-title">Redeem Promo Code</div>
+            <div class="promo-box">
+                <input type="text" class="promo-input" id="promoInput" placeholder="Enter your promo code">
+                <button class="promo-btn" onclick="redeemPromo()">Redeem</button>
+            </div>
+        </div>
+
+        <!-- RECENTLY ADDED SECTION -->
+        <div class="recently-added">
+            <div class="recently-title">Recently Added</div>
+
+            <!-- SCRATCH CARD -->
+            <div class="task-card">
+                <div class="task-icon-box">🎫</div>
+                <div class="task-info">
+                    <div class="task-name">Scratch & Win <span class="new-badge">NEW</span></div>
+                    <div class="task-desc">Scratch to reveal your reward! Costs 50 points</div>
+                    <div class="task-reward">Up to ₦5,000</div>
+                </div>
+                <button class="task-btn" onclick="openScratchCard()">Scratch</button>
+            </div>
+
+            <!-- INVITE FRIENDS -->
+            <div class="task-card" style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.2);">
+                <div class="task-icon-box">&#128172;</div>
+                <div class="task-info">
+                    <div class="task-name">Invite Friends <span class="new-badge">NEW</span></div>
+                    <div class="task-desc">Earn ₦3,800 for every friend who joins!</div>
+                    <div class="task-reward">₦3,800 per invite</div>
+                </div>
+                <button class="task-btn" onclick="goToInvitePage()">Invite</button>
+            </div>
+
+            <!-- DAILY QUIZ -->
+            <div class="task-card">
+                <div class="task-icon-box">🧠</div>
+                <div class="task-info">
+                    <div class="task-name">Daily Quiz <span class="new-badge">NEW</span></div>
+                    <div class="task-desc">3 hard questions. Answer all correct to win!</div>
+                    <div class="task-reward">₦1,000</div>
+                </div>
+                <button class="task-btn" id="quizBtn" onclick="openQuiz()">Start Quiz</button>
+            </div>
+
+            <!-- WATCH AD VIDEO -->
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📺</div>
+                <div class="task-info">
+                    <div class="task-name">Watch Ad & Earn</div>
+                    <div class="task-desc">Watch a short video advertisement</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦500</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Watch</button>
+            </div>
+
+            <!-- SOCIAL TASKS - NOT AVAILABLE -->
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📸</div>
+                <div class="task-info">
+                    <div class="task-name">Follow on Instagram</div>
+                    <div class="task-desc">Follow our Instagram page</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Follow</button>
+            </div>
+
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">🐦</div>
+                <div class="task-info">
+                    <div class="task-name">Follow on Twitter/X</div>
+                    <div class="task-desc">Follow our Twitter/X page</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Follow</button>
+            </div>
+
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">🎵</div>
+                <div class="task-info">
+                    <div class="task-name">Follow on TikTok</div>
+                    <div class="task-desc">Follow our TikTok page</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Follow</button>
+            </div>
+
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📺</div>
+                <div class="task-info">
+                    <div class="task-name">Subscribe on YouTube</div>
+                    <div class="task-desc">Subscribe to our YouTube channel</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦2,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Subscribe</button>
+            </div>
+
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">📱</div>
+                <div class="task-info">
+                    <div class="task-name">Share on WhatsApp Status</div>
+                    <div class="task-desc">Share our app on your WhatsApp status</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦500</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Share</button>
+            </div>
+
+            <div class="task-card" style="opacity:0.7;">
+                <div class="task-icon-box">⭐</div>
+                <div class="task-info">
+                    <div class="task-name">Rate App on Play Store</div>
+                    <div class="task-desc">Give us a 5-star rating</div>
+                    <div class="task-reward" style="color:#f59e0b;">₦1,000</div>
+                </div>
+                <button class="task-btn" onclick="showNotAvailable()">Rate</button>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-bottom:12px;">Available Tasks</div>
+
+        <!-- HOURLY CHECK-IN (2hrs, ₦19,000) -->
+        <div class="task-card">
+            <div class="task-icon-box">⏰</div>
+            <div class="task-info">
+                <div class="task-name">2-Hour Check-in</div>
+                <div class="task-desc">Check in every 2 hours to earn</div>
+                <div class="task-reward">₦19,000 per check-in</div>
+                <div class="countdown" id="checkinTimer"></div>
+            </div>
+            <button class="task-btn" id="checkinBtn" onclick="doHourlyCheckin()">Claim</button>
+        </div>
+
+        <!-- DAILY LOGIN STREAK (7 days, ₦25,000) -->
+        <div class="task-card">
+            <div class="task-icon-box">🔥</div>
+            <div class="task-info">
+                <div class="task-name">Daily Login Streak</div>
+                <div class="task-desc">Login 7 days straight for bonus</div>
+                <div class="task-reward">₦25,000 on Day 7</div>
+                <div class="streak-dots" id="streakDots"></div>
+            </div>
+            <button class="task-btn" id="streakBtn" onclick="claimStreak()">Day 1</button>
+        </div>
+
+        <!-- TELEGRAM (Blocked) -->
+        <div class="task-card">
+            <div class="task-icon-box">📱</div>
+            <div class="task-info">
+                <div class="task-name">Join Telegram <span class="new-badge">NEW</span></div>
+                <div class="task-desc">Join our Telegram community</div>
+                <div class="task-reward">€2,422</div>
+            </div>
+            <button class="task-btn" onclick="showNotAvailable()">Join</button>
+        </div>
+
+        <!-- WHATSAPP GROUP 1 -->
+        <div class="task-card">
+            <div class="task-icon-box">💬</div>
+            <div class="task-info">
+                <div class="task-name">Join WhatsApp Group 1 <span class="new-badge">NEW</span></div>
+                <div class="task-desc">Join our WhatsApp community</div>
+                <div class="task-reward">₦5,000 one-time</div>
+            </div>
+            <button class="task-btn" id="wa1Btn" onclick="joinWhatsApp1()">Join</button>
+        </div>
+
+        <!-- WHATSAPP GROUP 2 -->
+        <div class="task-card">
+            <div class="task-icon-box">💬</div>
+            <div class="task-info">
+                <div class="task-name">Join WhatsApp Group 2 <span class="new-badge">NEW</span></div>
+                <div class="task-desc">Join our second community</div>
+                <div class="task-reward">₦5,000 one-time</div>
+            </div>
+            <button class="task-btn" id="wa2Btn" onclick="joinWhatsApp2()">Join</button>
+        </div>
+
+        <!-- SPIN WHEEL -->
+        <div class="task-card">
+            <div class="task-icon-box">🎡</div>
+            <div class="task-info">
+                <div class="task-name">Spin the Wheel <span class="new-badge">NEW</span></div>
+                <div class="task-desc">100 points per spin. Win up to ₦10,000!</div>
+                <div class="task-reward">Random reward</div>
+            </div>
+            <button class="task-btn" onclick="openSpinWheel()">Spin (100pts)</button>
+        </div>
+
+        <!-- WATCH VIDEO (Coming Soon) -->
+        <div class="task-card" style="opacity:0.7;">
+            <div class="task-icon-box">📺</div>
+            <div class="task-info">
+                <div class="task-name">Watch Video & Earn</div>
+                <div class="task-desc">Watch short videos to earn rewards</div>
+                <div class="task-reward" style="color:#f59e0b;">Coming Soon</div>
+            </div>
+            <button class="task-btn" disabled>Soon</button>
+        </div>
+    </div>
+
+    <!-- SPIN WHEEL OVERLAY -->
+    <div class="spin-overlay" id="spinOverlay">
+        <div class="spin-card">
+            <div class="spin-title">🎡 Spin the Wheel</div>
+            <div style="position:relative;display:inline-block;">
+                <div class="spin-arrow">▼</div>
+                <div class="spin-wheel" id="spinWheel" style="display:flex;align-items:center;justify-content:center;font-size:60px;">🎰</div>
+            </div>
+            <div class="spin-result" id="spinResult"></div>
+            <button class="spin-btn" id="spinBtn" onclick="doSpin()">SPIN (100 pts)</button>
+            <br>
+            <button class="spin-close" onclick="closeSpin()">Close</button>
+        </div>
+    </div>
+
+    <!-- NOT AVAILABLE POPUP -->
+    <div class="popup-overlay" id="notAvailPopup">
+        <div class="popup-card">
+            <div class="popup-icon">🌍</div>
+            <div class="popup-title">Not Available</div>
+            <div class="popup-text">This feature is not available for your country at the moment.</div>
+            <button class="popup-btn" onclick="closeNotAvail()">Got it</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><span>✅</span> <span id="toastMsg">Done!</span></div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#22c55e" }, "shape": { "type": "circle" }, "opacity": { "value": 0.3, "random": true }, "size": { "value": 2, "random": true }, "line_linked": { "enable": false }, "move": { "enable": true, "speed": 0.8, "direction": "none", "random": true, "straight": false, "out_mode": "out" } },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "bubble" }, "onclick": { "enable": false }, "resize": true } },
+            "retina_detect": true
+        });
+
+        // STORAGE HELPERS
+        function getEmailKey(k) { var e = localStorage.getItem('fairmonie_user_email') || 'default'; return 'fairmonie_' + e + '_' + k; }
+        function loadData(k, f) { var v = localStorage.getItem(getEmailKey(k)); return v !== null ? v : f; }
+        function saveData(k, v) { localStorage.setItem(getEmailKey(k), v); }
+
+        var taskBalance = parseInt(loadData('task_balance', '0')) || 0;
+        var spinPoints = parseInt(loadData('spin_points', '0')) || 0;
+        var streakCount = parseInt(loadData('streak_count', '0')) || 0;
+        var lastStreakDate = loadData('last_streak_date', '');
+        var wa1Done = loadData('wa1_done', 'false') === 'true';
+        var wa2Done = loadData('wa2_done', 'false') === 'true';
+        var lastCheckinTime = parseInt(loadData('last_checkin_time', '0')) || 0;
+
+        function updateUI() {
+            document.getElementById('taskBalance').textContent = '₦' + taskBalance.toLocaleString();
+            document.getElementById('spinPoints').textContent = spinPoints;
+            document.getElementById('streakDays').textContent = streakCount + '/7';
+            updateCheckinTimer();
+            updateStreakUI();
+            if (wa1Done) { document.getElementById('wa1Btn').textContent = 'Completed ✅'; document.getElementById('wa1Btn').disabled = true; }
+            if (wa2Done) { document.getElementById('wa2Btn').textContent = 'Completed ✅'; document.getElementById('wa2Btn').disabled = true; }
+        }
+
+        function addReward(amount, type, title) {
+            taskBalance += amount;
+            spinPoints += Math.floor(amount / 100); // Earn points from tasks
+            saveData('task_balance', taskBalance.toString());
+            saveData('spin_points', spinPoints.toString());
+            var mainBal = parseInt(localStorage.getItem(getEmailKey('balance')) || '0');
+            mainBal += amount;
+            localStorage.setItem(getEmailKey('balance'), mainBal.toString());
+            var notifs = JSON.parse(localStorage.getItem(getEmailKey('notifications')) || '[]');
+            notifs.unshift({ id: Date.now(), type: type, title: title, message: 'You earned ₦' + amount.toLocaleString(), amount: '+₦' + amount.toLocaleString(), amountType: 'credit', time: new Date().toISOString(), read: false });
+            localStorage.setItem(getEmailKey('notifications'), JSON.stringify(notifs));
+            
+        // ===== SCRATCH CARD =====
+        var scratchPrizes = [
+            { val: 5000, chance: 2 },
+            { val: 1000, chance: 8 },
+            { val: 500, chance: 20 },
+            { val: 200, chance: 30 },
+            { val: 100, chance: 25 },
+            { val: 0, chance: 15 }
+        ];
+        var lastScratchDate = loadData('last_scratch_date', '');
+        var todayStr = new Date().toDateString();
+
+        function openScratchCard() {
+            if (spinPoints < 50) { showToast('Not enough points! Need 50 points.'); return; }
+            if (lastScratchDate === todayStr) { showToast('Already scratched today! Come back tomorrow.'); return; }
+
+            document.getElementById('scratchOverlay').classList.add('active');
+            document.getElementById('scratchReveal').textContent = '?';
+            document.getElementById('scratchCover').classList.remove('scratched');
+            document.getElementById('scratchCover').textContent = 'TAP TO SCRATCH';
+            document.getElementById('scratchResult').textContent = '';
+            document.getElementById('scratchBtn').style.display = 'none';
+        }
+
+        function closeScratch() {
+            document.getElementById('scratchOverlay').classList.remove('active');
+        }
+
+        function doScratch() {
+            var cover = document.getElementById('scratchCover');
+            cover.classList.add('scratched');
+
+            spinPoints -= 50;
+            saveData('spin_points', spinPoints.toString());
+
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < scratchPrizes.length; i++) {
+                cum += scratchPrizes[i].chance;
+                if (rand <= cum) { prize = scratchPrizes[i].val; break; }
+            }
+
+            lastScratchDate = todayStr;
+            saveData('last_scratch_date', lastScratchDate);
+
+            var reveal = document.getElementById('scratchReveal');
+            var result = document.getElementById('scratchResult');
+
+            if (prize > 0) {
+                reveal.textContent = '₦' + prize.toLocaleString();
+                result.textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                addReward(prize, 'scratch', 'Scratch Card Win');
+            } else {
+                reveal.textContent = '😔';
+                result.textContent = 'Try again tomorrow!';
+            }
+
+            document.getElementById('scratchBtn').style.display = 'inline-block';
+            updateUI();
+        }
+
+        // ===== INVITE FRIENDS =====
+        function generateInviteCode() {
+            var email = localStorage.getItem('fairmonie_user_email') || 'user';
+            var code = 'FM' + email.substring(0, 4).toUpperCase() + Math.floor(Math.random() * 9999);
+            return code;
+        }
+
+        var inviteCode = loadData('invite_code', '');
+        if (!inviteCode) {
+            inviteCode = generateInviteCode();
+            saveData('invite_code', inviteCode);
+        }
+
+        var inviteCount = parseInt(loadData('invite_count', '0')) || 0;
+
+        function updateInviteUI() {
+            document.getElementById('inviteCode').textContent = inviteCode;
+            document.getElementById('inviteCount').textContent = inviteCount;
+        }
+
+        function copyInviteCode() {
+            navigator.clipboard.writeText(inviteCode).then(function() {
+                showToast('Code copied! Share with friends');
+            }).catch(function() {
+                showToast('Code: ' + inviteCode);
+            });
+        }
+
+        // ===== DAILY QUIZ =====
+        var quizQuestions = [
+            {
+                q: "Who is the current Governor of the Central Bank of Nigeria (CBN)?",
+                options: ["Yemi Cardoso", "Godwin Emefiele", "Sanusi Lamido", "Charles Soludo"],
+                correct: 0
+            },
+            {
+                q: "In what year did Nigeria become a republic?",
+                options: ["1960", "1963", "1979", "1999"],
+                correct: 1
+            },
+            {
+                q: "What is the capital city of Australia?",
+                options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                correct: 2
+            },
+            {
+                q: "Who wrote the novel 'Things Fall Apart'?",
+                options: ["Wole Soyinka", "Chinua Achebe", "Chimamanda Adichie", "Ben Okri"],
+                correct: 1
+            },
+            {
+                q: "What is the largest ocean in the world?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correct: 3
+            },
+            {
+                q: "Which Nigerian state is known as the 'Centre of Excellence'?",
+                options: ["Abuja", "Lagos", "Kano", "Rivers"],
+                correct: 1
+            },
+            {
+                q: "What is the chemical symbol for Gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                q: "Who was the first President of the United States?",
+                options: ["Thomas Jefferson", "John Adams", "George Washington", "Abraham Lincoln"],
+                correct: 2
+            },
+            {
+                q: "What is the longest river in Africa?",
+                options: ["Congo River", "Niger River", "Zambezi River", "Nile River"],
+                correct: 3
+            },
+            {
+                q: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            }
+        ];
+
+        var currentQuizIndex = 0;
+        var quizScore = 0;
+        var quizQuestionsToday = [];
+        var lastQuizDate = loadData('last_quiz_date', '');
+        var quizDoneToday = lastQuizDate === todayStr;
+
+        function openQuiz() {
+            if (quizDoneToday) { showToast('Already completed today's quiz!'); return; }
+
+            quizScore = 0;
+            currentQuizIndex = 0;
+            quizQuestionsToday = [];
+
+            var indices = [];
+            while (indices.length < 3) {
+                var r = Math.floor(Math.random() * quizQuestions.length);
+                if (indices.indexOf(r) === -1) indices.push(r);
+            }
+            for (var i = 0; i < indices.length; i++) {
+                quizQuestionsToday.push(quizQuestions[indices[i]]);
+            }
+
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizResult').textContent = '';
+            document.getElementById('quizCloseBtn').textContent = 'Close';
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            var q = quizQuestionsToday[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = 'Question ' + (currentQuizIndex + 1) + ' of 3';
+            document.getElementById('quizQuestion').textContent = q.q;
+
+            var html = '';
+            for (var i = 0; i < q.options.length; i++) {
+                html += '<button class="quiz-option" onclick="answerQuiz(' + i + ')">' + q.options[i] + '</button>';
+            }
+            document.getElementById('quizOptions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            var q = quizQuestionsToday[currentQuizIndex];
+            var buttons = document.querySelectorAll('.quiz-option');
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) buttons[i].classList.add('correct');
+                else if (i === index && i !== q.correct) buttons[i].classList.add('wrong');
+            }
+
+            if (index === q.correct) quizScore++;
+
+            setTimeout(function() {
+                currentQuizIndex++;
+                if (currentQuizIndex < 3) {
+                    showQuizQuestion();
+                } else {
+                    showQuizResult();
+                }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizProgress').textContent = 'Quiz Complete!';
+            document.getElementById('quizQuestion').textContent = '';
+            document.getElementById('quizOptions').innerHTML = '';
+
+            var reward = 0;
+            var resultText = '';
+
+            if (quizScore === 3) {
+                reward = 1000;
+                resultText = '🎉 Perfect! 3/3 correct! +₦1,000!';
+            } else if (quizScore === 2) {
+                reward = 500;
+                resultText = '👍 Good! 2/3 correct! +₦500!';
+            } else if (quizScore === 1) {
+                reward = 200;
+                resultText = '😊 1/3 correct! +₦200!';
+            } else {
+                resultText = '😔 0/3 correct! Try again tomorrow!';
+            }
+
+            if (reward > 0) {
+                addReward(reward, 'quiz', 'Daily Quiz');
+            }
+
+            document.getElementById('quizResult').textContent = resultText;
+            document.getElementById('quizCloseBtn').textContent = 'Done';
+
+            lastQuizDate = todayStr;
+            saveData('last_quiz_date', lastQuizDate);
+            quizDoneToday = true;
+            updateUI();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').classList.remove('active');
+        }
+
+        updateInviteUI();
+        
+        updateUI();
+        }
+
+        // PROMO CODE
+        function redeemPromo() {
+    var code = document.getElementById('promoInput').value.trim().toUpperCase();
+    if (!code) { showToast('Enter a promo code!'); return; }
+    
+    // Check static codes first
+    if (code === 'FAIRMONIE10K') { addReward(10000, 'promo', 'Promo Code Redeemed'); showToast('+₦10,000!'); }
+    else if (code === 'WELCOME5K') { addReward(5000, 'promo', 'Promo Code Redeemed'); showToast('+₦5,000!'); }
+    else if (code === 'BONUS20K') { addReward(20000, 'promo', 'Promo Code Redeemed'); showToast('+₦20,000!'); }
+    else {
+        // Check purchased promo codes from promo.html
+        var promos = JSON.parse(localStorage.getItem('fairmonie_promo_codes') || '{}');
+        var promoData = promos[code];
+        
+        if (promoData) {
+            if (promoData.used) {
+                showToast('This code has already been used!');
+            } else if (Date.now() > promoData.expires) {
+                showToast('This code has expired!');
+            } else {
+                // Valid code - redeem it
+                promoData.used = true;
+                promos[code] = promoData;
+                localStorage.setItem('fairmonie_promo_codes', JSON.stringify(promos));
+                addReward(promoData.reward, 'promo', 'Promo Code Redeemed');
+                showToast('+₦' + promoData.reward.toLocaleString() + '!');
+            }
+        } else {
+            showToast('Invalid promo code!');
+        }
+    }
+    document.getElementById('promoInput').value = '';
+}
+        // HOURLY CHECK-IN (2hrs, ₦19,000)
+        function updateCheckinTimer() {
+            var now = Date.now();
+            var diff = now - lastCheckinTime;
+            var twoHrs = 2 * 60 * 60 * 1000;
+            var remaining = twoHrs - diff;
+            var btn = document.getElementById('checkinBtn');
+            var timer = document.getElementById('checkinTimer');
+            if (remaining > 0) {
+                var hrs = Math.floor(remaining / (60 * 60 * 1000));
+                var mins = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                var secs = Math.floor((remaining % (60 * 1000)) / 1000);
+                timer.textContent = 'Next in: ' + hrs + 'h ' + mins + 'm ' + secs + 's';
+                btn.disabled = true;
+                btn.textContent = 'Wait';
+                setTimeout(updateCheckinTimer, 1000);
+            } else {
+                timer.textContent = '';
+                btn.disabled = false;
+                btn.textContent = 'Claim ₦19k';
+            }
+        }
+
+        function doHourlyCheckin() {
+            var now = Date.now();
+            var twoHrs = 2 * 60 * 60 * 1000;
+            if (now - lastCheckinTime < twoHrs) { showToast('Already checked in! Wait for timer.'); return; }
+            lastCheckinTime = now;
+            saveData('last_checkin_time', lastCheckinTime.toString());
+            addReward(19000, 'checkin', '2-Hour Check-in');
+            showToast('+₦19,000!');
+            updateCheckinTimer();
+        }
+
+        // DAILY LOGIN STREAK
+        function updateStreakUI() {
+            var dots = document.getElementById('streakDots');
+            var html = '';
+            for (var i = 1; i <= 7; i++) {
+                if (i <= streakCount) html += '<div class="streak-dot done">✓</div>';
+                else if (i === streakCount + 1) html += '<div class="streak-dot active">' + i + '</div>';
+                else html += '<div class="streak-dot">' + i + '</div>';
+            }
+            dots.innerHTML = html;
+            var btn = document.getElementById('streakBtn');
+            var today = new Date().toDateString();
+            if (lastStreakDate === today) { btn.textContent = 'Done Today'; btn.disabled = true; }
+            else if (streakCount >= 7) { btn.textContent = 'Claim ₦25k!'; btn.disabled = false; }
+            else { btn.textContent = 'Day ' + (streakCount + 1); btn.disabled = false; }
+        }
+
+        function claimStreak() {
+            var today = new Date().toDateString();
+            if (lastStreakDate === today) { showToast('Already claimed today!'); return; }
+            var yesterday = new Date(Date.now() - 86400000).toDateString();
+            if (lastStreakDate === yesterday || lastStreakDate === '') {
+                streakCount++;
+                if (streakCount >= 7) { addReward(25000, 'streak', '7-Day Login Streak Bonus'); showToast('+₦25,000 Streak Bonus! 🎉'); streakCount = 0; }
+                else { showToast('Day ' + streakCount + ' of 7! Keep going!'); }
+                lastStreakDate = today;
+                saveData('streak_count', streakCount.toString());
+                saveData('last_streak_date', lastStreakDate);
+            } else { streakCount = 1; lastStreakDate = today; saveData('streak_count', '1'); saveData('last_streak_date', lastStreakDate); showToast('Streak reset! Day 1 started.'); }
+            
+        // ===== SCRATCH CARD =====
+        var scratchPrizes = [
+            { val: 5000, chance: 2 },
+            { val: 1000, chance: 8 },
+            { val: 500, chance: 20 },
+            { val: 200, chance: 30 },
+            { val: 100, chance: 25 },
+            { val: 0, chance: 15 }
+        ];
+        var lastScratchDate = loadData('last_scratch_date', '');
+        var todayStr = new Date().toDateString();
+
+        function openScratchCard() {
+            if (spinPoints < 50) { showToast('Not enough points! Need 50 points.'); return; }
+            if (lastScratchDate === todayStr) { showToast('Already scratched today! Come back tomorrow.'); return; }
+
+            document.getElementById('scratchOverlay').classList.add('active');
+            document.getElementById('scratchReveal').textContent = '?';
+            document.getElementById('scratchCover').classList.remove('scratched');
+            document.getElementById('scratchCover').textContent = 'TAP TO SCRATCH';
+            document.getElementById('scratchResult').textContent = '';
+            document.getElementById('scratchBtn').style.display = 'none';
+        }
+
+        function closeScratch() {
+            document.getElementById('scratchOverlay').classList.remove('active');
+        }
+
+        function doScratch() {
+            var cover = document.getElementById('scratchCover');
+            cover.classList.add('scratched');
+
+            spinPoints -= 50;
+            saveData('spin_points', spinPoints.toString());
+
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < scratchPrizes.length; i++) {
+                cum += scratchPrizes[i].chance;
+                if (rand <= cum) { prize = scratchPrizes[i].val; break; }
+            }
+
+            lastScratchDate = todayStr;
+            saveData('last_scratch_date', lastScratchDate);
+
+            var reveal = document.getElementById('scratchReveal');
+            var result = document.getElementById('scratchResult');
+
+            if (prize > 0) {
+                reveal.textContent = '₦' + prize.toLocaleString();
+                result.textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                addReward(prize, 'scratch', 'Scratch Card Win');
+            } else {
+                reveal.textContent = '😔';
+                result.textContent = 'Try again tomorrow!';
+            }
+
+            document.getElementById('scratchBtn').style.display = 'inline-block';
+            updateUI();
+        }
+
+        // ===== INVITE FRIENDS =====
+        function generateInviteCode() {
+            var email = localStorage.getItem('fairmonie_user_email') || 'user';
+            var code = 'FM' + email.substring(0, 4).toUpperCase() + Math.floor(Math.random() * 9999);
+            return code;
+        }
+
+        var inviteCode = loadData('invite_code', '');
+        if (!inviteCode) {
+            inviteCode = generateInviteCode();
+            saveData('invite_code', inviteCode);
+        }
+
+        var inviteCount = parseInt(loadData('invite_count', '0')) || 0;
+
+        function updateInviteUI() {
+            document.getElementById('inviteCode').textContent = inviteCode;
+            document.getElementById('inviteCount').textContent = inviteCount;
+        }
+
+        function copyInviteCode() {
+            navigator.clipboard.writeText(inviteCode).then(function() {
+                showToast('Code copied! Share with friends');
+            }).catch(function() {
+                showToast('Code: ' + inviteCode);
+            });
+        }
+
+        // ===== DAILY QUIZ =====
+        var quizQuestions = [
+            {
+                q: "Who is the current Governor of the Central Bank of Nigeria (CBN)?",
+                options: ["Yemi Cardoso", "Godwin Emefiele", "Sanusi Lamido", "Charles Soludo"],
+                correct: 0
+            },
+            {
+                q: "In what year did Nigeria become a republic?",
+                options: ["1960", "1963", "1979", "1999"],
+                correct: 1
+            },
+            {
+                q: "What is the capital city of Australia?",
+                options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                correct: 2
+            },
+            {
+                q: "Who wrote the novel 'Things Fall Apart'?",
+                options: ["Wole Soyinka", "Chinua Achebe", "Chimamanda Adichie", "Ben Okri"],
+                correct: 1
+            },
+            {
+                q: "What is the largest ocean in the world?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correct: 3
+            },
+            {
+                q: "Which Nigerian state is known as the 'Centre of Excellence'?",
+                options: ["Abuja", "Lagos", "Kano", "Rivers"],
+                correct: 1
+            },
+            {
+                q: "What is the chemical symbol for Gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                q: "Who was the first President of the United States?",
+                options: ["Thomas Jefferson", "John Adams", "George Washington", "Abraham Lincoln"],
+                correct: 2
+            },
+            {
+                q: "What is the longest river in Africa?",
+                options: ["Congo River", "Niger River", "Zambezi River", "Nile River"],
+                correct: 3
+            },
+            {
+                q: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            }
+        ];
+
+        var currentQuizIndex = 0;
+        var quizScore = 0;
+        var quizQuestionsToday = [];
+        var lastQuizDate = loadData('last_quiz_date', '');
+        var quizDoneToday = lastQuizDate === todayStr;
+
+        function openQuiz() {
+            if (quizDoneToday) { showToast('Already completed today's quiz!'); return; }
+
+            quizScore = 0;
+            currentQuizIndex = 0;
+            quizQuestionsToday = [];
+
+            var indices = [];
+            while (indices.length < 3) {
+                var r = Math.floor(Math.random() * quizQuestions.length);
+                if (indices.indexOf(r) === -1) indices.push(r);
+            }
+            for (var i = 0; i < indices.length; i++) {
+                quizQuestionsToday.push(quizQuestions[indices[i]]);
+            }
+
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizResult').textContent = '';
+            document.getElementById('quizCloseBtn').textContent = 'Close';
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            var q = quizQuestionsToday[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = 'Question ' + (currentQuizIndex + 1) + ' of 3';
+            document.getElementById('quizQuestion').textContent = q.q;
+
+            var html = '';
+            for (var i = 0; i < q.options.length; i++) {
+                html += '<button class="quiz-option" onclick="answerQuiz(' + i + ')">' + q.options[i] + '</button>';
+            }
+            document.getElementById('quizOptions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            var q = quizQuestionsToday[currentQuizIndex];
+            var buttons = document.querySelectorAll('.quiz-option');
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) buttons[i].classList.add('correct');
+                else if (i === index && i !== q.correct) buttons[i].classList.add('wrong');
+            }
+
+            if (index === q.correct) quizScore++;
+
+            setTimeout(function() {
+                currentQuizIndex++;
+                if (currentQuizIndex < 3) {
+                    showQuizQuestion();
+                } else {
+                    showQuizResult();
+                }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizProgress').textContent = 'Quiz Complete!';
+            document.getElementById('quizQuestion').textContent = '';
+            document.getElementById('quizOptions').innerHTML = '';
+
+            var reward = 0;
+            var resultText = '';
+
+            if (quizScore === 3) {
+                reward = 1000;
+                resultText = '🎉 Perfect! 3/3 correct! +₦1,000!';
+            } else if (quizScore === 2) {
+                reward = 500;
+                resultText = '👍 Good! 2/3 correct! +₦500!';
+            } else if (quizScore === 1) {
+                reward = 200;
+                resultText = '😊 1/3 correct! +₦200!';
+            } else {
+                resultText = '😔 0/3 correct! Try again tomorrow!';
+            }
+
+            if (reward > 0) {
+                addReward(reward, 'quiz', 'Daily Quiz');
+            }
+
+            document.getElementById('quizResult').textContent = resultText;
+            document.getElementById('quizCloseBtn').textContent = 'Done';
+
+            lastQuizDate = todayStr;
+            saveData('last_quiz_date', lastQuizDate);
+            quizDoneToday = true;
+            updateUI();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').classList.remove('active');
+        }
+
+        updateInviteUI();
+        
+        updateUI();
+        }
+
+        // TELEGRAM (Blocked)
+        function showNotAvailable() { document.getElementById('notAvailPopup').classList.add('active'); }
+        function closeNotAvail() { document.getElementById('notAvailPopup').classList.remove('active'); }
+
+        // WHATSAPP 1
+        function joinWhatsApp1() {
+            if (wa1Done) return;
+            wa1Done = true;
+            saveData('wa1_done', 'true');
+            addReward(5000, 'whatsapp', 'Joined WhatsApp Group 1');
+            window.open('https://chat.whatsapp.com/JGXZkoViFIZGSG33NvutS6', '_blank');
+            
+        // ===== SCRATCH CARD =====
+        var scratchPrizes = [
+            { val: 5000, chance: 2 },
+            { val: 1000, chance: 8 },
+            { val: 500, chance: 20 },
+            { val: 200, chance: 30 },
+            { val: 100, chance: 25 },
+            { val: 0, chance: 15 }
+        ];
+        var lastScratchDate = loadData('last_scratch_date', '');
+        var todayStr = new Date().toDateString();
+
+        function openScratchCard() {
+            if (spinPoints < 50) { showToast('Not enough points! Need 50 points.'); return; }
+            if (lastScratchDate === todayStr) { showToast('Already scratched today! Come back tomorrow.'); return; }
+
+            document.getElementById('scratchOverlay').classList.add('active');
+            document.getElementById('scratchReveal').textContent = '?';
+            document.getElementById('scratchCover').classList.remove('scratched');
+            document.getElementById('scratchCover').textContent = 'TAP TO SCRATCH';
+            document.getElementById('scratchResult').textContent = '';
+            document.getElementById('scratchBtn').style.display = 'none';
+        }
+
+        function closeScratch() {
+            document.getElementById('scratchOverlay').classList.remove('active');
+        }
+
+        function doScratch() {
+            var cover = document.getElementById('scratchCover');
+            cover.classList.add('scratched');
+
+            spinPoints -= 50;
+            saveData('spin_points', spinPoints.toString());
+
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < scratchPrizes.length; i++) {
+                cum += scratchPrizes[i].chance;
+                if (rand <= cum) { prize = scratchPrizes[i].val; break; }
+            }
+
+            lastScratchDate = todayStr;
+            saveData('last_scratch_date', lastScratchDate);
+
+            var reveal = document.getElementById('scratchReveal');
+            var result = document.getElementById('scratchResult');
+
+            if (prize > 0) {
+                reveal.textContent = '₦' + prize.toLocaleString();
+                result.textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                addReward(prize, 'scratch', 'Scratch Card Win');
+            } else {
+                reveal.textContent = '😔';
+                result.textContent = 'Try again tomorrow!';
+            }
+
+            document.getElementById('scratchBtn').style.display = 'inline-block';
+            updateUI();
+        }
+
+        // ===== INVITE FRIENDS =====
+        function generateInviteCode() {
+            var email = localStorage.getItem('fairmonie_user_email') || 'user';
+            var code = 'FM' + email.substring(0, 4).toUpperCase() + Math.floor(Math.random() * 9999);
+            return code;
+        }
+
+        var inviteCode = loadData('invite_code', '');
+        if (!inviteCode) {
+            inviteCode = generateInviteCode();
+            saveData('invite_code', inviteCode);
+        }
+
+        var inviteCount = parseInt(loadData('invite_count', '0')) || 0;
+
+        function updateInviteUI() {
+            document.getElementById('inviteCode').textContent = inviteCode;
+            document.getElementById('inviteCount').textContent = inviteCount;
+        }
+
+        function copyInviteCode() {
+            navigator.clipboard.writeText(inviteCode).then(function() {
+                showToast('Code copied! Share with friends');
+            }).catch(function() {
+                showToast('Code: ' + inviteCode);
+            });
+        }
+
+        // ===== DAILY QUIZ =====
+        var quizQuestions = [
+            {
+                q: "Who is the current Governor of the Central Bank of Nigeria (CBN)?",
+                options: ["Yemi Cardoso", "Godwin Emefiele", "Sanusi Lamido", "Charles Soludo"],
+                correct: 0
+            },
+            {
+                q: "In what year did Nigeria become a republic?",
+                options: ["1960", "1963", "1979", "1999"],
+                correct: 1
+            },
+            {
+                q: "What is the capital city of Australia?",
+                options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                correct: 2
+            },
+            {
+                q: "Who wrote the novel 'Things Fall Apart'?",
+                options: ["Wole Soyinka", "Chinua Achebe", "Chimamanda Adichie", "Ben Okri"],
+                correct: 1
+            },
+            {
+                q: "What is the largest ocean in the world?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correct: 3
+            },
+            {
+                q: "Which Nigerian state is known as the 'Centre of Excellence'?",
+                options: ["Abuja", "Lagos", "Kano", "Rivers"],
+                correct: 1
+            },
+            {
+                q: "What is the chemical symbol for Gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                q: "Who was the first President of the United States?",
+                options: ["Thomas Jefferson", "John Adams", "George Washington", "Abraham Lincoln"],
+                correct: 2
+            },
+            {
+                q: "What is the longest river in Africa?",
+                options: ["Congo River", "Niger River", "Zambezi River", "Nile River"],
+                correct: 3
+            },
+            {
+                q: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            }
+        ];
+
+        var currentQuizIndex = 0;
+        var quizScore = 0;
+        var quizQuestionsToday = [];
+        var lastQuizDate = loadData('last_quiz_date', '');
+        var quizDoneToday = lastQuizDate === todayStr;
+
+        function openQuiz() {
+            if (quizDoneToday) { showToast('Already completed today's quiz!'); return; }
+
+            quizScore = 0;
+            currentQuizIndex = 0;
+            quizQuestionsToday = [];
+
+            var indices = [];
+            while (indices.length < 3) {
+                var r = Math.floor(Math.random() * quizQuestions.length);
+                if (indices.indexOf(r) === -1) indices.push(r);
+            }
+            for (var i = 0; i < indices.length; i++) {
+                quizQuestionsToday.push(quizQuestions[indices[i]]);
+            }
+
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizResult').textContent = '';
+            document.getElementById('quizCloseBtn').textContent = 'Close';
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            var q = quizQuestionsToday[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = 'Question ' + (currentQuizIndex + 1) + ' of 3';
+            document.getElementById('quizQuestion').textContent = q.q;
+
+            var html = '';
+            for (var i = 0; i < q.options.length; i++) {
+                html += '<button class="quiz-option" onclick="answerQuiz(' + i + ')">' + q.options[i] + '</button>';
+            }
+            document.getElementById('quizOptions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            var q = quizQuestionsToday[currentQuizIndex];
+            var buttons = document.querySelectorAll('.quiz-option');
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) buttons[i].classList.add('correct');
+                else if (i === index && i !== q.correct) buttons[i].classList.add('wrong');
+            }
+
+            if (index === q.correct) quizScore++;
+
+            setTimeout(function() {
+                currentQuizIndex++;
+                if (currentQuizIndex < 3) {
+                    showQuizQuestion();
+                } else {
+                    showQuizResult();
+                }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizProgress').textContent = 'Quiz Complete!';
+            document.getElementById('quizQuestion').textContent = '';
+            document.getElementById('quizOptions').innerHTML = '';
+
+            var reward = 0;
+            var resultText = '';
+
+            if (quizScore === 3) {
+                reward = 1000;
+                resultText = '🎉 Perfect! 3/3 correct! +₦1,000!';
+            } else if (quizScore === 2) {
+                reward = 500;
+                resultText = '👍 Good! 2/3 correct! +₦500!';
+            } else if (quizScore === 1) {
+                reward = 200;
+                resultText = '😊 1/3 correct! +₦200!';
+            } else {
+                resultText = '😔 0/3 correct! Try again tomorrow!';
+            }
+
+            if (reward > 0) {
+                addReward(reward, 'quiz', 'Daily Quiz');
+            }
+
+            document.getElementById('quizResult').textContent = resultText;
+            document.getElementById('quizCloseBtn').textContent = 'Done';
+
+            lastQuizDate = todayStr;
+            saveData('last_quiz_date', lastQuizDate);
+            quizDoneToday = true;
+            updateUI();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').classList.remove('active');
+        }
+
+        updateInviteUI();
+        
+        updateUI();
+            showToast('+₦5,000!');
+        }
+
+        // WHATSAPP 2
+        function joinWhatsApp2() {
+            if (wa2Done) return;
+            wa2Done = true;
+            saveData('wa2_done', 'true');
+            addReward(5000, 'whatsapp', 'Joined WhatsApp Group 2');
+            window.open('https://chat.whatsapp.com/JGXZkoViFIZGSG33NvutS6', '_blank');
+            
+        // ===== SCRATCH CARD =====
+        var scratchPrizes = [
+            { val: 5000, chance: 2 },
+            { val: 1000, chance: 8 },
+            { val: 500, chance: 20 },
+            { val: 200, chance: 30 },
+            { val: 100, chance: 25 },
+            { val: 0, chance: 15 }
+        ];
+        var lastScratchDate = loadData('last_scratch_date', '');
+        var todayStr = new Date().toDateString();
+
+        function openScratchCard() {
+            if (spinPoints < 50) { showToast('Not enough points! Need 50 points.'); return; }
+            if (lastScratchDate === todayStr) { showToast('Already scratched today! Come back tomorrow.'); return; }
+
+            document.getElementById('scratchOverlay').classList.add('active');
+            document.getElementById('scratchReveal').textContent = '?';
+            document.getElementById('scratchCover').classList.remove('scratched');
+            document.getElementById('scratchCover').textContent = 'TAP TO SCRATCH';
+            document.getElementById('scratchResult').textContent = '';
+            document.getElementById('scratchBtn').style.display = 'none';
+        }
+
+        function closeScratch() {
+            document.getElementById('scratchOverlay').classList.remove('active');
+        }
+
+        function doScratch() {
+            var cover = document.getElementById('scratchCover');
+            cover.classList.add('scratched');
+
+            spinPoints -= 50;
+            saveData('spin_points', spinPoints.toString());
+
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < scratchPrizes.length; i++) {
+                cum += scratchPrizes[i].chance;
+                if (rand <= cum) { prize = scratchPrizes[i].val; break; }
+            }
+
+            lastScratchDate = todayStr;
+            saveData('last_scratch_date', lastScratchDate);
+
+            var reveal = document.getElementById('scratchReveal');
+            var result = document.getElementById('scratchResult');
+
+            if (prize > 0) {
+                reveal.textContent = '₦' + prize.toLocaleString();
+                result.textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                addReward(prize, 'scratch', 'Scratch Card Win');
+            } else {
+                reveal.textContent = '😔';
+                result.textContent = 'Try again tomorrow!';
+            }
+
+            document.getElementById('scratchBtn').style.display = 'inline-block';
+            updateUI();
+        }
+
+        // ===== INVITE FRIENDS =====
+        function generateInviteCode() {
+            var email = localStorage.getItem('fairmonie_user_email') || 'user';
+            var code = 'FM' + email.substring(0, 4).toUpperCase() + Math.floor(Math.random() * 9999);
+            return code;
+        }
+
+        var inviteCode = loadData('invite_code', '');
+        if (!inviteCode) {
+            inviteCode = generateInviteCode();
+            saveData('invite_code', inviteCode);
+        }
+
+        var inviteCount = parseInt(loadData('invite_count', '0')) || 0;
+
+        function updateInviteUI() {
+            document.getElementById('inviteCode').textContent = inviteCode;
+            document.getElementById('inviteCount').textContent = inviteCount;
+        }
+
+        function copyInviteCode() {
+            navigator.clipboard.writeText(inviteCode).then(function() {
+                showToast('Code copied! Share with friends');
+            }).catch(function() {
+                showToast('Code: ' + inviteCode);
+            });
+        }
+
+        // ===== DAILY QUIZ =====
+        var quizQuestions = [
+            {
+                q: "Who is the current Governor of the Central Bank of Nigeria (CBN)?",
+                options: ["Yemi Cardoso", "Godwin Emefiele", "Sanusi Lamido", "Charles Soludo"],
+                correct: 0
+            },
+            {
+                q: "In what year did Nigeria become a republic?",
+                options: ["1960", "1963", "1979", "1999"],
+                correct: 1
+            },
+            {
+                q: "What is the capital city of Australia?",
+                options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                correct: 2
+            },
+            {
+                q: "Who wrote the novel 'Things Fall Apart'?",
+                options: ["Wole Soyinka", "Chinua Achebe", "Chimamanda Adichie", "Ben Okri"],
+                correct: 1
+            },
+            {
+                q: "What is the largest ocean in the world?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correct: 3
+            },
+            {
+                q: "Which Nigerian state is known as the 'Centre of Excellence'?",
+                options: ["Abuja", "Lagos", "Kano", "Rivers"],
+                correct: 1
+            },
+            {
+                q: "What is the chemical symbol for Gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                q: "Who was the first President of the United States?",
+                options: ["Thomas Jefferson", "John Adams", "George Washington", "Abraham Lincoln"],
+                correct: 2
+            },
+            {
+                q: "What is the longest river in Africa?",
+                options: ["Congo River", "Niger River", "Zambezi River", "Nile River"],
+                correct: 3
+            },
+            {
+                q: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            }
+        ];
+
+        var currentQuizIndex = 0;
+        var quizScore = 0;
+        var quizQuestionsToday = [];
+        var lastQuizDate = loadData('last_quiz_date', '');
+        var quizDoneToday = lastQuizDate === todayStr;
+
+        function openQuiz() {
+            if (quizDoneToday) { showToast('Already completed today's quiz!'); return; }
+
+            quizScore = 0;
+            currentQuizIndex = 0;
+            quizQuestionsToday = [];
+
+            var indices = [];
+            while (indices.length < 3) {
+                var r = Math.floor(Math.random() * quizQuestions.length);
+                if (indices.indexOf(r) === -1) indices.push(r);
+            }
+            for (var i = 0; i < indices.length; i++) {
+                quizQuestionsToday.push(quizQuestions[indices[i]]);
+            }
+
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizResult').textContent = '';
+            document.getElementById('quizCloseBtn').textContent = 'Close';
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            var q = quizQuestionsToday[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = 'Question ' + (currentQuizIndex + 1) + ' of 3';
+            document.getElementById('quizQuestion').textContent = q.q;
+
+            var html = '';
+            for (var i = 0; i < q.options.length; i++) {
+                html += '<button class="quiz-option" onclick="answerQuiz(' + i + ')">' + q.options[i] + '</button>';
+            }
+            document.getElementById('quizOptions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            var q = quizQuestionsToday[currentQuizIndex];
+            var buttons = document.querySelectorAll('.quiz-option');
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) buttons[i].classList.add('correct');
+                else if (i === index && i !== q.correct) buttons[i].classList.add('wrong');
+            }
+
+            if (index === q.correct) quizScore++;
+
+            setTimeout(function() {
+                currentQuizIndex++;
+                if (currentQuizIndex < 3) {
+                    showQuizQuestion();
+                } else {
+                    showQuizResult();
+                }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizProgress').textContent = 'Quiz Complete!';
+            document.getElementById('quizQuestion').textContent = '';
+            document.getElementById('quizOptions').innerHTML = '';
+
+            var reward = 0;
+            var resultText = '';
+
+            if (quizScore === 3) {
+                reward = 1000;
+                resultText = '🎉 Perfect! 3/3 correct! +₦1,000!';
+            } else if (quizScore === 2) {
+                reward = 500;
+                resultText = '👍 Good! 2/3 correct! +₦500!';
+            } else if (quizScore === 1) {
+                reward = 200;
+                resultText = '😊 1/3 correct! +₦200!';
+            } else {
+                resultText = '😔 0/3 correct! Try again tomorrow!';
+            }
+
+            if (reward > 0) {
+                addReward(reward, 'quiz', 'Daily Quiz');
+            }
+
+            document.getElementById('quizResult').textContent = resultText;
+            document.getElementById('quizCloseBtn').textContent = 'Done';
+
+            lastQuizDate = todayStr;
+            saveData('last_quiz_date', lastQuizDate);
+            quizDoneToday = true;
+            updateUI();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').classList.remove('active');
+        }
+
+        updateInviteUI();
+        
+        updateUI();
+            showToast('+₦5,000!');
+        }
+
+        // SPIN WHEEL
+        function openSpinWheel() {
+            if (spinPoints < 100) { showToast('Not enough points! Earn from tasks.'); return; }
+            document.getElementById('spinOverlay').classList.add('active');
+            document.getElementById('spinResult').textContent = '';
+            document.getElementById('spinBtn').disabled = false;
+        }
+        function closeSpin() { document.getElementById('spinOverlay').classList.remove('active'); }
+
+        function doSpin() {
+            if (spinPoints < 100) { showToast('Not enough points!'); return; }
+            spinPoints -= 100;
+            saveData('spin_points', spinPoints.toString());
+            document.getElementById('spinBtn').disabled = true;
+            var wheel = document.getElementById('spinWheel');
+            var spins = 5 + Math.floor(Math.random() * 5);
+            wheel.style.transform = 'rotate(' + (spins * 360 + Math.random() * 360) + 'deg)';
+            var prizes = [
+                { val: 10000, chance: 3 }, { val: 5000, chance: 7 }, { val: 2000, chance: 15 },
+                { val: 500, chance: 25 }, { val: 200, chance: 20 }, { val: 0, chance: 30 }
+            ];
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < prizes.length; i++) { cum += prizes[i].chance; if (rand <= cum) { prize = prizes[i].val; break; } }
+            setTimeout(function() {
+                if (prize > 0) {
+                    addReward(prize, 'spin', 'Spin Wheel Win');
+                    document.getElementById('spinResult').textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                } else {
+                    document.getElementById('spinResult').textContent = '😔 Try again! No win this time.';
+                }
+                
+        // ===== SCRATCH CARD =====
+        var scratchPrizes = [
+            { val: 5000, chance: 2 },
+            { val: 1000, chance: 8 },
+            { val: 500, chance: 20 },
+            { val: 200, chance: 30 },
+            { val: 100, chance: 25 },
+            { val: 0, chance: 15 }
+        ];
+        var lastScratchDate = loadData('last_scratch_date', '');
+        var todayStr = new Date().toDateString();
+
+        function openScratchCard() {
+            if (spinPoints < 50) { showToast('Not enough points! Need 50 points.'); return; }
+            if (lastScratchDate === todayStr) { showToast('Already scratched today! Come back tomorrow.'); return; }
+
+            document.getElementById('scratchOverlay').classList.add('active');
+            document.getElementById('scratchReveal').textContent = '?';
+            document.getElementById('scratchCover').classList.remove('scratched');
+            document.getElementById('scratchCover').textContent = 'TAP TO SCRATCH';
+            document.getElementById('scratchResult').textContent = '';
+            document.getElementById('scratchBtn').style.display = 'none';
+        }
+
+        function closeScratch() {
+            document.getElementById('scratchOverlay').classList.remove('active');
+        }
+
+        function doScratch() {
+            var cover = document.getElementById('scratchCover');
+            cover.classList.add('scratched');
+
+            spinPoints -= 50;
+            saveData('spin_points', spinPoints.toString());
+
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < scratchPrizes.length; i++) {
+                cum += scratchPrizes[i].chance;
+                if (rand <= cum) { prize = scratchPrizes[i].val; break; }
+            }
+
+            lastScratchDate = todayStr;
+            saveData('last_scratch_date', lastScratchDate);
+
+            var reveal = document.getElementById('scratchReveal');
+            var result = document.getElementById('scratchResult');
+
+            if (prize > 0) {
+                reveal.textContent = '₦' + prize.toLocaleString();
+                result.textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                addReward(prize, 'scratch', 'Scratch Card Win');
+            } else {
+                reveal.textContent = '😔';
+                result.textContent = 'Try again tomorrow!';
+            }
+
+            document.getElementById('scratchBtn').style.display = 'inline-block';
+            updateUI();
+        }
+
+        // ===== INVITE FRIENDS =====
+        function generateInviteCode() {
+            var email = localStorage.getItem('fairmonie_user_email') || 'user';
+            var code = 'FM' + email.substring(0, 4).toUpperCase() + Math.floor(Math.random() * 9999);
+            return code;
+        }
+
+        var inviteCode = loadData('invite_code', '');
+        if (!inviteCode) {
+            inviteCode = generateInviteCode();
+            saveData('invite_code', inviteCode);
+        }
+
+        var inviteCount = parseInt(loadData('invite_count', '0')) || 0;
+
+        function updateInviteUI() {
+            document.getElementById('inviteCode').textContent = inviteCode;
+            document.getElementById('inviteCount').textContent = inviteCount;
+        }
+
+        function copyInviteCode() {
+            navigator.clipboard.writeText(inviteCode).then(function() {
+                showToast('Code copied! Share with friends');
+            }).catch(function() {
+                showToast('Code: ' + inviteCode);
+            });
+        }
+
+        // ===== DAILY QUIZ =====
+        var quizQuestions = [
+            {
+                q: "Who is the current Governor of the Central Bank of Nigeria (CBN)?",
+                options: ["Yemi Cardoso", "Godwin Emefiele", "Sanusi Lamido", "Charles Soludo"],
+                correct: 0
+            },
+            {
+                q: "In what year did Nigeria become a republic?",
+                options: ["1960", "1963", "1979", "1999"],
+                correct: 1
+            },
+            {
+                q: "What is the capital city of Australia?",
+                options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                correct: 2
+            },
+            {
+                q: "Who wrote the novel 'Things Fall Apart'?",
+                options: ["Wole Soyinka", "Chinua Achebe", "Chimamanda Adichie", "Ben Okri"],
+                correct: 1
+            },
+            {
+                q: "What is the largest ocean in the world?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correct: 3
+            },
+            {
+                q: "Which Nigerian state is known as the 'Centre of Excellence'?",
+                options: ["Abuja", "Lagos", "Kano", "Rivers"],
+                correct: 1
+            },
+            {
+                q: "What is the chemical symbol for Gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                q: "Who was the first President of the United States?",
+                options: ["Thomas Jefferson", "John Adams", "George Washington", "Abraham Lincoln"],
+                correct: 2
+            },
+            {
+                q: "What is the longest river in Africa?",
+                options: ["Congo River", "Niger River", "Zambezi River", "Nile River"],
+                correct: 3
+            },
+            {
+                q: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            }
+        ];
+
+        var currentQuizIndex = 0;
+        var quizScore = 0;
+        var quizQuestionsToday = [];
+        var lastQuizDate = loadData('last_quiz_date', '');
+        var quizDoneToday = lastQuizDate === todayStr;
+
+        function openQuiz() {
+            if (quizDoneToday) { showToast('Already completed today's quiz!'); return; }
+
+            quizScore = 0;
+            currentQuizIndex = 0;
+            quizQuestionsToday = [];
+
+            var indices = [];
+            while (indices.length < 3) {
+                var r = Math.floor(Math.random() * quizQuestions.length);
+                if (indices.indexOf(r) === -1) indices.push(r);
+            }
+            for (var i = 0; i < indices.length; i++) {
+                quizQuestionsToday.push(quizQuestions[indices[i]]);
+            }
+
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizResult').textContent = '';
+            document.getElementById('quizCloseBtn').textContent = 'Close';
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            var q = quizQuestionsToday[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = 'Question ' + (currentQuizIndex + 1) + ' of 3';
+            document.getElementById('quizQuestion').textContent = q.q;
+
+            var html = '';
+            for (var i = 0; i < q.options.length; i++) {
+                html += '<button class="quiz-option" onclick="answerQuiz(' + i + ')">' + q.options[i] + '</button>';
+            }
+            document.getElementById('quizOptions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            var q = quizQuestionsToday[currentQuizIndex];
+            var buttons = document.querySelectorAll('.quiz-option');
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) buttons[i].classList.add('correct');
+                else if (i === index && i !== q.correct) buttons[i].classList.add('wrong');
+            }
+
+            if (index === q.correct) quizScore++;
+
+            setTimeout(function() {
+                currentQuizIndex++;
+                if (currentQuizIndex < 3) {
+                    showQuizQuestion();
+                } else {
+                    showQuizResult();
+                }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizProgress').textContent = 'Quiz Complete!';
+            document.getElementById('quizQuestion').textContent = '';
+            document.getElementById('quizOptions').innerHTML = '';
+
+            var reward = 0;
+            var resultText = '';
+
+            if (quizScore === 3) {
+                reward = 1000;
+                resultText = '🎉 Perfect! 3/3 correct! +₦1,000!';
+            } else if (quizScore === 2) {
+                reward = 500;
+                resultText = '👍 Good! 2/3 correct! +₦500!';
+            } else if (quizScore === 1) {
+                reward = 200;
+                resultText = '😊 1/3 correct! +₦200!';
+            } else {
+                resultText = '😔 0/3 correct! Try again tomorrow!';
+            }
+
+            if (reward > 0) {
+                addReward(reward, 'quiz', 'Daily Quiz');
+            }
+
+            document.getElementById('quizResult').textContent = resultText;
+            document.getElementById('quizCloseBtn').textContent = 'Done';
+
+            lastQuizDate = todayStr;
+            saveData('last_quiz_date', lastQuizDate);
+            quizDoneToday = true;
+            updateUI();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').classList.remove('active');
+        }
+
+        updateInviteUI();
+        
+        updateUI();
+            }, 3200);
+        }
+
+        function showToast(msg) { var t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.classList.add('show'); setTimeout(function() { t.classList.remove('show'); }, 3000); }
+
+        
+        // ===== SCRATCH CARD =====
+        var scratchPrizes = [
+            { val: 5000, chance: 2 },
+            { val: 1000, chance: 8 },
+            { val: 500, chance: 20 },
+            { val: 200, chance: 30 },
+            { val: 100, chance: 25 },
+            { val: 0, chance: 15 }
+        ];
+        var lastScratchDate = loadData('last_scratch_date', '');
+        var todayStr = new Date().toDateString();
+
+        function openScratchCard() {
+            if (spinPoints < 50) { showToast('Not enough points! Need 50 points.'); return; }
+            if (lastScratchDate === todayStr) { showToast('Already scratched today! Come back tomorrow.'); return; }
+
+            document.getElementById('scratchOverlay').classList.add('active');
+            document.getElementById('scratchReveal').textContent = '?';
+            document.getElementById('scratchCover').classList.remove('scratched');
+            document.getElementById('scratchCover').textContent = 'TAP TO SCRATCH';
+            document.getElementById('scratchResult').textContent = '';
+            document.getElementById('scratchBtn').style.display = 'none';
+        }
+
+        function closeScratch() {
+            document.getElementById('scratchOverlay').classList.remove('active');
+        }
+
+        function doScratch() {
+            var cover = document.getElementById('scratchCover');
+            cover.classList.add('scratched');
+
+            spinPoints -= 50;
+            saveData('spin_points', spinPoints.toString());
+
+            var rand = Math.random() * 100;
+            var prize = 0;
+            var cum = 0;
+            for (var i = 0; i < scratchPrizes.length; i++) {
+                cum += scratchPrizes[i].chance;
+                if (rand <= cum) { prize = scratchPrizes[i].val; break; }
+            }
+
+            lastScratchDate = todayStr;
+            saveData('last_scratch_date', lastScratchDate);
+
+            var reveal = document.getElementById('scratchReveal');
+            var result = document.getElementById('scratchResult');
+
+            if (prize > 0) {
+                reveal.textContent = '₦' + prize.toLocaleString();
+                result.textContent = '🎉 You won ₦' + prize.toLocaleString() + '!';
+                addReward(prize, 'scratch', 'Scratch Card Win');
+            } else {
+                reveal.textContent = '😔';
+                result.textContent = 'Try again tomorrow!';
+            }
+
+            document.getElementById('scratchBtn').style.display = 'inline-block';
+            updateUI();
+        }
+
+        // ===== INVITE FRIENDS =====
+        function generateInviteCode() {
+            var email = localStorage.getItem('fairmonie_user_email') || 'user';
+            var code = 'FM' + email.substring(0, 4).toUpperCase() + Math.floor(Math.random() * 9999);
+            return code;
+        }
+
+        var inviteCode = loadData('invite_code', '');
+        if (!inviteCode) {
+            inviteCode = generateInviteCode();
+            saveData('invite_code', inviteCode);
+        }
+
+        var inviteCount = parseInt(loadData('invite_count', '0')) || 0;
+
+        function updateInviteUI() {
+            document.getElementById('inviteCode').textContent = inviteCode;
+            document.getElementById('inviteCount').textContent = inviteCount;
+        }
+
+        function copyInviteCode() {
+            navigator.clipboard.writeText(inviteCode).then(function() {
+                showToast('Code copied! Share with friends');
+            }).catch(function() {
+                showToast('Code: ' + inviteCode);
+            });
+        }
+
+        // ===== DAILY QUIZ =====
+        var quizQuestions = [
+            {
+                q: "Who is the current Governor of the Central Bank of Nigeria (CBN)?",
+                options: ["Yemi Cardoso", "Godwin Emefiele", "Sanusi Lamido", "Charles Soludo"],
+                correct: 0
+            },
+            {
+                q: "In what year did Nigeria become a republic?",
+                options: ["1960", "1963", "1979", "1999"],
+                correct: 1
+            },
+            {
+                q: "What is the capital city of Australia?",
+                options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                correct: 2
+            },
+            {
+                q: "Who wrote the novel 'Things Fall Apart'?",
+                options: ["Wole Soyinka", "Chinua Achebe", "Chimamanda Adichie", "Ben Okri"],
+                correct: 1
+            },
+            {
+                q: "What is the largest ocean in the world?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correct: 3
+            },
+            {
+                q: "Which Nigerian state is known as the 'Centre of Excellence'?",
+                options: ["Abuja", "Lagos", "Kano", "Rivers"],
+                correct: 1
+            },
+            {
+                q: "What is the chemical symbol for Gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                q: "Who was the first President of the United States?",
+                options: ["Thomas Jefferson", "John Adams", "George Washington", "Abraham Lincoln"],
+                correct: 2
+            },
+            {
+                q: "What is the longest river in Africa?",
+                options: ["Congo River", "Niger River", "Zambezi River", "Nile River"],
+                correct: 3
+            },
+            {
+                q: "Which planet is known as the Red Planet?",
+                options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            }
+        ];
+
+        var currentQuizIndex = 0;
+        var quizScore = 0;
+        var quizQuestionsToday = [];
+        var lastQuizDate = loadData('last_quiz_date', '');
+        var quizDoneToday = lastQuizDate === todayStr;
+
+        function openQuiz() {
+            if (quizDoneToday) { showToast('Already completed today's quiz!'); return; }
+
+            quizScore = 0;
+            currentQuizIndex = 0;
+            quizQuestionsToday = [];
+
+            var indices = [];
+            while (indices.length < 3) {
+                var r = Math.floor(Math.random() * quizQuestions.length);
+                if (indices.indexOf(r) === -1) indices.push(r);
+            }
+            for (var i = 0; i < indices.length; i++) {
+                quizQuestionsToday.push(quizQuestions[indices[i]]);
+            }
+
+            document.getElementById('quizOverlay').classList.add('active');
+            document.getElementById('quizResult').textContent = '';
+            document.getElementById('quizCloseBtn').textContent = 'Close';
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            var q = quizQuestionsToday[currentQuizIndex];
+            document.getElementById('quizProgress').textContent = 'Question ' + (currentQuizIndex + 1) + ' of 3';
+            document.getElementById('quizQuestion').textContent = q.q;
+
+            var html = '';
+            for (var i = 0; i < q.options.length; i++) {
+                html += '<button class="quiz-option" onclick="answerQuiz(' + i + ')">' + q.options[i] + '</button>';
+            }
+            document.getElementById('quizOptions').innerHTML = html;
+        }
+
+        function answerQuiz(index) {
+            var q = quizQuestionsToday[currentQuizIndex];
+            var buttons = document.querySelectorAll('.quiz-option');
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === q.correct) buttons[i].classList.add('correct');
+                else if (i === index && i !== q.correct) buttons[i].classList.add('wrong');
+            }
+
+            if (index === q.correct) quizScore++;
+
+            setTimeout(function() {
+                currentQuizIndex++;
+                if (currentQuizIndex < 3) {
+                    showQuizQuestion();
+                } else {
+                    showQuizResult();
+                }
+            }, 1500);
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizProgress').textContent = 'Quiz Complete!';
+            document.getElementById('quizQuestion').textContent = '';
+            document.getElementById('quizOptions').innerHTML = '';
+
+            var reward = 0;
+            var resultText = '';
+
+            if (quizScore === 3) {
+                reward = 1000;
+                resultText = '🎉 Perfect! 3/3 correct! +₦1,000!';
+            } else if (quizScore === 2) {
+                reward = 500;
+                resultText = '👍 Good! 2/3 correct! +₦500!';
+            } else if (quizScore === 1) {
+                reward = 200;
+                resultText = '😊 1/3 correct! +₦200!';
+            } else {
+                resultText = '😔 0/3 correct! Try again tomorrow!';
+            }
+
+            if (reward > 0) {
+                addReward(reward, 'quiz', 'Daily Quiz');
+            }
+
+            document.getElementById('quizResult').textContent = resultText;
+            document.getElementById('quizCloseBtn').textContent = 'Done';
+
+            lastQuizDate = todayStr;
+            saveData('last_quiz_date', lastQuizDate);
+            quizDoneToday = true;
+            updateUI();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').classList.remove('active');
+        }
+
+        updateInviteUI();
+        
+        updateUI();
+        setInterval(updateCheckinTimer, 1000);
+    </script>
+
+    <!-- SCRATCH CARD OVERLAY -->
+    <div class="scratch-overlay" id="scratchOverlay">
+        <div class="scratch-card">
+            <div class="scratch-title">🎫 Scratch & Win</div>
+            <div class="scratch-cost">Cost: 50 Spin Points</div>
+            <div class="scratch-area" id="scratchArea">
+                <div class="scratch-reveal" id="scratchReveal">?</div>
+                <div class="scratch-cover" id="scratchCover" onclick="doScratch()">TAP TO SCRATCH</div>
+            </div>
+            <div class="spin-result" id="scratchResult"></div>
+            <button class="scratch-btn" id="scratchBtn" onclick="openScratchCard()">Play Again (50 pts)</button>
+            <br>
+            <button class="scratch-close" onclick="closeScratch()">Close</button>
+        </div>
+    </div>
+
+    <!-- QUIZ OVERLAY -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-card">
+            <div class="quiz-title">🧠 Daily Quiz</div>
+            <div class="quiz-progress" id="quizProgress">Question 1 of 3</div>
+            <div class="quiz-question" id="quizQuestion">Loading...</div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult"></div>
+            <button class="quiz-close" id="quizCloseBtn" onclick="closeQuiz()">Close</button>
+        </div>
+    </div>
+
+</body>
+</html>

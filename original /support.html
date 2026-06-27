@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Support - FairMonie Pay</title>
+<link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0f0a; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 20px;
+}
+.aurora-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; background: #0a0f0a; overflow: hidden;
+}
+.aurora-wave {
+    position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(34,197,94,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.03) 0%, transparent 60%);
+    animation: auroraMove 15s ease-in-out infinite;
+}
+.aurora-wave:nth-child(2) {
+    animation-delay: -5s; animation-duration: 20s;
+    background: radial-gradient(ellipse at 60% 30%, rgba(34,197,94,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 70%, rgba(74,222,128,0.03) 0%, transparent 50%);
+}
+.aurora-wave:nth-child(3) {
+    animation-delay: -10s; animation-duration: 25s;
+    background: radial-gradient(ellipse at 80% 60%, rgba(16,185,129,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 40%, rgba(34,197,94,0.02) 0%, transparent 50%);
+}
+@keyframes auroraMove {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(5%,5%) rotate(2deg); }
+    50% { transform: translate(-3%,8%) rotate(-1deg); }
+    75% { transform: translate(8%,-5%) rotate(1deg); }
+}
+.grid-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    background: linear-gradient(rgba(34,197,94,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34,197,94,0.02) 1px, transparent 1px);
+    background-size: 50px 50px; animation: gridMove 20s linear infinite;
+}
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
+#particles-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+}
+
+.header {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px 12px;
+}
+.back-btn {
+    width: 40px; height: 40px; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #22c55e; transition: all 0.3s;
+}
+.back-btn:hover { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.2); }
+.back-btn svg { width: 20px; height: 20px; }
+
+.hero-card {
+    position: relative; z-index: 2;
+    margin: 0 16px 24px; padding: 32px 24px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    text-align: center; overflow: hidden;
+}
+.hero-card::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(34,197,94,0.08) 0%, transparent 60%);
+    animation: heroGlow 8s ease-in-out infinite; pointer-events: none;
+}
+@keyframes heroGlow {
+    0%,100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+.headphone-icon {
+    width: 64px; height: 64px; background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; position: relative; z-index: 1;
+    box-shadow: 0 0 30px rgba(34,197,94,0.15);
+    animation: iconPulse 3s ease-in-out infinite;
+}
+@keyframes iconPulse {
+    0%,100% { box-shadow: 0 0 30px rgba(34,197,94,0.15); transform: scale(1); }
+    50% { box-shadow: 0 0 50px rgba(34,197,94,0.3); transform: scale(1.05); }
+}
+.headphone-icon svg { width: 32px; height: 32px; color: #22c55e; }
+.hero-title {
+    font-family: 'Amaranth', sans-serif; font-size: 26px; font-weight: 700;
+    color: white; margin-bottom: 10px; position: relative; z-index: 1;
+}
+.hero-subtitle {
+    font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.5;
+    position: relative; z-index: 1; max-width: 260px; margin: 0 auto 16px;
+}
+.hero-badges {
+    display: flex; justify-content: center; gap: 16px; position: relative; z-index: 1;
+}
+.hero-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: #22c55e; font-weight: 600;
+}
+.hero-badge svg { width: 16px; height: 16px; }
+
+.support-card {
+    position: relative; z-index: 2;
+    margin: 0 16px 12px; padding: 20px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    display: flex; align-items: center; gap: 16px; cursor: pointer;
+}
+.support-card:hover {
+    border-color: rgba(34,197,94,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2), 0 0 30px rgba(34,197,94,0.06), inset 0 1px 0 rgba(255,255,255,0.04);
+    transform: translateY(-2px);
+}
+.support-icon {
+    width: 56px; height: 56px; background: rgba(34,197,94,0.06);
+    border: 1px solid rgba(34,197,94,0.15); border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.3s;
+}
+.support-card:hover .support-icon {
+    background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.25);
+    box-shadow: 0 0 20px rgba(34,197,94,0.15);
+}
+.support-icon svg { width: 26px; height: 26px; color: #22c55e; }
+.support-content { flex: 1; min-width: 0; }
+.support-top {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;
+}
+.support-title { font-size: 18px; font-weight: 700; color: white; }
+.support-tag {
+    font-size: 11px; font-weight: 700; color: #22c55e;
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 10px; padding: 3px 10px;
+}
+.support-desc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; margin-bottom: 4px; }
+.support-link { font-size: 13px; color: #22c55e; font-weight: 600; word-break: break-all; }
+
+.faq-section {
+    position: relative; z-index: 2;
+    margin: 24px 16px 16px;
+}
+.faq-header {
+    font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700;
+    color: white; margin-bottom: 16px;
+}
+.faq-item {
+    margin-bottom: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; overflow: hidden;
+    transition: all 0.3s ease;
+}
+.faq-item:hover { border-color: rgba(34,197,94,0.15); }
+.faq-question {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; cursor: pointer;
+    font-size: 15px; font-weight: 600; color: white;
+}
+.faq-question svg {
+    width: 20px; height: 20px; color: rgba(255,255,255,0.4);
+    transition: transform 0.3s ease; flex-shrink: 0; margin-left: 12px;
+}
+.faq-item.open .faq-question svg { transform: rotate(180deg); color: #22c55e; }
+.faq-answer {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    padding: 0 20px;
+    font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6;
+}
+.faq-item.open .faq-answer {
+    max-height: 200px; padding: 0 20px 16px;
+}
+
+.security-badge {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 24px; padding: 0 16px;
+}
+.security-badge span {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 20px; padding: 8px 16px;
+    font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500;
+}
+.security-badge svg { width: 14px; height: 14px; color: #22c55e; }
+
+.popup-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    z-index: 2000; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; visibility: hidden; transition: all 0.4s ease;
+}
+.popup-overlay.active { opacity: 1; visibility: visible; }
+.popup-card {
+    width: 100%; max-width: 340px;
+    background: linear-gradient(145deg, #0d1f0d 0%, #1a3a1a 100%);
+    border: 1px solid rgba(34,197,94,0.2); border-radius: 24px;
+    padding: 32px 24px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(34,197,94,0.1);
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.popup-overlay.active .popup-card { transform: translateY(0) scale(1); }
+.popup-icon {
+    width: 56px; height: 56px; background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.popup-icon svg { width: 24px; height: 24px; color: #ef4444; }
+.popup-title { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; color: white; margin-bottom: 8px; }
+.popup-text { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 24px; }
+.popup-btn {
+    width: 100%; padding: 14px; border-radius: 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: white; font-size: 15px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: all 0.3s;
+}
+.popup-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+
+@media (min-width: 768px) {
+    .hero-card, .support-card, .faq-section { max-width: 500px; margin-left: auto; margin-right: auto; }
+}
+</style>
+</head>
+<body>
+<div class="aurora-bg"><div class="aurora-wave"></div><div class="aurora-wave"></div><div class="aurora-wave"></div></div>
+<div class="grid-bg"></div>
+<canvas id="particles-canvas"></canvas>
+
+<header class="header">
+    <button class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+</header>
+
+<div class="hero-card">
+    <div class="headphone-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        </svg>
+    </div>
+    <div class="hero-title">How can we help you?</div>
+    <div class="hero-subtitle">Choose your preferred way to get support from our team</div>
+    <div class="hero-badges">
+        <div class="hero-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            24/7 Support
+        </div>
+        <div class="hero-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure
+        </div>
+    </div>
+</div>
+
+<div class="support-card" onclick="openTelegram()">
+    <div class="support-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </div>
+    <div class="support-content">
+        <div class="support-top">
+            <div class="support-title">Telegram Support</div>
+            <div class="support-tag">Fastest</div>
+        </div>
+        <div class="support-desc">Get instant support through our Telegram channel</div>
+        <div class="support-link">@fairmonie_earning_support</div>
+    </div>
+</div>
+
+<div class="support-card" onclick="openEmail()">
+    <div class="support-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </div>
+    <div class="support-content">
+        <div class="support-top">
+            <div class="support-title">Email Support</div>
+        </div>
+        <div class="support-desc">Send us an email and we'll get back to you within 24 hours</div>
+        <div class="support-link">fairmoniepay20@gmail.com</div>
+    </div>
+</div>
+
+<div class="support-card" onclick="openLiveChat()">
+    <div class="support-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    </div>
+    <div class="support-content">
+        <div class="support-top">
+            <div class="support-title">Live Chat</div>
+            <div class="support-tag">AI Powered</div>
+        </div>
+        <div class="support-desc">Chat with our support team in real-time</div>
+        <div class="support-link">Available 24/7</div>
+    </div>
+</div>
+
+<div class="faq-section">
+    <div class="faq-header">Frequently Asked Questions</div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+            How do I withdraw my earnings?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-answer">Go to the Withdraw section, enter your bank details, amount, and Fair Code. Your funds will be transferred within minutes.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+            What is a Fair Code?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-answer">A Fair Code is a security token required for withdrawals and purchases. You can buy one from the Buy Faircode section.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+            How does the referral program work?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-answer">Share your referral code with friends. You earn ₦3,800 for every person who joins and activates their account.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+            Is my money safe?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-answer">Yes! We use 256-bit SSL encryption and bank-grade security. Your funds and data are fully protected.</div>
+    </div>
+</div>
+
+<div class="security-badge">
+    <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Your conversations are encrypted
+    </span>
+</div>
+
+<div class="popup-overlay" id="popupOverlay">
+    <div class="popup-card">
+        <div class="popup-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="popup-title">Not Available</div>
+        <div class="popup-text">This feature is not available for your country at the moment.</div>
+        <button class="popup-btn" onclick="closePopup()">Got it</button>
+    </div>
+</div>
+
+<script>
+// ===== PARTICLES =====
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+    constructor() { this.reset(); }
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.2;
+        this.opacity = Math.random() * 0.4 + 0.2;
+        this.glow = Math.random() * 15 + 10;
+        this.pulseSpeed = Math.random() * 0.02 + 0.01;
+        this.pulsePhase = Math.random() * Math.PI * 2;
+        this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128';
+    }
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.pulsePhase += this.pulseSpeed;
+        if (this.y < -50) this.y = canvas.height + 50;
+        if (this.y > canvas.height + 50) this.y = -50;
+        if (this.x < -50) this.x = canvas.width + 50;
+        if (this.x > canvas.width + 50) this.x = -50;
+    }
+    draw() {
+        const pulse = Math.sin(this.pulsePhase) * 0.3 + 0.7;
+        const currentGlow = this.glow * pulse;
+        const currentOpacity = this.opacity * pulse;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + this.color + ',' + (currentOpacity * 0.1) + ')';
+        ctx.shadowBlur = currentGlow;
+        ctx.shadowColor = 'rgba(' + this.color + ',0.5)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + this.color + ',' + currentOpacity + ')';
+        ctx.shadowBlur = currentGlow * 0.3;
+        ctx.shadowColor = 'rgba(' + this.color + ',0.8)';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+}
+for (let i = 0; i < 50; i++) { const p = new Particle(); particles.push(p); }
+function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(function(p) { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+animateParticles();
+
+function openTelegram() { document.getElementById('popupOverlay').classList.add('active'); }
+function openLiveChat() { document.getElementById('popupOverlay').classList.add('active'); }
+function closePopup() { document.getElementById('popupOverlay').classList.remove('active'); }
+
+function openEmail() {
+    window.location.href = 'mailto:fairmoniepay20@gmail.com?subject=FairMonie%20Support%20Request&body=Hello%20FairMonie%20Team,%0A%0A';
+}
+
+function toggleFaq(item) {
+    var isOpen = item.classList.contains('open');
+    var allFaqs = document.querySelectorAll('.faq-item');
+    for (var i = 0; i < allFaqs.length; i++) { allFaqs[i].classList.remove('open'); }
+    if (!isOpen) item.classList.add('open');
+}
+
+function goBack() { window.location.href = 'dashboard.html'; }
+</script>
+</body>
+</html>

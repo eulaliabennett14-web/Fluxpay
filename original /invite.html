@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invite & Earn - FairMonie Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #0f1a0f; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 30px;
+        }
+
+        .aurora-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: #0f1a0f; overflow: hidden; }
+        .aurora-wave { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(ellipse at 30% 20%, rgba(34,197,94,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.04) 0%, transparent 60%); animation: auroraMove 15s ease-in-out infinite; }
+        .aurora-wave:nth-child(2) { animation-delay: -5s; animation-duration: 20s; background: radial-gradient(ellipse at 60% 30%, rgba(34,197,94,0.06) 0%, transparent 50%), radial-gradient(ellipse at 20% 70%, rgba(74,222,128,0.04) 0%, transparent 50%); }
+        .aurora-wave:nth-child(3) { animation-delay: -10s; animation-duration: 25s; background: radial-gradient(ellipse at 80% 60%, rgba(16,185,129,0.05) 0%, transparent 50%), radial-gradient(ellipse at 40% 40%, rgba(34,197,94,0.03) 0%, transparent 50%); }
+        @keyframes auroraMove { 0%,100% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(5%,5%) rotate(2deg); } 50% { transform: translate(-3%,8%) rotate(-1deg); } 75% { transform: translate(8%,-5%) rotate(1deg); } }
+        
+        .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px); background-size: 50px 50px; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
+        
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+        .header { position: relative; z-index: 2; display: flex; align-items: center; padding: 16px 20px 20px; }
+        .back-btn { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(34, 197, 94, 0.15); color: #22c55e; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; text-decoration: none; font-size: 20px; margin-right: 16px; }
+        .back-btn:hover { background: rgba(34, 197, 94, 0.1); }
+        .header-text { flex: 1; }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; color: white; letter-spacing: -0.5px; margin-bottom: 2px; }
+        .header-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+
+        .container { position: relative; z-index: 2; max-width: 500px; margin: 0 auto; padding: 0 16px; }
+
+        .balance-card {
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.15) 0%, rgba(0, 150, 36, 0.1) 100%);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 24px; padding: 28px; margin-bottom: 20px;
+            backdrop-filter: blur(20px); position: relative; overflow: hidden; text-align: center;
+        }
+        .balance-card::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0, 200, 83, 0.2) 0%, transparent 70%); border-radius: 50%; }
+        .balance-label { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 10px; position: relative; z-index: 1; }
+        .balance-label i { color: #22c55e; }
+        .balance-amount { font-size: 42px; font-weight: 800; background: linear-gradient(135deg, #ffffff, #69f0ae); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 18px; position: relative; z-index: 1; }
+        .withdraw-btn {
+            width: 100%; padding: 14px; border: none; border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            color: white; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            position: relative; z-index: 1;
+        }
+        .withdraw-btn:hover { background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%); transform: translateY(-2px); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px; padding: 22px; text-align: center;
+            backdrop-filter: blur(15px); transition: all 0.3s ease;
+        }
+        .stat-card:hover { border-color: rgba(34,197,94,0.15); transform: translateY(-2px); }
+        .stat-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 18px; }
+        .stat-icon.invites { background: linear-gradient(135deg, rgba(0, 200, 83, 0.2), rgba(0, 200, 83, 0.05)); color: #22c55e; }
+        .stat-icon.earned { background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 193, 7, 0.05)); color: #ffc107; }
+        .stat-value { font-size: 26px; font-weight: 800; margin-bottom: 3px; }
+        .stat-value.earned { background: linear-gradient(135deg, #ffc107, #ff9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 600; }
+
+        .commission-banner {
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.1) 0%, rgba(0, 150, 36, 0.05) 100%);
+            border: 1px solid rgba(34,197,94,0.15); border-radius: 20px;
+            padding: 18px; display: flex; align-items: center; gap: 14px;
+            margin-bottom: 20px; backdrop-filter: blur(15px);
+        }
+        .commission-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: white; flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+        }
+        .commission-text { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+        .commission-text strong { color: #69f0ae; font-weight: 700; }
+
+        .referral-section {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px; padding: 24px; margin-bottom: 20px;
+            backdrop-filter: blur(15px);
+        }
+        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: #22c55e; }
+        .link-container {
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 16px; display: flex; align-items: center;
+            gap: 12px; margin-bottom: 14px; transition: all 0.3s ease;
+        }
+        .link-text { flex: 1; font-size: 13px; color: rgba(255,255,255,0.6); word-break: break-all; font-family: 'Courier New', monospace; }
+        .copy-btn {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border: none; color: white; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+        }
+        .copy-btn:hover { transform: scale(1.05); }
+        .copy-btn.copied { background: linear-gradient(135deg, #4caf50, #2e7d32); }
+        .code-display { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.6); }
+        .code-display span { color: #69f0ae; font-weight: 700; font-family: 'Courier New', monospace; letter-spacing: 1px; }
+
+        .social-section {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px; padding: 24px; margin-bottom: 20px;
+            backdrop-filter: blur(15px);
+        }
+        .social-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .social-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+        .social-item:hover { transform: translateY(-3px); }
+        .social-icon {
+            width: 50px; height: 50px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: white; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .social-icon.whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); }
+        .social-icon.telegram { background: linear-gradient(135deg, #0088cc, #005f8f); }
+        .social-icon.facebook { background: linear-gradient(135deg, #1877f2, #0d5cb6); }
+        .social-icon.twitter { background: linear-gradient(135deg, #1a1a1a, #000000); }
+        .social-label { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; }
+
+        .history-section {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px; padding: 24px; margin-bottom: 20px;
+            backdrop-filter: blur(15px);
+        }
+        .history-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .history-item:last-child { border-bottom: none; }
+        .history-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #16a34a, #22c55e); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+        .history-info { flex: 1; min-width: 0; }
+        .history-name { font-size: 14px; font-weight: 700; color: white; }
+        .history-date { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+        .history-amount { font-size: 14px; font-weight: 700; color: #22c55e; }
+        .empty-history { text-align: center; padding: 30px; color: rgba(255,255,255,0.4); font-size: 13px; }
+        .empty-history i { font-size: 30px; color: rgba(255,255,255,0.15); margin-bottom: 10px; display: block; }
+
+        .tracking-badge {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
+            padding: 12px 20px; font-size: 12px; color: rgba(255,255,255,0.5);
+            margin: 0 auto; width: fit-content; backdrop-filter: blur(10px);
+        }
+        .tracking-badge i { color: #22c55e; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            color: white; padding: 14px 28px; border-radius: 16px;
+            font-weight: 700; font-size: 14px;
+            box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
+            z-index: 1000; opacity: 0;
+            transition: all 0.4s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"><div class="aurora-wave"></div><div class="aurora-wave"></div><div class="aurora-wave"></div></div>
+    <div class="grid-bg"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="header">
+        <a href="more.html" class="back-btn">&#8592;</a>
+        <div class="header-text">
+            <h1>Invite & Earn</h1>
+            <p class="header-sub">Earn ₦3,800 per friend you refer</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="balance-card">
+            <div class="balance-label"><span>&#127942;</span> Referral Earnings</div>
+            <div class="balance-amount" id="balanceAmount">₦0</div>
+            <button class="withdraw-btn" onclick="withdrawToMain()">
+                <span>&#128229;</span> Transfer to Main Balance
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon invites">&#128101;</div>
+                <div class="stat-value" id="inviteCount">0</div>
+                <div class="stat-label">Total Invites</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon earned">&#128200;</div>
+                <div class="stat-value earned" id="earnedAmount">₦0</div>
+                <div class="stat-label">Total Earned</div>
+            </div>
+        </div>
+
+        <div class="commission-banner">
+            <div class="commission-icon">&#127873;</div>
+            <div class="commission-text">Earn <strong>₦3,800</strong> for every friend who signs up using your referral link!</div>
+        </div>
+
+        <div class="referral-section">
+            <div class="section-title"><span>&#128279;</span> Your Referral Link</div>
+            <div class="link-container">
+                <div class="link-text" id="referralLink">Loading...</div>
+                <button class="copy-btn" id="copyBtn" onclick="copyLink()">
+                    <span>&#128203;</span>
+                </button>
+            </div>
+            <div class="code-display">
+                <span>&#35;</span> Code: <span id="referralCode">------</span>
+            </div>
+        </div>
+
+        <div class="social-section">
+            <div class="section-title"><span>&#128225;</span> Share to Social Media</div>
+            <div class="social-grid">
+                <a href="#" class="social-item" onclick="shareWhatsApp(event)">
+                    <div class="social-icon whatsapp">&#128172;</div>
+                    <span class="social-label">WhatsApp</span>
+                </a>
+                <a href="#" class="social-item" onclick="shareTelegram(event)">
+                    <div class="social-icon telegram">&#128260;</div>
+                    <span class="social-label">Telegram</span>
+                </a>
+                <a href="#" class="social-item" onclick="shareFacebook(event)">
+                    <div class="social-icon facebook">&#128247;</div>
+                    <span class="social-label">Facebook</span>
+                </a>
+                <a href="#" class="social-item" onclick="shareTwitter(event)">
+                    <div class="social-icon twitter">&#120143;</div>
+                    <span class="social-label">X</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="section-title"><span>&#128337;</span> Invite History</div>
+            <div id="historyList">
+                <div class="empty-history">
+                    <span>&#128101;</span>
+                    No invites yet. Share your link to start earning!
+                </div>
+            </div>
+        </div>
+
+        <div class="tracking-badge">
+            <span>&#128241;</span> Share your code with friends & earn!
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span>&#9989;</span> <span id="toastMsg">Link copied!</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * canvas.width; this.y = canvas.height + Math.random() * 100; this.size = Math.random() * 2 + 0.5; this.speedY = Math.random() * 0.4 + 0.1; this.speedX = (Math.random() - 0.5) * 0.15; this.opacity = Math.random() * 0.4 + 0.2; this.glow = Math.random() * 15 + 10; this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128'; }
+            update() { this.y -= this.speedY; this.x += this.speedX; if (this.y < -50) this.reset(); }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fillStyle = `rgba(${this.color},${this.opacity})`; ctx.shadowBlur = this.glow; ctx.shadowColor = `rgba(${this.color},0.5)`; ctx.fill(); ctx.shadowBlur = 0; }
+        }
+        for (let i=0;i<50;i++) { const p=new Particle(); p.y=Math.random()*canvas.height; particles.push(p); }
+        function animateParticles() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animateParticles); }
+        animateParticles();
+
+        function getEmailKey(k) { var e = localStorage.getItem('fairmonie_user_email') || 'default'; return 'fairmonie_' + e + '_' + k; }
+        function loadData(k, f) { var v = localStorage.getItem(getEmailKey(k)); return v !== null ? v : f; }
+        function saveData(k, v) { localStorage.setItem(getEmailKey(k), v); }
+
+        function generateReferralCode() {
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            var code = 'FMP';
+            for (var i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code;
+        }
+
+        function getOrCreateReferralCode() {
+            var code = loadData('referral_code', '');
+            if (!code) { code = generateReferralCode(); saveData('referral_code', code); }
+            return code;
+        }
+
+        function creditReferrer(refCode) {
+            var allKeys = Object.keys(localStorage);
+            var referrerEmail = null;
+            for (var i = 0; i < allKeys.length; i++) {
+                if (allKeys[i].indexOf('_referral_code') !== -1) {
+                    var storedCode = localStorage.getItem(allKeys[i]);
+                    if (storedCode === refCode) {
+                        referrerEmail = allKeys[i].split('_referral_code')[0].replace('fairmonie_', '');
+                        break;
+                    }
+                }
+            }
+            if (referrerEmail) {
+                var currentUserEmail = localStorage.getItem('fairmonie_user_email') || '';
+                if (referrerEmail !== currentUserEmail && referrerEmail !== 'default') {
+                    var creditedRefs = JSON.parse(localStorage.getItem('fairmonie_credited_refs') || '[]');
+                    if (creditedRefs.indexOf(refCode + '_' + currentUserEmail) === -1) {
+                        var refBalance = parseInt(localStorage.getItem('fairmonie_' + referrerEmail + '_referral_balance') || '0');
+                        var refCount = parseInt(localStorage.getItem('fairmonie_' + referrerEmail + '_referral_count') || '0');
+                        var refEarned = parseInt(localStorage.getItem('fairmonie_' + referrerEmail + '_referral_earned') || '0');
+                        refBalance += 3800; refCount += 1; refEarned += 3800;
+                        localStorage.setItem('fairmonie_' + referrerEmail + '_referral_balance', refBalance.toString());
+                        localStorage.setItem('fairmonie_' + referrerEmail + '_referral_count', refCount.toString());
+                        localStorage.setItem('fairmonie_' + referrerEmail + '_referral_earned', refEarned.toString());
+                        var history = JSON.parse(localStorage.getItem('fairmonie_' + referrerEmail + '_referral_history') || '[]');
+                        history.unshift({ name: currentUserEmail || 'New User', date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }), amount: 3800, time: new Date().toISOString() });
+                        localStorage.setItem('fairmonie_' + referrerEmail + '_referral_history', JSON.stringify(history));
+                        creditedRefs.push(refCode + '_' + currentUserEmail);
+                        localStorage.setItem('fairmonie_credited_refs', JSON.stringify(creditedRefs));
+                        var notifs = JSON.parse(localStorage.getItem('fairmonie_' + referrerEmail + '_notifications') || '[]');
+                        notifs.unshift({ id: Date.now(), type: 'referral', title: 'New Referral! +₦3,800', message: 'Someone signed up using your referral link!', amount: '+₦3,800', amountType: 'credit', time: new Date().toISOString(), read: false });
+                        localStorage.setItem('fairmonie_' + referrerEmail + '_notifications', JSON.stringify(notifs));
+                    }
+                }
+            }
+        }
+
+        function checkReferralOnLoad() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var refCode = urlParams.get('ref');
+            if (refCode) creditReferrer(refCode);
+        }
+
+        var referralCode = getOrCreateReferralCode();
+        var referralBalance = parseInt(loadData('referral_balance', '0')) || 0;
+        var totalInvites = parseInt(loadData('referral_count', '0')) || 0;
+        var totalEarned = parseInt(loadData('referral_earned', '0')) || 0;
+        var username = loadData('username', localStorage.getItem('fairmonie_username') || 'user');
+        var cleanName = username.replace(/\s+/g, '').toLowerCase();
+        var baseUrl = window.location.origin + '/signup.html?ref=';
+
+        function init() {
+            document.getElementById('referralCode').textContent = referralCode;
+            document.getElementById('referralLink').textContent = baseUrl + referralCode;
+            document.getElementById('balanceAmount').textContent = '₦' + referralBalance.toLocaleString();
+            document.getElementById('inviteCount').textContent = totalInvites;
+            document.getElementById('earnedAmount').textContent = '₦' + totalEarned.toLocaleString();
+            loadHistory();
+        }
+
+        function loadHistory() {
+            var history = JSON.parse(loadData('referral_history', '[]'));
+            var historyList = document.getElementById('historyList');
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="empty-history"><span>&#128101;</span>No invites yet. Share your link to start earning!</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < history.length; i++) {
+                var item = history[i];
+                html += '<div class="history-item">';
+                html += '<div class="history-avatar">' + (item.name || 'U').substring(0, 2).toUpperCase() + '</div>';
+                html += '<div class="history-info"><div class="history-name">' + item.name + '</div><div class="history-date">' + item.date + '</div></div>';
+                html += '<div class="history-amount">+₦' + item.amount.toLocaleString() + '</div>';
+                html += '</div>';
+            }
+            historyList.innerHTML = html;
+        }
+
+        function copyLink() {
+            var link = baseUrl + referralCode;
+            navigator.clipboard.writeText(link).then(function() {
+                var btn = document.getElementById('copyBtn');
+                btn.classList.add('copied');
+                btn.innerHTML = '<span>&#10004;</span>';
+                showToast('Referral link copied!');
+                setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = '<span>&#128203;</span>'; }, 2000);
+            });
+        }
+
+        function withdrawToMain() {
+            if (referralBalance <= 0) { showToast('No balance to transfer yet!'); return; }
+            var mainBalance = parseInt(loadData('balance', '0')) || 0;
+            mainBalance += referralBalance;
+            saveData('balance', mainBalance.toString());
+            var amount = referralBalance;
+            referralBalance = 0;
+            saveData('referral_balance', '0');
+            init();
+            showToast('₦' + amount.toLocaleString() + ' transferred to main balance!');
+        }
+
+        var shareText = 'Join FairMonie Pay and earn ₦3,800 bonus! Use my referral link:';
+        var shareUrl = encodeURIComponent(baseUrl + referralCode);
+
+        function shareWhatsApp(e) { e.preventDefault(); window.open('https://wa.me/?text=' + encodeURIComponent(shareText + ' ' + decodeURIComponent(shareUrl)), '_blank'); }
+        function shareTelegram(e) { e.preventDefault(); window.open('https://t.me/share/url?url=' + shareUrl + '&text=' + encodeURIComponent(shareText), '_blank'); }
+        function shareFacebook(e) { e.preventDefault(); window.open('https://www.facebook.com/sharer/sharer.php?u=' + shareUrl, '_blank'); }
+        function shareTwitter(e) { e.preventDefault(); window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) + '&url=' + shareUrl, '_blank'); }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        checkReferralOnLoad();
+        init();
+    </script>
+</body>
+</html>

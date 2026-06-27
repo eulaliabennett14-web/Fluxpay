@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Privacy Policy - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --bg-card: #1a2332; --bg-card-hover: #1e293b;
+            --accent-green: #00d4aa; --accent-green-dark: #00a884; --accent-gold: #f59e0b;
+            --accent-gold-light: #fbbf24; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+            --accent-red: #ef4444; --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-bg: rgba(10, 40, 32, 0.7);
+            --glass-border: rgba(0, 212, 170, 0.1); --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(6,13,26,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .main-content { position: relative; z-index: 1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+
+        /* Hero */
+        .privacy-hero { text-align: center; padding: 30px 20px 20px; }
+        .privacy-hero i { font-size: 48px; color: var(--accent-green); margin-bottom: 16px; }
+        .privacy-hero h2 { font-family: 'Amaranth', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+        .privacy-hero p { font-size: 13px; color: var(--text-secondary); }
+        .privacy-date { display: inline-block; margin-top: 12px; padding: 6px 16px; background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.15); border-radius: 20px; font-size: 12px; color: var(--accent-green); font-weight: 600; }
+
+        /* Section Cards */
+        .privacy-section { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .privacy-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark), var(--accent-green)); opacity: 0.4; }
+        .privacy-section h3 { font-family: 'Amaranth', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: var(--accent-green); display: flex; align-items: center; gap: 10px; }
+        .privacy-section h3 i { font-size: 16px; }
+        .privacy-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+        .privacy-section p:last-child { margin-bottom: 0; }
+        .privacy-section strong { color: var(--text-primary); font-weight: 600; }
+        .privacy-list { list-style: none; padding: 0; }
+        .privacy-list li { font-size: 13px; color: var(--text-secondary); line-height: 1.8; padding: 8px 0; padding-left: 28px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .privacy-list li:last-child { border-bottom: none; }
+        .privacy-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent-green); font-weight: 700; }
+        .privacy-highlight { background: rgba(0,212,170,0.05); border-left: 3px solid var(--accent-green); padding: 14px 16px; border-radius: 0 12px 12px 0; margin: 14px 0; }
+        .privacy-highlight p { margin-bottom: 0; font-size: 12px; }
+        .privacy-highlight strong { color: var(--accent-green); }
+        .privacy-warning { background: rgba(239,68,68,0.05); border-left: 3px solid var(--accent-red); padding: 14px 16px; border-radius: 0 12px 12px 0; margin: 14px 0; }
+        .privacy-warning p { margin-bottom: 0; font-size: 12px; color: var(--text-secondary); }
+        .privacy-warning strong { color: var(--accent-red); }
+
+        /* Section num */
+        .section-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; font-family: 'Amaranth', sans-serif; font-size: 14px; font-weight: 700; margin-right: 8px; }
+
+        /* Data table */
+        .data-table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+        .data-table th, .data-table td { padding: 10px 12px; text-align: left; font-size: 12px; border-bottom: 1px solid var(--border-color); }
+        .data-table th { color: var(--accent-green); font-weight: 700; background: rgba(0,212,170,0.05); }
+        .data-table td { color: var(--text-secondary); }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        /* Footer */
+        .privacy-footer { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 12px; }
+        .privacy-footer a { color: var(--accent-gold); text-decoration: none; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(0,212,170,0.2); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <canvas id="bg-particles"></canvas>
+    <div class="toast" id="toast"><span id="toastText">Message</span></div>
+
+    <header class="header">
+        <a href="profile.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <h1>🔒 Privacy Policy</h1>
+    </header>
+
+    <div class="main-content">
+        <!-- Hero -->
+        <div class="privacy-hero">
+            <i class="fas fa-shield-alt"></i>
+            <h2>Privacy Policy</h2>
+            <p>Your data is safe with us. Learn how we protect your information.</p>
+            <div class="privacy-date">Last Updated: 23 June 2026</div>
+        </div>
+
+        <!-- Section 1: Introduction -->
+        <div class="privacy-section">
+            <h3><span class="section-num">1</span> Introduction</h3>
+            <p>At <strong>Flux Pay</strong>, we take your privacy seriously. This Privacy Policy explains how we collect, use, store, and protect your personal information when you use our platform.</p>
+            <p>By using Flux Pay, you consent to the practices described in this policy. If you do not agree, please do not use our Services.</p>
+            <div class="privacy-highlight">
+                <p><strong>Our Promise:</strong> We never sell your personal data to third parties. Your information is used solely to provide and improve our services.</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Information We Collect -->
+        <div class="privacy-section">
+            <h3><span class="section-num">2</span> Information We Collect</h3>
+            <p>We collect the following types of information:</p>
+            <table class="data-table">
+                <tr><th>Information</th><th>Purpose</th></tr>
+                <tr><td>Full Name</td><td>Account identification</td></tr>
+                <tr><td>Email Address</td><td>Communication & login</td></tr>
+                <tr><td>Phone Number</td><td>Verification & support</td></tr>
+                <tr><td>Bank Account Details</td><td>Withdrawal processing</td></tr>
+                <tr><td>ID Documents (NIN, etc.)</td><td>KYC verification</td></tr>
+                <tr><td>Selfie Photo</td><td>Identity verification</td></tr>
+                <tr><td>Device Information</td><td>Security & fraud prevention</td></tr>
+                <tr><td>IP Address</td><td>Security & location verification</td></tr>
+            </table>
+        </div>
+
+        <!-- Section 3: How We Use Your Information -->
+        <div class="privacy-section">
+            <h3><span class="section-num">3</span> How We Use Your Information</h3>
+            <p>Your information is used for the following purposes:</p>
+            <ul class="privacy-list">
+                <li>To create and manage your account</li>
+                <li>To process your earnings and withdrawals</li>
+                <li>To verify your identity (KYC compliance)</li>
+                <li>To prevent fraud and unauthorized access</li>
+                <li>To send important notifications about your account</li>
+                <li>To improve our platform and user experience</li>
+                <li>To comply with legal and regulatory requirements</li>
+            </ul>
+        </div>
+
+        <!-- Section 4: Data Security -->
+        <div class="privacy-section">
+            <h3><span class="section-num">4</span> Data Security</h3>
+            <p>We implement industry-standard security measures to protect your data:</p>
+            <ul class="privacy-list">
+                <li><strong>Encryption:</strong> All data is encrypted in transit (SSL/TLS) and at rest</li>
+                <li><strong>Secure Servers:</strong> Hosted on cloud infrastructure with 99.9% uptime</li>
+                <li><strong>Access Control:</strong> Strict internal access controls and audit logs</li>
+                <li><strong>Regular Audits:</strong> Security assessments performed quarterly</li>
+                <li><strong>Firewalls:</strong> Advanced network protection against attacks</li>
+            </ul>
+            <div class="privacy-highlight">
+                <p><strong>Bank-Level Security:</strong> Your bank details are encrypted using AES-256 encryption — the same standard used by banks worldwide.</p>
+            </div>
+        </div>
+
+        <!-- Section 5: Data Sharing -->
+        <div class="privacy-section">
+            <h3><span class="section-num">5</span> Data Sharing & Third Parties</h3>
+            <p>We do <strong>not</strong> sell, rent, or trade your personal information. We only share data with:</p>
+            <ul class="privacy-list">
+                <li><strong>Payment Processors:</strong> To process withdrawals to your bank</li>
+                <li><strong>Verification Partners:</strong> To confirm your identity (KYC)</li>
+                <li><strong>Legal Authorities:</strong> When required by Nigerian law</li>
+                <li><strong>Service Providers:</strong> Cloud hosting, analytics (anonymized data only)</li>
+            </ul>
+            <div class="privacy-warning">
+                <p><strong>We Never Share:</strong> Your password, full bank details, or ID documents with marketing companies or unrelated third parties.</p>
+            </div>
+        </div>
+
+        <!-- Section 6: Cookies & Tracking -->
+        <div class="privacy-section">
+            <h3><span class="section-num">6</span> Cookies & Tracking Technologies</h3>
+            <p>We use cookies and similar technologies to:</p>
+            <ul class="privacy-list">
+                <li>Keep you logged in during your session</li>
+                <li>Remember your preferences (dark mode, language)</li>
+                <li>Analyze platform usage to improve features</li>
+                <li>Detect suspicious activity and prevent fraud</li>
+            </ul>
+            <p>You can disable cookies in your browser settings, but some features may not work properly.</p>
+        </div>
+
+        <!-- Section 7: Your Rights -->
+        <div class="privacy-section">
+            <h3><span class="section-num">7</span> Your Rights</h3>
+            <p>As a Flux Pay user, you have the right to:</p>
+            <ul class="privacy-list">
+                <li><strong>Access:</strong> Request a copy of your personal data</li>
+                <li><strong>Correction:</strong> Update inaccurate information</li>
+                <li><strong>Deletion:</strong> Request account and data deletion</li>
+                <li><strong>Portability:</strong> Export your data in a readable format</li>
+                <li><strong>Restriction:</strong> Limit how we use your data</li>
+                <li><strong>Objection:</strong> Opt out of non-essential communications</li>
+            </ul>
+            <div class="privacy-highlight">
+                <p><strong>Contact us</strong> at support@fluxpay.com to exercise any of these rights. We respond within 30 days.</p>
+            </div>
+        </div>
+
+        <!-- Section 8: Data Retention -->
+        <div class="privacy-section">
+            <h3><span class="section-num">8</span> Data Retention</h3>
+            <p>We retain your information for as long as necessary:</p>
+            <ul class="privacy-list">
+                <li><strong>Active Accounts:</strong> Data retained while your account is active</li>
+                <li><strong>Deleted Accounts:</strong> Data removed within 90 days of deletion request</li>
+                <li><strong>Legal Requirements:</strong> Some data may be retained longer for compliance</li>
+                <li><strong>Transaction Records:</strong> Kept for 7 years per Nigerian financial regulations</li>
+            </ul>
+        </div>
+
+        <!-- Section 9: Children's Privacy -->
+        <div class="privacy-section">
+            <h3><span class="section-num">9</span> Children's Privacy</h3>
+            <p>Flux Pay is <strong>not intended for children under 18</strong>. We do not knowingly collect data from minors. If we discover a user is under 18, we will delete their account and data immediately.</p>
+            <div class="privacy-warning">
+                <p><strong>Parents/Guardians:</strong> If you believe your child has provided us with personal information, contact us immediately at support@fluxpay.com.</p>
+            </div>
+        </div>
+
+        <!-- Section 10: Changes to Policy -->
+        <div class="privacy-section">
+            <h3><span class="section-num">10</span> Changes to This Policy</h3>
+            <p>We may update this Privacy Policy from time to time. We will notify you of significant changes via:</p>
+            <ul class="privacy-list">
+                <li>Email notification to your registered address</li>
+                <li>In-app notification banner</li>
+                <li>Updated "Last Updated" date at the top of this page</li>
+            </ul>
+            <p>Continued use of Flux Pay after changes constitutes acceptance of the updated policy.</p>
+        </div>
+
+        <!-- Section 11: Contact -->
+        <div class="privacy-section">
+            <h3><span class="section-num">11</span> Contact Us</h3>
+            <p>If you have any questions about this Privacy Policy or how we handle your data, please contact us:</p>
+            <ul class="privacy-list">
+                <li><strong>Email:</strong> support@fluxpay.com</li>
+                <li><strong>Live Chat:</strong> Available 24/7 in the app</li>
+                <li><strong>WhatsApp:</strong> <a href="https://whatsapp.com/channel/0029VbChXCg5a23zm42vXs0R" target="_blank" style="color:var(--accent-gold)">Join Channel</a></li>
+                <li><strong>Data Protection Officer:</strong> privacy@fluxpay.com</li>
+                <li><strong>Address:</strong> Lagos, Nigeria</li>
+            </ul>
+            <div class="privacy-highlight">
+                <p><strong>Response Time:</strong> We aim to respond to all privacy-related inquiries within 48 hours.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="privacy-footer">
+            <p>© 2026 Flux Pay Nigeria. All rights reserved.</p>
+            <p><a href="terms.html">Terms of Service</a> · <a href="about.html">About Us</a></p>
+        </div>
+    </div>
+
+    <script>
+        // ========== FLOATING PARTICLES ==========
+        (function() {
+            var canvas = document.getElementById('bg-particles');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var particles = [], w, h;
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            resize(); window.addEventListener('resize', resize);
+            function Particle() { this.reset(); }
+            Particle.prototype.reset = function() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.size = Math.random() * 3 + 1.5; this.speedY = -(Math.random() * 0.35 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.18; this.opacity = Math.random() * 0.4 + 0.2;
+                this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+            };
+            Particle.prototype.update = function() {
+                this.y += this.speedY; this.x += this.speedX; this.life--;
+                if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+                if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+            };
+            Particle.prototype.draw = function() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+                ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+            };
+            var count = window.innerWidth < 768 ? 25 : 40;
+            for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+            function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+            animate();
+        })();
+
+        console.log('🔒 Flux Pay Privacy Policy — Ready');
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

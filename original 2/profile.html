@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Profile - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --bg-card: #1a2332; --bg-card-hover: #1e293b;
+            --accent-green: #00d4aa; --accent-green-dark: #00a884; --accent-gold: #f59e0b;
+            --accent-gold-light: #fbbf24; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+            --accent-red: #ef4444; --accent-orange: #f97316; --accent-pink: #ec4899;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-border: rgba(0, 212, 170, 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(6,13,26,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .back-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .main-content { position: relative; z-index: 1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+
+        .profile-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 24px; margin-bottom: 16px; text-align: center; position: relative; overflow: hidden; }
+        .profile-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); opacity: 0.6; }
+        .avatar-wrapper { position: relative; display: inline-block; margin-bottom: 16px; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 40px; border: 3px solid rgba(59,130,246,0.3); box-shadow: 0 0 30px rgba(59,130,246,0.2); position: relative; color: #fff; font-weight: 700; }
+        .avatar-edit { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--accent-gold); border: 2px solid var(--bg-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: #fff; transition: var(--transition-smooth); }
+        .avatar-edit:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+        .avatar-edit svg { width: 14px; height: 14px; fill: #fff; }
+        .level-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: var(--accent-gold); margin-bottom: 10px; font-family: 'Amaranth', sans-serif; }
+        .profile-name { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .profile-name .edit-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; transition: var(--transition-smooth); }
+        .profile-name .edit-icon:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
+        .profile-name .edit-icon svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .profile-email { font-size: 13px; color: var(--text-secondary); }
+        .verification-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .verification-badge.verified { background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.2); color: var(--accent-green); }
+        .verification-badge.pending { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: var(--accent-gold); }
+        .verification-badge.unverified { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--accent-red); }
+        .verification-badge svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        .stats-rings { display: flex; justify-content: center; gap: 24px; margin-top: 20px; }
+        .ring-item { text-align: center; }
+        .ring { width: 70px; height: 70px; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+        .ring-bg { stroke: rgba(255,255,255,0.05); }
+        .ring-fill { stroke: var(--accent-gold); transition: stroke-dashoffset 1s ease; }
+        .ring-text { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .ring-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+        .badges-row { display: flex; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+        .badge { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border: 1px solid var(--border-color); transition: var(--transition-smooth); cursor: pointer; position: relative; }
+        .badge:hover { transform: translateY(-3px); border-color: var(--accent-gold); }
+        .badge.earned { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border-color: rgba(245,158,11,0.3); }
+        .badge svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .badge.earned svg { stroke: var(--accent-gold); }
+        .badge:not(.earned) svg { stroke: var(--text-muted); }
+        .badge-tooltip { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 12px; font-size: 11px; color: var(--text-primary); white-space: nowrap; opacity: 0; pointer-events: none; transition: var(--transition-smooth); }
+        .badge:hover .badge-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .status-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+        .status-info { display: flex; align-items: center; gap: 14px; }
+        .status-icon { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.2); display: flex; align-items: center; justify-content: center; }
+        .status-icon svg { width: 24px; height: 24px; fill: none; stroke: var(--accent-gold); stroke-width: 2; }
+        .status-icon.upgraded { background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,212,170,0.05)); border-color: rgba(0,212,170,0.2); }
+        .status-icon.upgraded svg { stroke: var(--accent-green); }
+        .status-text h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; }
+        .status-text p { font-size: 13px; color: var(--accent-gold); font-weight: 600; }
+        .status-text p.upgraded { color: var(--accent-green); }
+        .upgrade-btn { padding: 10px 20px; background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #fff; border: none; border-radius: 12px; font-family: 'Amaranth', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 15px rgba(245,158,11,0.3); }
+        .upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.4); }
+
+        .section-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .section-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+        .detail-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border-color); }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+        .detail-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .detail-content { flex: 1; }
+        .detail-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+        .detail-value { font-size: 15px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        .detail-action { color: var(--text-muted); font-size: 13px; cursor: pointer; transition: var(--transition-smooth); }
+        .detail-action:hover { color: var(--accent-gold); }
+        .detail-action svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        .kyc-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .kyc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .kyc-title { display: flex; align-items: center; gap: 10px; }
+        .kyc-title svg { width: 18px; height: 18px; fill: none; stroke: var(--accent-gold); stroke-width: 2; }
+        .kyc-title h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; }
+        .kyc-status { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .kyc-status.verified { background: rgba(0,212,170,0.1); color: var(--accent-green); border: 1px solid rgba(0,212,170,0.2); }
+        .kyc-status.pending { background: rgba(245,158,11,0.1); color: var(--accent-gold); border: 1px solid rgba(245,158,11,0.2); }
+        .kyc-status.unverified { background: rgba(239,68,68,0.1); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.2); }
+        .kyc-steps { display: flex; flex-direction: column; gap: 10px; }
+        .kyc-step { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; cursor: pointer; transition: var(--transition-smooth); }
+        .kyc-step:hover { border-color: var(--accent-gold); background: rgba(245,158,11,0.04); }
+        .kyc-step.completed { border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.04); }
+        .kyc-step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+        .kyc-step.completed .kyc-step-num { background: var(--accent-green); border-color: var(--accent-green); color: #fff; }
+        .kyc-step-info { flex: 1; }
+        .kyc-step-info h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .kyc-step-info p { font-size: 11px; color: var(--text-muted); }
+        .kyc-step-icon { color: var(--text-muted); font-size: 14px; }
+        .kyc-step.completed .kyc-step-icon { color: var(--accent-green); }
+        .kyc-step-icon svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        .bank-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .bank-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .bank-header h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .bank-header h3 svg { width: 18px; height: 18px; fill: none; stroke: var(--accent-green); stroke-width: 2; }
+        .add-bank-btn { padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: var(--accent-green); font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition-smooth); }
+        .add-bank-btn:hover { border-color: var(--accent-green); background: rgba(0,212,170,0.05); }
+        .bank-info { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; }
+        .bank-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .bank-label { font-size: 12px; color: var(--text-muted); }
+        .bank-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .no-bank { text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px; }
+
+        .referral-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+        .ref-stat { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px 10px; text-align: center; }
+        .ref-stat-value { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent-gold); margin-bottom: 4px; }
+        .ref-stat-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+        .activity-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+        .act-stat { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px; }
+        .act-stat-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .act-stat-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .act-stat-icon.earn { background: rgba(0,212,170,0.1); color: var(--accent-green); }
+        .act-stat-icon.withdraw { background: rgba(245,158,11,0.1); color: var(--accent-gold); }
+        .act-stat-icon.days { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+        .act-stat-icon.streak { background: rgba(236,72,153,0.1); color: var(--accent-pink); }
+        .act-stat-info h4 { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; }
+        .act-stat-info p { font-size: 11px; color: var(--text-muted); }
+
+        .settings-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .settings-card h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .settings-card h3 svg { width: 18px; height: 18px; fill: none; stroke: var(--accent-blue); stroke-width: 2; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border-color); }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-info { display: flex; align-items: center; gap: 12px; }
+        .setting-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        .setting-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .setting-text h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .setting-text p { font-size: 11px; color: var(--text-muted); }
+        .toggle { width: 48px; height: 26px; border-radius: 13px; background: var(--bg-secondary); border: 1px solid var(--border-color); position: relative; cursor: pointer; transition: var(--transition-smooth); }
+        .toggle.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); border-color: var(--accent-green); }
+        .toggle-dot { width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: var(--transition-smooth); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .toggle.active .toggle-dot { left: 24px; }
+        .setting-select { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 12px; color: var(--text-primary); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; cursor: pointer; }
+
+        .support-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .support-card h3 { font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .support-card h3 svg { width: 18px; height: 18px; fill: none; stroke: var(--accent-purple); stroke-width: 2; }
+        .support-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; font-family: 'Amaranth', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .support-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .support-btn.chat { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; box-shadow: 0 4px 15px rgba(0,212,170,0.3); }
+        .support-btn.chat:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,212,170,0.4); }
+        .support-btn.faq { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .support-btn.faq:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+        .support-btn.report { background: var(--bg-card); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.2); }
+        .support-btn.report:hover { background: rgba(239,68,68,0.1); }
+
+        .menu-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 8px 20px; margin-bottom: 16px; }
+        .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: var(--transition-smooth); }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover { color: var(--accent-gold); }
+        .menu-left { display: flex; align-items: center; gap: 14px; }
+        .menu-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .menu-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .menu-icon.about { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+        .menu-icon.download { background: rgba(0,212,170,0.1); color: var(--accent-green); }
+        .menu-icon.terms { background: rgba(245,158,11,0.1); color: var(--accent-gold); }
+        .menu-icon.privacy { background: rgba(139,92,246,0.1); color: var(--accent-purple); }
+        .menu-text h4 { font-size: 14px; font-weight: 600; }
+        .menu-text p { font-size: 11px; color: var(--text-muted); }
+        .menu-arrow { color: var(--text-muted); font-size: 12px; }
+
+        .logout-btn { width: 100%; padding: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 16px; color: var(--accent-red); font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px; }
+        .logout-btn:hover { background: rgba(239,68,68,0.2); transform: translateY(-2px); }
+        .logout-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(0,212,170,0.2); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { width: 22px; height: 22px; border-radius: 6px; background: rgba(0,212,170,0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 11px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: linear-gradient(135deg, rgba(26,35,50,0.95) 0%, rgba(17,24,39,0.98) 100%); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 400px; text-align: center; position: relative; transform: scale(0.9); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-icon { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05)); border: 2px solid rgba(239,68,68,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .modal-icon svg { width: 28px; height: 28px; fill: none; stroke: var(--accent-red); stroke-width: 2; }
+        .modal-title { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .modal-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+        .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .modal-btn { padding: 14px; border-radius: 14px; border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); }
+        .modal-btn-cancel { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .modal-btn-cancel:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .modal-btn-danger { background: linear-gradient(135deg, var(--accent-red), #dc2626); color: #fff; box-shadow: 0 4px 15px rgba(239,68,68,0.3); }
+        .modal-btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239,68,68,0.4); }
+
+        .hidden { display: none !important; }
+
+        /* Auth check overlay */
+        .auth-check-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .auth-check-overlay.hidden { display: none; }
+        .auth-check-spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(0,212,170,0.15);
+            border-top-color: var(--accent-green); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .auth-check-text { font-size: 14px; color: var(--text-muted); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- Auth Check Overlay -->
+    <div class="auth-check-overlay" id="authCheckOverlay">
+        <div class="auth-check-spinner"></div>
+        <div class="auth-check-text">Checking your account...</div>
+    </div>
+
+    <canvas id="bg-particles"></canvas>
+
+    <div class="toast" id="toast"><div class="toast-icon">✓</div><span id="toastText">Message</span></div>
+
+    <!-- Logout Modal -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </div>
+            <h2 class="modal-title">Log Out?</h2>
+            <p class="modal-text">Are you sure you want to log out of your account?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="modal-btn modal-btn-danger" onclick="confirmLogout()">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="dashboard.html" class="back-btn">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <h1>Profile</h1>
+    </header>
+
+    <div class="main-content">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="avatar-wrapper">
+                <div class="avatar" id="userAvatar">U</div>
+                <div class="avatar-edit" onclick="uploadAvatar()" title="Change avatar">
+                    <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+            </div>
+            <div class="level-badge" id="levelBadge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Level 1
+            </div>
+            <div class="profile-name">
+                <span id="displayName">User</span>
+                <div class="edit-icon" onclick="editName()">
+                    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </div>
+            </div>
+            <div class="profile-email" id="displayEmail">user@fluxpay.com</div>
+            <div class="verification-badge unverified" id="verifyBadge">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Unverified
+            </div>
+
+            <div class="stats-rings">
+                <div class="ring-item">
+                    <div class="ring">
+                        <svg width="70" height="70"><circle class="ring-bg" cx="35" cy="35" r="30" fill="none" stroke-width="4"/><circle class="ring-fill" cx="35" cy="35" r="30" fill="none" stroke-width="4" stroke-dasharray="188.5" stroke-dashoffset="47" stroke-linecap="round"/></svg>
+                        <div class="ring-text">75%</div>
+                    </div>
+                    <div class="ring-label">Profile</div>
+                </div>
+                <div class="ring-item">
+                    <div class="ring">
+                        <svg width="70" height="70"><circle class="ring-bg" cx="35" cy="35" r="30" fill="none" stroke-width="4"/><circle class="ring-fill" cx="35" cy="35" r="30" fill="none" stroke-width="4" stroke-dasharray="188.5" stroke-dashoffset="94" stroke-linecap="round"/></svg>
+                        <div class="ring-text">50%</div>
+                    </div>
+                    <div class="ring-label">KYC</div>
+                </div>
+                <div class="ring-item">
+                    <div class="ring">
+                        <svg width="70" height="70"><circle class="ring-bg" cx="35" cy="35" r="30" fill="none" stroke-width="4"/><circle class="ring-fill" cx="35" cy="35" r="30" fill="none" stroke-width="4" stroke-dasharray="188.5" stroke-dashoffset="113" stroke-linecap="round"/></svg>
+                        <div class="ring-text">40%</div>
+                    </div>
+                    <div class="ring-label">Activity</div>
+                </div>
+            </div>
+
+            <div class="badges-row">
+                <div class="badge earned" title="Early Adopter">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <div class="badge-tooltip">Early Adopter</div>
+                </div>
+                <div class="badge earned" title="First Withdrawal">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12" r="4"/></svg>
+                    <div class="badge-tooltip">First Withdrawal</div>
+                </div>
+                <div class="badge earned" title="Referral Master">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg>
+                    <div class="badge-tooltip">Referral Master</div>
+                </div>
+                <div class="badge" title="VIP Investor">
+                    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <div class="badge-tooltip">VIP Investor — locked</div>
+                </div>
+                <div class="badge" title="Top Earner">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <div class="badge-tooltip">Top Earner — locked</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Status -->
+        <div class="status-card">
+            <div class="status-info">
+                <div class="status-icon" id="statusIcon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="status-text">
+                    <h3>Account Status</h3>
+                    <p id="accountStatus">Not Upgraded</p>
+                </div>
+            </div>
+            <button class="upgrade-btn" onclick="window.location.href='upgrade.html'">Upgrade</button>
+        </div>
+
+        <!-- Account Details -->
+        <div class="section-card">
+            <div class="section-title">Account Details</div>
+            <div class="detail-row">
+                <div class="detail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/></svg></div>
+                <div class="detail-content"><div class="detail-label">Full Name</div><div class="detail-value" id="fieldName">User</div></div>
+                <div class="detail-action" onclick="editField('name')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg></div>
+                <div class="detail-content"><div class="detail-label">Email</div><div class="detail-value" id="fieldEmail">user@fluxpay.com</div></div>
+                <div class="detail-action" onclick="editField('email')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+                <div class="detail-content"><div class="detail-label">Phone</div><div class="detail-value" id="fieldPhone">Not set</div></div>
+                <div class="detail-action" onclick="editField('phone')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                <div class="detail-content"><div class="detail-label">Joined</div><div class="detail-value" id="fieldJoined">Today</div></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="detail-content"><div class="detail-label">Status</div><div class="detail-value" id="fieldStatus" style="color:var(--accent-gold)">Not Upgraded</div></div>
+            </div>
+        </div>
+
+        <!-- KYC Verification -->
+        <div class="kyc-card">
+            <div class="kyc-header">
+                <div class="kyc-title">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <h3>KYC Verification</h3>
+                </div>
+                <div class="kyc-status unverified" id="kycStatus">Unverified</div>
+            </div>
+            <div class="kyc-steps">
+                <div class="kyc-step" onclick="uploadID()">
+                    <div class="kyc-step-num" id="step1Num">1</div>
+                    <div class="kyc-step-info"><h4>Upload ID</h4><p>NIN, Voter's Card, or Passport</p></div>
+                    <div class="kyc-step-icon" id="step1Icon"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+                </div>
+                <div class="kyc-step" onclick="uploadSelfie()">
+                    <div class="kyc-step-num" id="step2Num">2</div>
+                    <div class="kyc-step-info"><h4>Selfie Verification</h4><p>Take a clear photo of your face</p></div>
+                    <div class="kyc-step-icon" id="step2Icon"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+                </div>
+                <div class="kyc-step" onclick="verifyKYC()">
+                    <div class="kyc-step-num" id="step3Num">3</div>
+                    <div class="kyc-step-info"><h4>Submit for Review</h4><p>We verify within 24 hours</p></div>
+                    <div class="kyc-step-icon" id="step3Icon"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Details -->
+        <div class="bank-card">
+            <div class="bank-header">
+                <h3><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Bank Details</h3>
+                <button class="add-bank-btn" onclick="addBank()" id="addBankBtn">+ Add Bank</button>
+            </div>
+            <div id="bankInfo"><div class="no-bank">No bank account added yet.<br>Add one to withdraw your earnings.</div></div>
+        </div>
+
+        <!-- Referral Stats -->
+        <div class="referral-stats">
+            <div class="ref-stat"><div class="ref-stat-value" id="refCount">0</div><div class="ref-stat-label">Referrals</div></div>
+            <div class="ref-stat"><div class="ref-stat-value" id="refEarned">₦0</div><div class="ref-stat-label">Earned</div></div>
+            <div class="ref-stat"><div class="ref-stat-value" id="refCode">---</div><div class="ref-stat-label">Code</div></div>
+        </div>
+
+        <!-- Activity Stats -->
+        <div class="activity-stats">
+            <div class="act-stat">
+                <div class="act-stat-icon earn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 5 19 12"/></svg></div>
+                <div class="act-stat-info"><h4 id="totalEarned">₦0</h4><p>Total Earned</p></div>
+            </div>
+            <div class="act-stat">
+                <div class="act-stat-icon withdraw"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
+                <div class="act-stat-info"><h4 id="totalWithdrawn">₦0</h4><p>Total Withdrawn</p></div>
+            </div>
+            <div class="act-stat">
+                <div class="act-stat-icon days"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                <div class="act-stat-info"><h4 id="daysActive">1</h4><p>Days Active</p></div>
+            </div>
+            <div class="act-stat">
+                <div class="act-stat-icon streak"><svg viewBox="0 0 24 24"><path d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg></div>
+                <div class="act-stat-info"><h4 id="streakDays">0</h4><p>Day Streak</p></div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="settings-card">
+            <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Settings</h3>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+                    <div class="setting-text"><h4>Push Notifications</h4><p>Get alerts for earnings & updates</p></div>
+                </div>
+                <div class="toggle active" id="notifToggle" onclick="toggleSetting(this)"><div class="toggle-dot"></div></div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
+                    <div class="setting-text"><h4>Dark Mode</h4><p>Currently enabled</p></div>
+                </div>
+                <div class="toggle active" id="darkToggle" onclick="toggleSetting(this)"><div class="toggle-dot"></div></div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg></div>
+                    <div class="setting-text"><h4>Sound Effects</h4><p>Play sounds on actions</p></div>
+                </div>
+                <div class="toggle active" id="soundToggle" onclick="toggleSetting(this)"><div class="toggle-dot"></div></div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                    <div class="setting-text"><h4>Language</h4><p>Select your preferred language</p></div>
+                </div>
+                <select class="setting-select" id="langSelect" onchange="changeLanguage()">
+                    <option value="en">English</option><option value="yo">Yoruba</option><option value="ig">Igbo</option><option value="ha">Hausa</option>
+                </select>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+                    <div class="setting-text"><h4>Currency</h4><p>Display amounts in</p></div>
+                </div>
+                <select class="setting-select" id="currencySelect" onchange="changeCurrency()">
+                    <option value="NGN">₦ Naira</option><option value="USD">$ USD</option><option value="GBP">£ GBP</option><option value="EUR">€ EUR</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div class="support-card">
+            <h3><svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg> Support</h3>
+            <button class="support-btn chat" onclick="window.location.href='support.html'"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Live Chat</button>
+            <button class="support-btn faq" onclick="showToast('FAQ page coming soon!')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> FAQ & Help Center</button>
+            <button class="support-btn report" onclick="reportBug()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Report a Bug</button>
+        </div>
+
+        <!-- Menu -->
+        <div class="menu-card">
+            <div class="menu-item" onclick="window.location.href='about.html'">
+                <div class="menu-left">
+                    <div class="menu-icon about"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+                    <div class="menu-text"><h4>About FluxPay</h4><p>Learn more about us</p></div>
+                </div>
+                <div class="menu-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="menu-item" onclick="showToast('Feature not available yet')">
+                <div class="menu-left">
+                    <div class="menu-icon download"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                    <div class="menu-text"><h4>Download App</h4><p>Get the mobile app</p></div>
+                </div>
+                <div class="menu-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='terms.html'">
+                <div class="menu-left">
+                    <div class="menu-icon terms"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                    <div class="menu-text"><h4>Terms of Service</h4><p>Read our terms</p></div>
+                </div>
+                <div class="menu-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="menu-item" onclick="window.location.href='privacy.html'">
+                <div class="menu-left">
+                    <div class="menu-icon privacy"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                    <div class="menu-text"><h4>Privacy Policy</h4><p>How we protect your data</p></div>
+                </div>
+                <div class="menu-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+        </div>
+
+        <!-- Logout -->
+        <button class="logout-btn" onclick="openLogoutModal()">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log Out
+        </button>
+    </div>
+
+    <script>
+    // ========== SUPABASE CONFIG ==========
+    const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase connected');
+    } catch (e) {
+        console.error('❌ Supabase connection failed:', e);
+    }
+
+    // ========== GLOBAL STATE ==========
+    let currentUser = null;
+    let userProfile = null;
+
+    // ========== DOM ELEMENTS ==========
+    const authCheckOverlay = document.getElementById('authCheckOverlay');
+
+    // ========== AUTH CHECK ==========
+    async function checkAuth() {
+        if (!supabase) {
+            showToast('Connection error. Please refresh.', true);
+            return;
+        }
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+            console.log('Logged in as:', currentUser.email);
+            await loadUserProfile();
+            authCheckOverlay.classList.add('hidden');
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'login.html';
+        }
+    }
+
+    // ========== LOAD USER PROFILE FROM SUPABASE ==========
+    async function loadUserProfile() {
+        try {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error) {
+                console.error('Profile fetch error:', error);
+                showToast('Error loading profile', true);
+                return;
+            }
+
+            userProfile = profile;
+            console.log('Profile loaded:', userProfile);
+            updateUI();
+
+        } catch (e) {
+            console.error('Load profile error:', e);
+        }
+    }
+
+    // ========== SAVE PROFILE TO SUPABASE ==========
+    async function saveProfile(updates) {
+        if (!currentUser || !supabase) return false;
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', currentUser.id);
+
+            if (error) {
+                console.error('Save profile error:', error);
+                showToast('Error saving changes', true);
+                return false;
+            }
+            console.log('Profile saved');
+            return true;
+        } catch (e) {
+            console.error('Save profile error:', e);
+            return false;
+        }
+    }
+
+    // ========== UPDATE UI ==========
+    function updateUI() {
+        if (!userProfile) return;
+
+        // Name & Avatar
+        const fullName = userProfile.full_name || currentUser.user_metadata?.full_name || 'User';
+        document.getElementById('displayName').textContent = fullName;
+        document.getElementById('fieldName').textContent = fullName;
+        document.getElementById('userAvatar').textContent = fullName.charAt(0).toUpperCase();
+
+        // Email
+        const email = currentUser.email || 'user@fluxpay.com';
+        document.getElementById('displayEmail').textContent = email;
+        document.getElementById('fieldEmail').textContent = email;
+
+        // Phone
+        document.getElementById('fieldPhone').textContent = userProfile.phone || 'Not set';
+
+        // Joined date
+        const joined = userProfile.created_at ? new Date(userProfile.created_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Today';
+        document.getElementById('fieldJoined').textContent = joined;
+
+        // Upgrade status
+        const isUpgraded = userProfile.is_upgraded || false;
+        if (isUpgraded) {
+            document.getElementById('accountStatus').textContent = 'Upgraded';
+            document.getElementById('accountStatus').className = 'upgraded';
+            document.getElementById('fieldStatus').textContent = 'Upgraded';
+            document.getElementById('fieldStatus').style.color = 'var(--accent-green)';
+            document.getElementById('statusIcon').classList.add('upgraded');
+            document.getElementById('statusIcon').innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        }
+
+        // KYC status
+        const kycStatus = userProfile.kyc_status || 'unverified';
+        setKYCStatus(kycStatus);
+
+        // Bank details
+        if (userProfile.bank_name && userProfile.bank_account_name && userProfile.bank_account_number) {
+            document.getElementById('bankInfo').innerHTML =
+                '<div class="bank-row"><span class="bank-label">Bank</span><span class="bank-value">' + escapeHtml(userProfile.bank_name) + '</span></div>' +
+                '<div class="bank-row"><span class="bank-label">Account Name</span><span class="bank-value">' + escapeHtml(userProfile.bank_account_name) + '</span></div>' +
+                '<div class="bank-row"><span class="bank-label">Account Number</span><span class="bank-value">' + escapeHtml(userProfile.bank_account_number) + '</span></div>';
+            document.getElementById('addBankBtn').textContent = 'Edit';
+        }
+
+        // Referral stats
+        document.getElementById('refCount').textContent = (userProfile.total_referrals || 0).toLocaleString();
+        document.getElementById('refEarned').textContent = '₦' + (userProfile.referral_balance || 0).toLocaleString();
+        document.getElementById('refCode').textContent = userProfile.referral_code || '---';
+
+        // Activity stats
+        document.getElementById('totalEarned').textContent = '₦' + (userProfile.total_earned || 0).toLocaleString();
+        document.getElementById('totalWithdrawn').textContent = '₦' + (userProfile.total_withdrawn || 0).toLocaleString();
+        document.getElementById('daysActive').textContent = (userProfile.days_active || 1).toLocaleString();
+        document.getElementById('streakDays').textContent = (userProfile.streak_days || 0).toLocaleString();
+
+        // Settings
+        loadSettings(userProfile.settings || {});
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ========== KYC STATUS ==========
+    function setKYCStatus(status) {
+        var badge = document.getElementById('verifyBadge');
+        var kycEl = document.getElementById('kycStatus');
+        if (status === 'verified') {
+            kycEl.textContent = 'Verified'; kycEl.className = 'kyc-status verified';
+            badge.className = 'verification-badge verified';
+            badge.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Verified';
+            completeAllKYSSteps();
+        } else if (status === 'pending') {
+            kycEl.textContent = 'Pending'; kycEl.className = 'kyc-status pending';
+            badge.className = 'verification-badge pending';
+            badge.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pending';
+        }
+    }
+
+    function completeAllKYSSteps() {
+        var steps = document.querySelectorAll('.kyc-step');
+        for (var i = 0; i < steps.length; i++) { steps[i].classList.add('completed'); }
+        document.getElementById('step1Num').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        document.getElementById('step2Num').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        document.getElementById('step3Num').innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        document.getElementById('step1Icon').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        document.getElementById('step2Icon').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        document.getElementById('step3Icon').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+    }
+
+    // ========== EDIT FUNCTIONS ==========
+    async function editName() {
+        var current = document.getElementById('displayName').textContent;
+        var newName = prompt('Enter your name:', current);
+        if (newName && newName.trim()) {
+            var trimmed = newName.trim();
+            document.getElementById('displayName').textContent = trimmed;
+            document.getElementById('fieldName').textContent = trimmed;
+            document.getElementById('userAvatar').textContent = trimmed.charAt(0).toUpperCase();
+            var saved = await saveProfile({ full_name: trimmed });
+            if (saved) showToast('Name updated!');
+        }
+    }
+
+    async function editField(field) {
+        var fieldMap = { name: 'full_name', email: 'email', phone: 'phone' };
+        var displayMap = { name: 'displayName', email: 'displayEmail', phone: 'fieldPhone' };
+        var current = document.getElementById('field' + field.charAt(0).toUpperCase() + field.slice(1)).textContent;
+        var newValue = prompt('Enter your ' + field + ':', current);
+        if (newValue && newValue.trim()) {
+            var trimmed = newValue.trim();
+            document.getElementById('field' + field.charAt(0).toUpperCase() + field.slice(1)).textContent = trimmed;
+            if (displayMap[field]) document.getElementById(displayMap[field]).textContent = trimmed;
+            var saved = await saveProfile({ [fieldMap[field]]: trimmed });
+            if (saved) showToast('Updated!');
+        }
+    }
+
+    // ========== AVATAR UPLOAD ==========
+    async function uploadAvatar() {
+        var input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*';
+        input.onchange = async function(e) {
+            var file = e.target.files[0]; if (!file) return;
+
+            // Upload to Supabase Storage
+            var filePath = 'avatars/' + currentUser.id + '_' + Date.now() + '.' + file.name.split('.').pop();
+            var { data, error } = await supabase.storage.from('avatars').upload(filePath, file);
+            if (error) {
+                console.error('Avatar upload error:', error);
+                showToast('Upload failed', true);
+                return;
+            }
+
+            // Get public URL
+            var { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+
+            // Save to profile
+            var saved = await saveProfile({ avatar_url: publicUrl });
+            if (saved) {
+                document.getElementById('userAvatar').textContent = '';
+                document.getElementById('userAvatar').style.background = 'url(' + publicUrl + ') center/cover';
+                showToast('Avatar updated!');
+            }
+        };
+        input.click();
+    }
+
+    // ========== KYC FUNCTIONS ==========
+    function uploadID() {
+        var input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+        input.onchange = function(e) {
+            if (!e.target.files[0]) return;
+            showToast('ID uploaded! Complete step 2.');
+            markKYSStep(1);
+        };
+        input.click();
+    }
+
+    function uploadSelfie() {
+        var input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.setAttribute('capture', 'user');
+        input.onchange = function(e) {
+            if (!e.target.files[0]) return;
+            showToast('Selfie uploaded! Submit for review.');
+            markKYSStep(2);
+        };
+        input.click();
+    }
+
+    function markKYSStep(step) {
+        var numEl = document.getElementById('step' + step + 'Num');
+        var iconEl = document.getElementById('step' + step + 'Icon');
+        var stepEl = document.querySelectorAll('.kyc-step')[step - 1];
+        numEl.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        iconEl.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent-green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        stepEl.classList.add('completed');
+    }
+
+    async function verifyKYC() {
+        var step1 = document.querySelectorAll('.kyc-step')[0].classList.contains('completed');
+        var step2 = document.querySelectorAll('.kyc-step')[1].classList.contains('completed');
+        if (!step1 || !step2) { showToast('Complete steps 1 & 2 first!', true); return; }
+        markKYSStep(3);
+        var saved = await saveProfile({ kyc_status: 'pending' });
+        if (saved) {
+            document.getElementById('kycStatus').textContent = 'Pending';
+            document.getElementById('kycStatus').className = 'kyc-status pending';
+            document.getElementById('verifyBadge').className = 'verification-badge pending';
+            document.getElementById('verifyBadge').innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pending';
+            showToast('KYC submitted for review!');
+        }
+    }
+
+    // ========== BANK FUNCTIONS ==========
+    async function addBank() {
+        var bankName = prompt('Enter your bank name (e.g., First Bank):');
+        if (!bankName) return;
+        var accountName = prompt('Enter account name:');
+        if (!accountName) return;
+        var accountNumber = prompt('Enter account number:');
+        if (!accountNumber) return;
+
+        var saved = await saveProfile({
+            bank_name: bankName,
+            bank_account_name: accountName,
+            bank_account_number: accountNumber
+        });
+
+        if (saved) {
+            document.getElementById('bankInfo').innerHTML =
+                '<div class="bank-row"><span class="bank-label">Bank</span><span class="bank-value">' + escapeHtml(bankName) + '</span></div>' +
+                '<div class="bank-row"><span class="bank-label">Account Name</span><span class="bank-value">' + escapeHtml(accountName) + '</span></div>' +
+                '<div class="bank-row"><span class="bank-label">Account Number</span><span class="bank-value">' + escapeHtml(accountNumber) + '</span></div>';
+            document.getElementById('addBankBtn').textContent = 'Edit';
+            showToast('Bank details saved!');
+        }
+    }
+
+    // ========== SETTINGS ==========
+    function loadSettings(settings) {
+        if (settings.notifications === false) document.getElementById('notifToggle').classList.remove('active');
+        if (settings.dark_mode === false) document.getElementById('darkToggle').classList.remove('active');
+        if (settings.sound === false) document.getElementById('soundToggle').classList.remove('active');
+        if (settings.language) document.getElementById('langSelect').value = settings.language;
+        if (settings.currency) document.getElementById('currencySelect').value = settings.currency;
+    }
+
+    async function toggleSetting(toggle) {
+        toggle.classList.toggle('active');
+        var isActive = toggle.classList.contains('active');
+        var settings = userProfile.settings || {};
+        if (toggle.id === 'notifToggle') { settings.notifications = isActive; showToast(isActive ? 'Notifications on' : 'Notifications off'); }
+        else if (toggle.id === 'darkToggle') { settings.dark_mode = isActive; showToast(isActive ? 'Dark mode on' : 'Dark mode off'); }
+        else if (toggle.id === 'soundToggle') { settings.sound = isActive; showToast(isActive ? 'Sound on' : 'Sound off'); }
+        await saveProfile({ settings: settings });
+    }
+
+    async function changeLanguage() {
+        var settings = userProfile.settings || {};
+        settings.language = document.getElementById('langSelect').value;
+        await saveProfile({ settings: settings });
+        showToast('Language set!');
+    }
+
+    async function changeCurrency() {
+        var settings = userProfile.settings || {};
+        settings.currency = document.getElementById('currencySelect').value;
+        await saveProfile({ settings: settings });
+        showToast('Currency updated!');
+    }
+
+    // ========== SUPPORT ==========
+    function reportBug() {
+        var desc = prompt('Describe the bug you encountered:');
+        if (desc && desc.trim()) showToast('Bug reported! Our team will investigate.');
+    }
+
+    // ========== LOGOUT ==========
+    function openLogoutModal() { document.getElementById('logoutModal').classList.add('active'); }
+    function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('active'); }
+    async function confirmLogout() {
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
+    }
+
+    // ========== TOAST ==========
+    function showToast(message, isError) {
+        var toast = document.getElementById('toast');
+        document.getElementById('toastText').textContent = message;
+        var icon = toast.querySelector('.toast-icon');
+        icon.textContent = isError ? '!' : '✓';
+        icon.style.color = isError ? '#ef4444' : '#00d4aa';
+        icon.style.background = isError ? 'rgba(239,68,68,0.15)' : 'rgba(0,212,170,0.15)';
+        toast.classList.add('show');
+        setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+
+    // ========== FLOATING PARTICLES ==========
+    (function() {
+        var canvas = document.getElementById('bg-particles');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var particles = [], w, h;
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function Particle() { this.reset(); }
+        Particle.prototype.reset = function() {
+            this.x = Math.random() * w; this.y = Math.random() * h;
+            this.size = Math.random() * 3 + 1.5; this.speedY = -(Math.random() * 0.35 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.18; this.opacity = Math.random() * 0.4 + 0.2;
+            this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+        };
+        Particle.prototype.update = function() {
+            this.y += this.speedY; this.x += this.speedX; this.life--;
+            if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+            if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+        };
+        Particle.prototype.draw = function() {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+            ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+        };
+        var count = window.innerWidth < 768 ? 25 : 40;
+        for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+        function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+        animate();
+    })();
+
+    // ========== INITIALIZE ==========
+    async function init() {
+        await checkAuth();
+        console.log('👤 Flux Pay Profile — Supabase Connected');
+    }
+
+    init();
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

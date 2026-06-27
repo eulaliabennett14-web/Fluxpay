@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Terms of Service - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --bg-card: #1a2332; --bg-card-hover: #1e293b;
+            --accent-green: #00d4aa; --accent-green-dark: #00a884; --accent-gold: #f59e0b;
+            --accent-gold-light: #fbbf24; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+            --accent-red: #ef4444; --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-bg: rgba(10, 40, 32, 0.7);
+            --glass-border: rgba(0, 212, 170, 0.1); --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(6,13,26,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .main-content { position: relative; z-index: 1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+
+        /* Hero */
+        .terms-hero { text-align: center; padding: 30px 20px 20px; }
+        .terms-hero i { font-size: 48px; color: var(--accent-gold); margin-bottom: 16px; }
+        .terms-hero h2 { font-family: 'Amaranth', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+        .terms-hero p { font-size: 13px; color: var(--text-secondary); }
+        .terms-date { display: inline-block; margin-top: 12px; padding: 6px 16px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.15); border-radius: 20px; font-size: 12px; color: var(--accent-gold); font-weight: 600; }
+
+        /* Section Cards */
+        .terms-section { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .terms-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); opacity: 0.4; }
+        .terms-section h3 { font-family: 'Amaranth', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 14px; color: var(--accent-gold); display: flex; align-items: center; gap: 10px; }
+        .terms-section h3 i { font-size: 16px; }
+        .terms-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+        .terms-section p:last-child { margin-bottom: 0; }
+        .terms-section strong { color: var(--text-primary); font-weight: 600; }
+        .terms-list { list-style: none; padding: 0; }
+        .terms-list li { font-size: 13px; color: var(--text-secondary); line-height: 1.8; padding: 8px 0; padding-left: 28px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .terms-list li:last-child { border-bottom: none; }
+        .terms-list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent-gold); font-weight: 700; }
+        .terms-highlight { background: rgba(245,158,11,0.05); border-left: 3px solid var(--accent-gold); padding: 14px 16px; border-radius: 0 12px 12px 0; margin: 14px 0; }
+        .terms-highlight p { margin-bottom: 0; font-size: 12px; }
+        .terms-highlight strong { color: var(--accent-gold); }
+        .terms-warning { background: rgba(239,68,68,0.05); border-left: 3px solid var(--accent-red); padding: 14px 16px; border-radius: 0 12px 12px 0; margin: 14px 0; }
+        .terms-warning p { margin-bottom: 0; font-size: 12px; color: var(--text-secondary); }
+        .terms-warning strong { color: var(--accent-red); }
+        .terms-green { background: rgba(0,212,170,0.05); border-left: 3px solid var(--accent-green); padding: 14px 16px; border-radius: 0 12px 12px 0; margin: 14px 0; }
+        .terms-green p { margin-bottom: 0; font-size: 12px; }
+        .terms-green strong { color: var(--accent-green); }
+
+        /* Numbered sections */
+        .section-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #fff; font-family: 'Amaranth', sans-serif; font-size: 14px; font-weight: 700; margin-right: 8px; }
+
+        /* Accept Button */
+        .accept-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-top: 20px; text-align: center; }
+        .accept-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
+        .accept-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; border: none; border-radius: 14px; font-family: 'Amaranth', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 20px rgba(0,212,170,0.3); }
+        .accept-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,212,170,0.4); }
+        .accept-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .accept-check { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; cursor: pointer; }
+        .accept-check input { width: 18px; height: 18px; accent-color: var(--accent-green); cursor: pointer; }
+        .accept-check label { font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+
+        /* Footer */
+        .terms-footer { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 12px; }
+        .terms-footer a { color: var(--accent-gold); text-decoration: none; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(0,212,170,0.2); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <canvas id="bg-particles"></canvas>
+    <div class="toast" id="toast"><span id="toastText">Message</span></div>
+
+    <header class="header">
+        <a href="profile.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <h1>📄 Terms of Service</h1>
+    </header>
+
+    <div class="main-content">
+        <!-- Hero -->
+        <div class="terms-hero">
+            <i class="fas fa-file-contract"></i>
+            <h2>Terms of Service</h2>
+            <p>Please read these terms carefully before using Flux Pay.</p>
+            <div class="terms-date">Last Updated: 23 June 2026</div>
+        </div>
+
+        <!-- Section 1: Introduction -->
+        <div class="terms-section">
+            <h3><span class="section-num">1</span> Introduction</h3>
+            <p>Welcome to <strong>Flux Pay</strong> ("we," "our," or "us"). These Terms of Service ("Terms") govern your access to and use of the Flux Pay platform, website, mobile applications, and services (collectively, the "Services").</p>
+            <p>By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use the Services.</p>
+            <div class="terms-highlight">
+                <p><strong>Important:</strong> Flux Pay is a Nigerian fintech platform designed to help users earn money through various income streams including FluxCore daily claims, referrals, and VIP investment products.</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Eligibility -->
+        <div class="terms-section">
+            <h3><span class="section-num">2</span> Eligibility</h3>
+            <p>To use Flux Pay, you must:</p>
+            <ul class="terms-list">
+                <li>Be at least <strong>18 years of age</strong> or older</li>
+                <li>Be a resident of <strong>Nigeria</strong></li>
+                <li>Have a valid <strong>Bank Verification Number (BVN)</strong> or National ID</li>
+                <li>Have a valid <strong>Nigerian bank account</strong></li>
+                <li>Have a valid <strong>email address</strong> and <strong>phone number</strong></li>
+                <li>Not have been previously banned or suspended from Flux Pay</li>
+            </ul>
+            <div class="terms-warning">
+                <p><strong>Notice:</strong> By registering, you confirm that all information provided is accurate and truthful. Providing false information may result in immediate account termination.</p>
+            </div>
+        </div>
+
+        <!-- Section 3: Account Registration -->
+        <div class="terms-section">
+            <h3><span class="section-num">3</span> Account Registration</h3>
+            <p>When you create an account on Flux Pay, you agree to:</p>
+            <ul class="terms-list">
+                <li>Provide accurate, current, and complete information</li>
+                <li>Maintain and update your information as needed</li>
+                <li>Keep your password secure and confidential</li>
+                <li>Be responsible for all activity under your account</li>
+                <li>Notify us immediately of any unauthorized access</li>
+            </ul>
+            <div class="terms-warning">
+                <p><strong>One Account Rule:</strong> Each user is permitted to maintain <strong>only one account</strong>. Creating multiple accounts will result in permanent ban and forfeiture of all earnings.</p>
+            </div>
+        </div>
+
+        <!-- Section 4: Earnings & Income -->
+        <div class="terms-section">
+            <h3><span class="section-num">4</span> Earnings & Income</h3>
+            <p>Flux Pay offers multiple earning opportunities:</p>
+            <ul class="terms-list">
+                <li><strong>Welcome Bonus:</strong> ₦25,000 upon successful registration (one-time)</li>
+                <li><strong>FluxCore:</strong> ₦3,000 daily (standard) or ₦10,000 daily (lifetime)</li>
+                <li><strong>Referrals:</strong> ₦7,800 per referral (standard) or ₦20,000 (lifetime)</li>
+                <li><strong>VIP Investments:</strong> Returns from 50% to 80% based on plan</li>
+                <li><strong>Tasks:</strong> Complete social tasks for additional rewards</li>
+            </ul>
+            <div class="terms-green">
+                <p><strong>Note:</strong> All earnings are calculated in <strong>Nigerian Naira (₦)</strong>. Earnings are subject to verification and may be adjusted if fraudulent activity is detected.</p>
+            </div>
+        </div>
+
+        <!-- Section 5: Withdrawals -->
+        <div class="terms-section">
+            <h3><span class="section-num">5</span> Withdrawals</h3>
+            <p>To withdraw earnings from Flux Pay:</p>
+            <ul class="terms-list">
+                <li>Minimum withdrawal amount is <strong>₦100,000</strong></li>
+                <li>You must have an <strong>upgraded account</strong> (Premium or Lifetime)</li>
+                <li>Valid bank account details must be provided</li>
+                <li>Withdrawals are processed within <strong>24-48 hours</strong></li>
+                <li>Withdrawal fees may apply based on your plan</li>
+            </ul>
+            <div class="terms-highlight">
+                <p><strong>Premium Plan (₦6,350):</strong> Unlocks withdrawals for one month.<br><strong>Lifetime Plan (₦20,000):</strong> Unlocks fee-free withdrawals forever.</p>
+            </div>
+        </div>
+
+        <!-- Section 6: Investment Products -->
+        <div class="terms-section">
+            <h3><span class="section-num">6</span> Investment Products (VIP Plans)</h3>
+            <p>Flux Pay offers 7 VIP investment tiers:</p>
+            <ul class="terms-list">
+                <li>VIP 1: ₦5,000 → ₦7,750 (55% return)</li>
+                <li>VIP 2: ₦10,000 → ₦15,800 (58% return)</li>
+                <li>VIP 3: ₦25,000 → ₦40,000 (60% return)</li>
+                <li>VIP 4: ₦50,000 → ₦82,500 (65% return)</li>
+                <li>VIP 5: ₦100,000 → ₦170,000 (70% return)</li>
+                <li>VIP 6: ₦150,000 → ₦262,500 (75% return)</li>
+                <li>VIP 7: ₦250,000 → ₦450,000 (80% return)</li>
+            </ul>
+            <div class="terms-warning">
+                <p><strong>Risk Disclaimer:</strong> All investments carry risk. Past performance does not guarantee future results. Only invest what you can afford to lose. Flux Pay is not a bank and investments are not insured.</p>
+            </div>
+        </div>
+
+        <!-- Section 7: Prohibited Activities -->
+        <div class="terms-section">
+            <h3><span class="section-num">7</span> Prohibited Activities</h3>
+            <p>You agree NOT to:</p>
+            <ul class="terms-list">
+                <li>Create <strong>multiple accounts</strong> or use fake identities</li>
+                <li>Use <strong>bots, scripts, or automated tools</strong></li>
+                <li>Engage in <strong>fraudulent referrals</strong> or fake signups</li>
+                <li>Attempt to <strong>hack, disrupt, or damage</strong> the platform</li>
+                <li>Share your account credentials with others</li>
+                <li>Use Flux Pay for <strong>illegal activities</strong> including money laundering</li>
+                <li>Upload false or misleading information</li>
+                <li>Chargeback or reverse legitimate payments</li>
+            </ul>
+            <div class="terms-warning">
+                <p><strong>Violation of these rules will result in immediate account termination, forfeiture of all earnings, and potential legal action.</strong></p>
+            </div>
+        </div>
+
+        <!-- Section 8: Account Suspension -->
+        <div class="terms-section">
+            <h3><span class="section-num">8</span> Account Suspension & Termination</h3>
+            <p>Flux Pay reserves the right to suspend or terminate your account for:</p>
+            <ul class="terms-list">
+                <li>Violation of these Terms of Service</li>
+                <li>Fraudulent or suspicious activity</li>
+                <li>Multiple account creation</li>
+                <li>Chargebacks or payment disputes</li>
+                <li>Abuse of the referral system</li>
+                <li>Failure to complete KYC verification</li>
+            </ul>
+            <p>Upon termination, you will lose access to your account and all associated earnings. We are not liable for any losses resulting from account termination.</p>
+        </div>
+
+        <!-- Section 9: Privacy -->
+        <div class="terms-section">
+            <h3><span class="section-num">9</span> Privacy & Data Protection</h3>
+            <p>Your privacy is important to us. By using Flux Pay, you agree to our <a href="privacy.html" style="color:var(--accent-gold)">Privacy Policy</a>, which explains how we collect, use, and protect your personal information.</p>
+            <p>We use industry-standard encryption to protect your data. We never sell your personal information to third parties.</p>
+        </div>
+
+        <!-- Section 10: Limitation of Liability -->
+        <div class="terms-section">
+            <h3><span class="section-num">10</span> Limitation of Liability</h3>
+            <p>Flux Pay is provided "as is" without warranties of any kind. We are not liable for:</p>
+            <ul class="terms-list">
+                <li>Loss of earnings or profits</li>
+                <li>Technical failures or downtime</li>
+                <li>Third-party service interruptions</li>
+                <li>Investment losses on VIP plans</li>
+                <li>Unauthorized access to your account due to your negligence</li>
+            </ul>
+            <div class="terms-highlight">
+                <p><strong>Maximum Liability:</strong> Our total liability to you shall not exceed the amount you have paid to Flux Pay in the preceding 12 months.</p>
+            </div>
+        </div>
+
+        <!-- Section 11: Changes -->
+        <div class="terms-section">
+            <h3><span class="section-num">11</span> Changes to Terms</h3>
+            <p>We may update these Terms from time to time. We will notify you of significant changes via email or in-app notification. Continued use of the Services after changes constitutes acceptance of the new Terms.</p>
+            <p>It is your responsibility to review these Terms periodically.</p>
+        </div>
+
+        <!-- Section 12: Contact -->
+        <div class="terms-section">
+            <h3><span class="section-num">12</span> Contact Us</h3>
+            <p>If you have any questions about these Terms, please contact us:</p>
+            <ul class="terms-list">
+                <li><strong>Email:</strong> support@fluxpay.com</li>
+                <li><strong>Live Chat:</strong> Available 24/7 in the app</li>
+                <li><strong>WhatsApp:</strong> <a href="https://whatsapp.com/channel/0029VbChXCg5a23zm42vXs0R" target="_blank" style="color:var(--accent-gold)">Join Channel</a></li>
+                <li><strong>Address:</strong> Lagos, Nigeria</li>
+            </ul>
+        </div>
+
+        <!-- Accept -->
+        <div class="accept-card">
+            <p>By clicking "I Agree," you confirm that you have read, understood, and agree to be bound by these Terms of Service.</p>
+            <div class="accept-check">
+                <input type="checkbox" id="acceptCheck" onchange="toggleAccept()">
+                <label for="acceptCheck">I have read and agree to the Terms of Service</label>
+            </div>
+            <button class="accept-btn" id="acceptBtn" onclick="acceptTerms()" disabled>I Agree</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="terms-footer">
+            <p>© 2026 Flux Pay Nigeria. All rights reserved.</p>
+            <p><a href="privacy.html">Privacy Policy</a> · <a href="about.html">About Us</a></p>
+        </div>
+    </div>
+
+    <script>
+        // ========== FLOATING PARTICLES ==========
+        (function() {
+            var canvas = document.getElementById('bg-particles');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var particles = [], w, h;
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            resize(); window.addEventListener('resize', resize);
+            function Particle() { this.reset(); }
+            Particle.prototype.reset = function() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.size = Math.random() * 3 + 1.5; this.speedY = -(Math.random() * 0.35 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.18; this.opacity = Math.random() * 0.4 + 0.2;
+                this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+            };
+            Particle.prototype.update = function() {
+                this.y += this.speedY; this.x += this.speedX; this.life--;
+                if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+                if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+            };
+            Particle.prototype.draw = function() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+                ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+            };
+            var count = window.innerWidth < 768 ? 25 : 40;
+            for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+            function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+            animate();
+        })();
+
+        function toggleAccept() {
+            var checked = document.getElementById('acceptCheck').checked;
+            document.getElementById('acceptBtn').disabled = !checked;
+        }
+
+        function acceptTerms() {
+            localStorage.setItem('fluxpay_terms_accepted', 'true');
+            localStorage.setItem('fluxpay_terms_date', new Date().toISOString());
+            showToast('Terms accepted! Welcome to Flux Pay.');
+            setTimeout(function() { window.location.href = 'dashboard.html'; }, 1500);
+        }
+
+        function showToast(message) {
+            var toast = document.getElementById('toast');
+            document.getElementById('toastText').textContent = message;
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+
+        console.log('📄 Flux Pay Terms of Service — Ready');
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

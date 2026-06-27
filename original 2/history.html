@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Transaction History - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --accent-green: #00d4aa;
+            --accent-green-dark: #00a884; --accent-orange: #ff8c00; --accent-gold: #ffd700;
+            --accent-red: #ff4757; --text-white: #ffffff; --text-muted: rgba(255,255,255,0.55);
+            --text-dim: rgba(255,255,255,0.35); --border-subtle: rgba(255,255,255,0.04);
+            --border-light: rgba(255,255,255,0.07); --border-medium: rgba(255,255,255,0.12);
+            --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary); color: var(--text-white);
+            overflow-x: hidden; min-height: 100vh; padding-top: 70px; padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(255,140,0,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.5;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+            background: rgba(6,13,26,0.88); backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .back-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-white); text-decoration: none; transition: var(--transition-smooth);
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--border-medium); }
+        .back-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .page-header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+        .clear-btn {
+            background: rgba(255,71,87,0.08); border: 1px solid rgba(255,71,87,0.2);
+            color: var(--accent-red); font-size: 12px; font-weight: 600;
+            cursor: pointer; font-family: 'Inter', sans-serif; padding: 8px 14px; border-radius: 8px;
+            transition: var(--transition-smooth);
+        }
+        .clear-btn:hover { background: rgba(255,71,87,0.15); }
+
+        /* ===== MAIN ===== */
+        .main-content { padding: 16px 16px 0; max-width: 520px; margin: 0 auto; position: relative; z-index: 1; }
+
+        /* ===== SUMMARY BAR ===== */
+        .summary-bar {
+            display: flex; gap: 10px; margin-bottom: 16px;
+        }
+        .summary-item {
+            flex: 1; background: rgba(255,255,255,0.025); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px; padding: 14px; text-align: center;
+        }
+        .summary-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 4px; }
+        .summary-value { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+        .summary-value.green { color: var(--accent-green); }
+        .summary-value.red { color: var(--accent-red); }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center; padding: 60px 20px; display: none;
+        }
+        .empty-state.active { display: block; }
+        .empty-icon {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+        }
+        .empty-icon svg { width: 32px; height: 32px; fill: none; stroke: var(--text-dim); stroke-width: 1.5; }
+        .empty-title { font-size: 17px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+        .empty-text { font-size: 13px; color: var(--text-dim); }
+
+        /* ===== HISTORY LIST ===== */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .history-card {
+            background: rgba(255,255,255,0.025); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px; padding: 16px; display: flex; align-items: center;
+            gap: 14px; transition: var(--transition-smooth);
+            animation: rowIn 0.4s cubic-bezier(0.4,0,0.2,1) both;
+        }
+        .history-card:nth-child(1) { animation-delay: 0.05s; }
+        .history-card:nth-child(2) { animation-delay: 0.1s; }
+        .history-card:nth-child(3) { animation-delay: 0.15s; }
+        .history-card:nth-child(4) { animation-delay: 0.2s; }
+        .history-card:nth-child(5) { animation-delay: 0.25s; }
+        .history-card:nth-child(6) { animation-delay: 0.3s; }
+        @keyframes rowIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .history-card:hover { background: rgba(255,255,255,0.04); border-color: var(--border-medium); }
+
+        .history-icon {
+            width: 44px; height: 44px; border-radius: 13px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .history-icon svg { width: 20px; height: 20px; fill: none; stroke-width: 2; }
+        .history-icon.credit { background: rgba(0,212,170,0.1); }
+        .history-icon.credit svg { stroke: var(--accent-green); }
+        .history-icon.debit { background: rgba(255,71,87,0.1); }
+        .history-icon.debit svg { stroke: var(--accent-red); }
+        .history-icon.gift { background: rgba(255,215,0,0.1); }
+        .history-icon.gift svg { stroke: var(--accent-gold); }
+        .history-icon.flux { background: rgba(0,212,170,0.1); }
+        .history-icon.flux svg { stroke: var(--accent-green); }
+
+        .history-info { flex: 1; min-width: 0; }
+        .history-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-date { font-size: 11px; color: var(--text-dim); }
+
+        .history-amount { text-align: right; flex-shrink: 0; }
+        .history-amount-value { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+        .history-amount-value.credit { color: var(--accent-green); }
+        .history-amount-value.debit { color: var(--accent-red); }
+        .history-status { font-size: 11px; font-weight: 600; }
+        .history-status.approved { color: var(--accent-green); }
+        .history-status.pending { color: var(--accent-gold); }
+        .history-status.failed { color: var(--accent-red); }
+
+        /* ===== CUSTOM CONFIRMATION MODAL ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+            padding: 20px;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-dialog {
+            width: 100%; max-width: 360px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(6,13,26,0.96) 100%);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            padding: 32px 24px; text-align: center;
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.visible .modal-dialog { transform: translateY(0) scale(1); }
+        .modal-icon-wrap {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: rgba(255,71,87,0.1); border: 2px solid rgba(255,71,87,0.2);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px;
+        }
+        .modal-icon-wrap svg { width: 28px; height: 28px; fill: none; stroke: var(--accent-red); stroke-width: 2; }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-white); }
+        .modal-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-btn {
+            flex: 1; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 14px;
+            cursor: pointer; transition: var(--transition-smooth); font-family: 'Inter', sans-serif; border: none;
+        }
+        .modal-btn.cancel {
+            background: rgba(255,255,255,0.06); color: var(--text-white);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .modal-btn.cancel:hover { background: rgba(255,255,255,0.12); }
+        .modal-btn.danger {
+            background: var(--accent-red); color: #fff;
+            box-shadow: 0 4px 15px rgba(255,71,87,0.3);
+        }
+        .modal-btn.danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,71,87,0.4); }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(15,22,42,0.96); border: 1px solid var(--border-medium);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-radius: 14px; padding: 14px 28px; font-size: 13px; font-weight: 500;
+            color: var(--text-white); z-index: 3000; opacity: 0; visibility: hidden;
+            transition: all 0.35s ease; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        }
+        .toast.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: rgba(0,212,170,0.4); }
+        .toast.error { border-color: rgba(255,71,87,0.4); color: var(--accent-red); }
+
+        /* Auth check overlay */
+        .auth-check-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-primary); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .auth-check-overlay.hidden { display: none; }
+        .auth-check-spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(0,212,170,0.15);
+            border-top-color: var(--accent-green); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        .auth-check-text { font-size: 14px; color: var(--text-muted); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 380px) {
+            .summary-item { padding: 12px 8px; }
+            .summary-value { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Check Overlay -->
+    <div class="auth-check-overlay" id="authCheckOverlay">
+        <div class="auth-check-spinner"></div>
+        <div class="auth-check-text">Checking your account...</div>
+    </div>
+
+    <canvas id="bg-particles"></canvas>
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== CUSTOM CONFIRMATION MODAL ===== -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-dialog">
+            <div class="modal-icon-wrap">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="modal-title">Clear All History?</div>
+            <div class="modal-text">This will permanently delete all your transaction records. This action cannot be undone.</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeConfirmModal()">Cancel</button>
+                <button class="modal-btn danger" onclick="confirmClearHistory()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="page-header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn">
+                <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </a>
+            <h1>History</h1>
+        </div>
+        <button class="clear-btn" id="clearBtn" onclick="openConfirmModal()" style="display:none;">Clear All</button>
+    </header>
+
+    <div class="main-content">
+        <!-- SUMMARY BAR -->
+        <div class="summary-bar" id="summaryBar" style="display:none;">
+            <div class="summary-item">
+                <div class="summary-label">Credits</div>
+                <div class="summary-value green" id="totalCredits">₦0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Debits</div>
+                <div class="summary-value red" id="totalDebits">₦0</div>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="empty-title">No transactions yet</div>
+            <div class="empty-text">Your transaction history will appear here</div>
+        </div>
+
+        <!-- HISTORY LIST -->
+        <div class="history-list" id="historyList"></div>
+    </div>
+    <script>
+    // ========== SUPABASE CONFIG ==========
+    const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase connected');
+    } catch (e) {
+        console.error('❌ Supabase connection failed:', e);
+    }
+
+    // ========== GLOBAL STATE ==========
+    let currentUser = null;
+    let transactions = [];
+
+    // ========== DOM ELEMENTS ==========
+    const authCheckOverlay = document.getElementById('authCheckOverlay');
+
+    // ========== AUTH CHECK ==========
+    async function checkAuth() {
+        if (!supabase) {
+            showToast('Connection error. Please refresh.', 'error');
+            return;
+        }
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+            console.log('Logged in as:', currentUser.email);
+            await loadTransactions();
+            authCheckOverlay.classList.add('hidden');
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'login.html';
+        }
+    }
+
+    // ========== LOAD TRANSACTIONS FROM SUPABASE ==========
+    async function loadTransactions() {
+        try {
+            const { data, error } = await supabase
+                .from('transactions')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Transactions fetch error:', error);
+                showToast('Error loading history', 'error');
+                return;
+            }
+
+            transactions = data || [];
+            renderHistory();
+
+        } catch (e) {
+            console.error('Load transactions error:', e);
+        }
+    }
+
+    // ========== FLOATING PARTICLES ==========
+    (function() {
+        var canvas = document.getElementById('bg-particles');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var w, h;
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function Particle() { this.reset(); }
+        Particle.prototype.reset = function() {
+            this.x = Math.random() * w; this.y = Math.random() * h;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedY = -(Math.random() * 0.3 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.15;
+            this.opacity = Math.random() * 0.3 + 0.05;
+            this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0';
+            this.life = Math.random() * 300 + 200;
+        };
+        Particle.prototype.update = function() {
+            this.y += this.speedY; this.x += this.speedX; this.life--;
+            if (this.y < -10 || this.life <= 0) { this.y = h + 10; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+            if (this.x < -10) this.x = w + 10; if (this.x > w + 10) this.x = -10;
+        };
+        Particle.prototype.draw = function() {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')'; ctx.fill();
+        };
+        var count = window.innerWidth < 768 ? 30 : 50;
+        for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+        function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+        animate();
+    })();
+
+    // ========== FORMAT NUMBER ==========
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // ========== TOAST ==========
+    function showToast(message, type) {
+        var toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.className = 'toast';
+        if (type === 'success') toast.classList.add('success');
+        if (type === 'error') toast.classList.add('error');
+        toast.classList.add('visible');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(function() { toast.classList.remove('visible', 'success', 'error'); }, 2500);
+    }
+
+    // ========== CUSTOM CONFIRMATION MODAL ==========
+    function openConfirmModal() {
+        document.getElementById('confirmModal').classList.add('visible');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('visible');
+    }
+
+    async function confirmClearHistory() {
+        closeConfirmModal();
+        if (!currentUser) return;
+
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .delete()
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                console.error('Clear history error:', error);
+                showToast('Error clearing history', 'error');
+                return;
+            }
+
+            transactions = [];
+            renderHistory();
+            showToast('History cleared', 'success');
+        } catch (e) {
+            console.error('Clear history error:', e);
+            showToast('Error clearing history', 'error');
+        }
+    }
+
+    // ========== RENDER HISTORY ==========
+    function renderHistory() {
+        var list = document.getElementById('historyList');
+        var empty = document.getElementById('emptyState');
+        var clearBtn = document.getElementById('clearBtn');
+        var summaryBar = document.getElementById('summaryBar');
+
+        if (transactions.length === 0) {
+            list.innerHTML = '';
+            empty.classList.add('active');
+            clearBtn.style.display = 'none';
+            summaryBar.style.display = 'none';
+            return;
+        }
+
+        empty.classList.remove('active');
+        clearBtn.style.display = 'block';
+        summaryBar.style.display = 'flex';
+
+        // Calculate totals
+        var totalCredits = 0, totalDebits = 0;
+        for (var i = 0; i < transactions.length; i++) {
+            var t = transactions[i];
+            if (t.type === 'deposit' || t.type === 'bonus' || t.type === 'claim' || t.type === 'referral') {
+                totalCredits += parseInt(t.amount);
+            } else if (t.type === 'withdrawal') {
+                totalDebits += parseInt(t.amount);
+            }
+        }
+        document.getElementById('totalCredits').textContent = '₦' + formatNumber(totalCredits);
+        document.getElementById('totalDebits').textContent = '₦' + formatNumber(totalDebits);
+
+        var html = '';
+        for (var i = 0; i < transactions.length; i++) {
+            var item = transactions[i];
+            var isCredit = item.type === 'deposit' || item.type === 'bonus' || item.type === 'claim' || item.type === 'referral';
+            var amountSign = isCredit ? '+' : '-';
+            var amountClass = isCredit ? 'credit' : 'debit';
+            var statusClass = item.status === 'completed' ? 'approved' : (item.status === 'pending' ? 'pending' : 'failed');
+
+            var iconClass = isCredit ? 'credit' : 'debit';
+            var title = item.description || item.type;
+            if (item.type === 'bonus') { iconClass = 'gift'; title = 'Welcome Bonus'; }
+            if (item.type === 'claim') { iconClass = 'flux'; title = 'FluxCore Claim'; }
+
+            var iconSvg = '';
+            if (item.type === 'bonus') {
+                iconSvg = '<svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>';
+            } else if (item.type === 'claim') {
+                iconSvg = '<svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>';
+            } else if (item.type === 'withdrawal') {
+                iconSvg = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>';
+            } else {
+                iconSvg = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 5 19 12"/></svg>';
+            }
+
+            var dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ', ' +
+                new Date(item.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '--';
+
+            html += '<div class="history-card">';
+            html += '<div class="history-icon ' + iconClass + '">' + iconSvg + '</div>';
+            html += '<div class="history-info">';
+            html += '<div class="history-title">' + title + '</div>';
+            html += '<div class="history-date">' + dateStr + '</div>';
+            html += '</div>';
+            html += '<div class="history-amount">';
+            html += '<div class="history-amount-value ' + amountClass + '">' + amountSign + '₦' + formatNumber(item.amount) + '</div>';
+            html += '<div class="history-status ' + statusClass + '">' + (item.status === 'completed' ? 'Approved' : (item.status === 'pending' ? 'Pending Review' : 'Failed')) + '</div>';
+            html += '</div>';
+            html += '</div>';
+        }
+        list.innerHTML = html;
+    }
+
+    // ========== INITIALIZE ==========
+    async function init() {
+        await checkAuth();
+        console.log('📜 Flux Pay History — Supabase Connected');
+    }
+
+    init();
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

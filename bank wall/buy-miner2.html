@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Buy Miner - Bank Wallet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Amaranth', sans-serif;
+            background: #0a0a0a;
+            color: white;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #22c55e;
+            margin-right: 16px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover { background: rgba(34, 197, 94, 0.1); }
+        .back-btn svg { width: 20px; height: 20px; }
+
+        .header-title { font-size: 20px; font-weight: 900; color: white; }
+
+        /* CURRENT MINER STATUS */
+        .current-miner {
+            margin: 20px 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .current-miner-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .current-miner-name {
+            font-size: 24px;
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 4px;
+        }
+
+        .current-miner-reward {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* PLAN CARDS */
+        .plans-container {
+            padding: 0 16px 20px;
+        }
+
+        .plan-card {
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .plan-name {
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .plan-icon {
+            font-size: 32px;
+        }
+
+        .plan-price {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .plan-earn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .plan-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .check-icon {
+            color: #22c55e;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .plan-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 900;
+            font-family: 'Amaranth', sans-serif;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .plan-btn:active {
+            transform: scale(0.98);
+        }
+
+        .plan-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* BASIC PLAN - Green */
+        .basic-plan {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+        .basic-plan .plan-btn {
+            background: #000000;
+            color: white;
+        }
+
+        /* SILVER PLAN - Gray/Silver */
+        .silver-plan {
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+        }
+        .silver-plan .plan-btn {
+            background: #ffffff;
+            color: #334155;
+        }
+
+        /* GOLD PLAN - Gold */
+        .gold-plan {
+            background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+        }
+        .gold-plan .plan-btn {
+            background: #000000;
+            color: white;
+        }
+
+        /* DIAMOND PLAN - Purple */
+        .diamond-plan {
+            background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+        }
+        .diamond-plan .plan-btn {
+            background: #ffffff;
+            color: #4c1d95;
+        }
+
+        /* SELECTED PLAN */
+        .plan-card.selected {
+            border: 2px solid #22c55e;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .selected-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #22c55e;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(34, 197, 94, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 20px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-item.active .nav-icon { color: #22c55e; }
+        .nav-item.active .nav-label { color: #22c55e; }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #22c55e;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* PAYMENT MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: #1a1a1a;
+            border-radius: 24px 24px 0 0;
+            padding: 28px 24px;
+            width: 100%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .bank-details {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .bank-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .bank-row:last-child { border-bottom: none; }
+
+        .bank-label { font-size: 13px; color: rgba(255, 255, 255, 0.5); }
+        .bank-value { font-size: 15px; font-weight: 700; color: white; }
+
+        .copy-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #22c55e;
+            margin-left: 8px;
+        }
+
+        .upload-section {
+            margin-bottom: 20px;
+        }
+
+        .upload-label {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .upload-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .upload-input::-webkit-file-upload-button {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #22c55e;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 18px;
+            background: #22c55e;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            font-family: 'Amaranth', sans-serif;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .modal-btn:hover { transform: translateY(-2px); }
+
+        .modal-close {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Amaranth', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="back-btn" onclick="goBack()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+        </div>
+        <div class="header-title">Upgrade Miner</div>
+    </div>
+
+    <!-- CURRENT MINER -->
+    <div class="current-miner">
+        <div class="current-miner-label">Current Miner</div>
+        <div class="current-miner-name" id="currentMinerName">Free Miner</div>
+        <div class="current-miner-reward" id="currentMinerReward">₦86,000 per mining</div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="plans-container">
+        <!-- Basic Plan -->
+        <div class="plan-card basic-plan" id="basicPlan">
+            <div class="plan-header">
+                <div class="plan-name">Basic Plan</div>
+                <div class="plan-icon">🍃</div>
+            </div>
+            <div class="plan-price">₦7,000</div>
+            <div class="plan-earn">💰 Earn up to ₦172,000 per mining</div>
+            <ul class="plan-features">
+                <li><span class="check-icon">✓</span> 2x mining speed</li>
+                <li><span class="check-icon">✓</span> ₦172,000 fixed reward</li>
+                <li><span class="check-icon">✓</span> 24h cooldown after withdrawal</li>
+            </ul>
+            <button class="plan-btn" onclick="selectPlan('Basic Miner', 7000, 172000)">Upgrade to Basic</button>
+        </div>
+
+        <!-- Silver Plan -->
+        <div class="plan-card silver-plan" id="silverPlan">
+            <div class="plan-header">
+                <div class="plan-name">Silver Plan</div>
+                <div class="plan-icon">💎</div>
+            </div>
+            <div class="plan-price">₦15,000</div>
+            <div class="plan-earn">💰 Earn up to ₦380,000 per mining</div>
+            <ul class="plan-features">
+                <li><span class="check-icon">✓</span> 3x mining speed</li>
+                <li><span class="check-icon">✓</span> ₦380,000 fixed reward</li>
+                <li><span class="check-icon">✓</span> Priority withdrawals</li>
+            </ul>
+            <button class="plan-btn" onclick="selectPlan('Silver Miner', 15000, 380000)">Upgrade to Silver</button>
+        </div>
+
+        <!-- Gold Plan -->
+        <div class="plan-card gold-plan" id="goldPlan">
+            <div class="plan-header">
+                <div class="plan-name">Gold Plan</div>
+                <div class="plan-icon">👑</div>
+            </div>
+            <div class="plan-price">₦25,000</div>
+            <div class="plan-earn">💰 Earn up to ₦640,000 per mining</div>
+            <ul class="plan-features">
+                <li><span class="check-icon">✓</span> 5x mining speed</li>
+                <li><span class="check-icon">✓</span> ₦640,000 fixed reward</li>
+                <li><span class="check-icon">✓</span> Instant withdrawals</li>
+            </ul>
+            <button class="plan-btn" onclick="selectPlan('Gold Miner', 25000, 640000)">Upgrade to Gold</button>
+        </div>
+
+        <!-- Diamond Plan -->
+        <div class="plan-card diamond-plan" id="diamondPlan">
+            <div class="plan-header">
+                <div class="plan-name">Diamond Plan</div>
+                <div class="plan-icon">💎</div>
+            </div>
+            <div class="plan-price">₦50,000</div>
+            <div class="plan-earn">💰 Earn up to ₦1,250,000 per mining</div>
+            <ul class="plan-features">
+                <li><span class="check-icon">✓</span> 10x ultra-speed mining</li>
+                <li><span class="check-icon">✓</span> ₦1,250,000 fixed reward</li>
+                <li><span class="check-icon">✓</span> Lifetime premium access</li>
+            </ul>
+            <button class="plan-btn" onclick="selectPlan('Diamond Miner', 50000, 1250000)">Upgrade to Diamond</button>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-card">
+            <div class="modal-title" id="modalTitle">Upgrade to Basic</div>
+            <div class="bank-details">
+                <div class="bank-row">
+                    <span class="bank-label">Amount</span>
+                    <span class="bank-value" id="modalAmount" style="color: #22c55e; font-size: 20px;">₦7,000</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Bank</span>
+                    <span class="bank-value">Smartcash PSB</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Name</span>
+                    <span class="bank-value">JIMOH SADIA</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Number</span>
+                    <span class="bank-value" style="display: flex; align-items: center;">
+                        <span id="accountNum">124 452 9142</span>
+                        <button class="copy-btn" onclick="copyAccount()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="upload-section">
+                <label class="upload-label">Upload Payment Receipt</label>
+                <input type="file" class="upload-input" id="receiptUpload" accept="image/*">
+            </div>
+            <button class="modal-btn" onclick="confirmPayment()">I Have Paid</button>
+            <button class="modal-close" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="goToDashboard()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span class="nav-label">Home</span>
+        </div>
+        <div class="nav-item" onclick="goToMine()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span class="nav-label">Mine</span>
+        </div>
+        <div class="nav-item" onclick="goToHistory()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="nav-label">History</span>
+        </div>
+        <div class="nav-item" onclick="goToProfile()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span class="nav-label">Profile</span>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        var currentMiner = localStorage.getItem('bankwallet_miner') || 'Free Miner';
+        var selectedPlan = null;
+        var selectedPrice = 0;
+        var selectedReward = 0;
+
+        var minerRewards = {
+            'Free Miner': 86000,
+            'Basic Miner': 172000,
+            'Silver Miner': 380000,
+            'Gold Miner': 640000,
+            'Diamond Miner': 1250000
+        };
+
+        // Show current miner
+        document.getElementById('currentMinerName').textContent = currentMiner;
+        document.getElementById('currentMinerReward').textContent = '₦' + (minerRewards[currentMiner] || 86000).toLocaleString() + ' per mining';
+
+        // Highlight current plan
+        var planIds = {
+            'Free Miner': '',
+            'Basic Miner': 'basicPlan',
+            'Silver Miner': 'silverPlan',
+            'Gold Miner': 'goldPlan',
+            'Diamond Miner': 'diamondPlan'
+        };
+
+        if (planIds[currentMiner]) {
+            var card = document.getElementById(planIds[currentMiner]);
+            if (card) {
+                card.classList.add('selected');
+                var badge = document.createElement('div');
+                badge.className = 'selected-badge';
+                badge.textContent = 'Active';
+                card.appendChild(badge);
+
+                // Disable button
+                var btn = card.querySelector('.plan-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Current Plan';
+                }
+            }
+        }
+
+        function selectPlan(plan, price, reward) {
+            if (plan === currentMiner) {
+                showToast('You already have this plan!');
+                return;
+            }
+            selectedPlan = plan;
+            selectedPrice = price;
+            selectedReward = reward;
+            document.getElementById('modalTitle').textContent = 'Upgrade to ' + plan.replace(' Miner', '');
+            document.getElementById('modalAmount').textContent = '₦' + price.toLocaleString();
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function copyAccount() {
+            navigator.clipboard.writeText('1244529142').then(function() {
+                showToast('Account number copied!');
+            });
+        }
+
+        function confirmPayment() {
+            var upload = document.getElementById('receiptUpload');
+            if (!upload.files || upload.files.length === 0) {
+                showToast('Please upload your payment receipt!');
+                return;
+            }
+
+            // Save upgraded miner
+            localStorage.setItem('bankwallet_miner', selectedPlan);
+            localStorage.setItem('bankwallet_miner_reward', selectedReward.toString());
+
+            // Save transaction
+            var transactions = JSON.parse(localStorage.getItem('bankwallet_transactions') || '[]');
+            transactions.unshift({
+                id: Date.now(),
+                type: 'upgrade',
+                title: 'Upgraded to ' + selectedPlan,
+                amount: '-₦' + selectedPrice.toLocaleString(),
+                value: -selectedPrice,
+                time: new Date().toISOString()
+            });
+            localStorage.setItem('bankwallet_transactions', JSON.stringify(transactions));
+
+            closeModal();
+            showToast('Upgrade successful! You now have ' + selectedPlan);
+
+            setTimeout(function() {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        function goBack() { window.location.href = 'dashboard.html'; }
+        function goToDashboard() { window.location.href = 'dashboard.html'; }
+        function goToMine() { window.location.href = 'mine.html'; }
+        function goToHistory() { window.location.href = 'history.html'; }
+        function goToProfile() { window.location.href = 'profile.html'; }
+    </script>
+</body>
+</html>

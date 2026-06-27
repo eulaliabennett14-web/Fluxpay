@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bank Wallet - Mining</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #16a34a;
+            --primary-dark: #15803d;
+            --primary-light: #22c55e;
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #6b7280;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Amaranth', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .container {
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo-box {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-box svg {
+            width: 35px;
+            height: 35px;
+            fill: white;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .balance-currency {
+            font-size: 28px;
+        }
+
+        .user-phone {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        /* Mining Card */
+        .mining-card {
+            background: white;
+            border-radius: 28px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Progress Ring */
+        .progress-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 24px;
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: #e5e7eb;
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.3s linear;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .timer-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-unit {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Mining Icon */
+        .mining-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: pulse 2s infinite;
+        }
+
+        .mining-icon.mining-active {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Title */
+        .mining-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .mining-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        /* Reward Display */
+        .reward-display {
+            background: #fef3c7;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 24px;
+        }
+
+        .reward-label {
+            font-size: 13px;
+            color: #b45309;
+            font-weight: 600;
+        }
+
+        .reward-amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: #d97706;
+        }
+
+        /* Cooldown Timer */
+        .cooldown-box {
+            background: #f3f4f6;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .cooldown-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .cooldown-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Daily Limit */
+        .daily-limit {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 24px;
+        }
+
+        .daily-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Buttons */
+        .btn-mining {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-mining:active {
+            transform: scale(0.98);
+        }
+
+        .btn-mining:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            width: 100%;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 16px;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-back:active {
+            background: #f8f9fa;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a2e;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 2000;
+            transition: transform 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-box">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7v2h20V7L12 2zm0 2.5L18.5 7H5.5L12 4.5zM4 10v10h3V10H4zm6 0v10h3V10h-3zm6 0v10h3V10h-3zM2 22v2h20v-2H2z"/>
+                </svg>
+            </div>
+            <div class="brand">Bank Wallet Mining</div>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div class="balance-label">Current Wallet Balance</div>
+            <div class="balance-amount">
+                <span class="balance-currency">₦</span><span id="walletBalance">0</span>
+            </div>
+            <div class="user-phone" id="userPhoneDisplay">Account: Loading...</div>
+        </div>
+
+        <!-- Mining Card -->
+        <div class="mining-card">
+            <!-- Progress Ring -->
+            <div class="progress-container">
+                <svg width="180" height="180" viewBox="0 0 180 180">
+                    <circle class="progress-ring-bg" cx="90" cy="90" r="80"/>
+                    <circle class="progress-ring-fill" id="progressRing" cx="90" cy="90" r="80"/>
+                </svg>
+                <div class="progress-text">
+                    <div class="timer-value" id="timerDisplay">10</div>
+                    <div class="timer-unit">seconds</div>
+                </div>
+            </div>
+
+            <!-- Mining Icon -->
+            <div class="mining-icon" id="miningIcon">⛏️</div>
+
+            <!-- Title -->
+            <div class="mining-title" id="miningTitle">Ready to Mine</div>
+            <div class="mining-subtitle" id="miningSubtitle">Click start to mine ₦86,000</div>
+
+            <!-- Reward Display -->
+            <div class="reward-display">
+                <div class="reward-label">💰 Mining Reward 💰</div>
+                <div class="reward-amount">₦86,000</div>
+            </div>
+
+            <!-- Daily Limit Tracker -->
+            <div class="daily-limit">
+                <div class="daily-header">
+                    <span>📊 Today's Mining</span>
+                    <span id="dailyMined">₦0</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="dailyProgress"></div>
+                </div>
+                <div class="daily-header" style="margin-top: 8px; margin-bottom: 0;">
+                    <span>Daily Limit: ₦86,000</span>
+                    <span id="dailyRemaining">₦86,000 remaining</span>
+                </div>
+            </div>
+
+            <!-- Cooldown Box -->
+            <div class="cooldown-box" id="cooldownBox">
+                <div class="cooldown-label">⏳ Next mining available in</div>
+                <div class="cooldown-time" id="cooldownTimer">--:--:--</div>
+            </div>
+
+            <!-- Buttons -->
+            <button class="btn-mining" id="mineBtn" onclick="startMining()">START MINING</button>
+            <button class="btn-back" onclick="goToDashboard()">← Back to Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let currentUser = null;
+        let currentBalance = 0;
+        let dailyMinedAmount = 0;
+        let isMining = false;
+        let miningInterval = null;
+        let cooldownInterval = null;
+        
+        // Mining reward (FIXED)
+        const MINING_REWARD = 86000;
+        const DAILY_LIMIT = 86000;
+        const COOLDOWN_MINUTES = 30; // 30 minutes cooldown
+        
+        // Progress ring circumference (2 * PI * radius) where radius = 80
+        const CIRCUMFERENCE = 2 * Math.PI * 80;
+        
+        // ========== INITIALIZATION ==========
+        function init() {
+            // Get current logged in user
+            currentUser = localStorage.getItem('bankWallet_currentUser');
+            
+            if (!currentUser) {
+                showToast('Please login first');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            // Display user phone
+            document.getElementById('userPhoneDisplay').textContent = 'Account: ' + currentUser;
+            
+            // Load user data
+            loadUserData();
+            loadDailyMiningData();
+            checkMiningAvailability();
+            
+            // Set progress ring initial state
+            const ring = document.getElementById('progressRing');
+            ring.style.strokeDasharray = CIRCUMFERENCE;
+            ring.style.strokeDashoffset = CIRCUMFERENCE;
+        }
+        
+        // Load balance from localStorage
+        function loadUserData() {
+            const miningKey = `bankWallet_mining_${currentUser}`;
+            const miningData = JSON.parse(localStorage.getItem(miningKey) || '{}');
+            currentBalance = miningData.balance || 0;
+            document.getElementById('walletBalance').textContent = currentBalance.toLocaleString();
+        }
+        
+        // Load daily mining data
+        function loadDailyMiningData() {
+            const today = new Date().toDateString();
+            const dailyKey = `bankWallet_daily_${currentUser}`;
+            const dailyData = JSON.parse(localStorage.getItem(dailyKey) || '{}');
+            
+            if (dailyData.date !== today) {
+                // Reset daily mining
+                dailyMinedAmount = 0;
+                saveDailyMiningData();
+            } else {
+                dailyMinedAmount = dailyData.amount || 0;
+            }
+            
+            updateDailyDisplay();
+        }
+        
+        // Save daily mining data
+        function saveDailyMiningData() {
+            const today = new Date().toDateString();
+            const dailyKey = `bankWallet_daily_${currentUser}`;
+            const dailyData = {
+                date: today,
+                amount: dailyMinedAmount
+            };
+            localStorage.setItem(dailyKey, JSON.stringify(dailyData));
+        }
+        
+        // Update daily limit display
+        function updateDailyDisplay() {
+            const remaining = DAILY_LIMIT - dailyMinedAmount;
+            const percent = (dailyMinedAmount / DAILY_LIMIT) * 100;
+            
+            document.getElementById('dailyMined').textContent = '₦' + dailyMinedAmount.toLocaleString();
+            document.getElementById('dailyRemaining').textContent = '₦' + Math.max(0, remaining).toLocaleString() + ' remaining';
+            document.getElementById('dailyProgress').style.width = Math.min(100, percent) + '%';
+        }
+        
+        // Check if mining is available (no cooldown and daily limit not reached)
+        function checkMiningAvailability() {
+            const lastMiningKey = `bankWallet_lastMining_${currentUser}`;
+            const lastMiningData = JSON.parse(localStorage.getItem(lastMiningKey) || '{}');
+            const lastMiningTime = lastMiningData.timestamp || 0;
+            const timeSinceLastMining = Date.now() - lastMiningTime;
+            const cooldownMs = COOLDOWN_MINUTES * 60 * 1000;
+            
+            const canMine = (dailyMinedAmount < DAILY_LIMIT) && (timeSinceLastMining >= cooldownMs);
+            const mineBtn = document.getElementById('mineBtn');
+            const cooldownBox = document.getElementById('cooldownBox');
+            
+            if (!canMine && dailyMinedAmount < DAILY_LIMIT) {
+                // Show cooldown
+                const remainingTime = cooldownMs - timeSinceLastMining;
+                if (remainingTime > 0) {
+                    cooldownBox.style.display = 'block';
+                    startCooldownTimer(remainingTime);
+                }
+                mineBtn.disabled = true;
+            } else if (dailyMinedAmount >= DAILY_LIMIT) {
+                mineBtn.disabled = true;
+                mineBtn.textContent = 'DAILY LIMIT REACHED';
+                cooldownBox.style.display = 'none';
+            } else {
+                mineBtn.disabled = false;
+                mineBtn.textContent = 'START MINING';
+                cooldownBox.style.display = 'none';
+                if (cooldownInterval) clearInterval(cooldownInterval);
+            }
+        }
+        
+        // Start cooldown timer display
+        function startCooldownTimer(remainingMs) {
+            if (cooldownInterval) clearInterval(cooldownInterval);
+            
+            function updateCooldown() {
+                const remaining = Math.max(0, remainingMs);
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                
+                document.getElementById('cooldownTimer').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (remaining <= 0) {
+                    clearInterval(cooldownInterval);
+                    checkMiningAvailability();
+                }
+                remainingMs -= 1000;
+            }
+            
+            updateCooldown();
+            cooldownInterval = setInterval(updateCooldown, 1000);
+        }
+        
+        // ========== MINING LOGIC ==========
+        function startMining() {
+            if (isMining) return;
+            
+            // Check daily limit
+            if (dailyMinedAmount >= DAILY_LIMIT) {
+                showToast('Daily limit of ₦86,000 reached! Come back tomorrow.');
+                return;
+            }
+            
+            const mineBtn = document.getElementById('mineBtn');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const miningTitle = document.getElementById('miningTitle');
+            const miningSubtitle = document.getElementById('miningSubtitle');
+            const miningIcon = document.getElementById('miningIcon');
+            const ring = document.getElementById('progressRing');
+            
+            isMining = true;
+            mineBtn.disabled = true;
+            mineBtn.textContent = 'MINING...';
+            miningTitle.textContent = 'Mining in Progress';
+            miningSubtitle.textContent = 'Please wait...';
+            miningIcon.classList.add('mining-active');
+            
+            let seconds = 10;
+            const totalSeconds = 10;
+            timerDisplay.textContent = seconds;
+            
+            // Reset progress ring
+            ring.style.strokeDashoffset = CIRCUMFERENCE;
+            
+            miningInterval = setInterval(() => {
+                seconds--;
+                timerDisplay.textContent = seconds;
+                
+                // Update progress ring
+                const progress = (totalSeconds - seconds) / totalSeconds;
+                const offset = CIRCUMFERENCE - (progress * CIRCUMFERENCE);
+                ring.style.strokeDashoffset = offset;
+                
+                if (seconds <= 0) {
+                    clearInterval(miningInterval);
+                    miningInterval = null;
+                    
+                    // Mining complete!
+                    isMining = false;
+                    miningIcon.classList.remove('mining-active');
+                    
+                    // Add reward to balance
+                    addMiningReward();
+                    
+                    // Update UI
+                    mineBtn.disabled = true;
+                    mineBtn.textContent = 'MINING COMPLETE';
+                    miningTitle.textContent = 'Mining Complete! 🎉';
+                    miningSubtitle.textContent = 'You earned ₦86,000!';
+                    timerDisplay.textContent = '0';
+                    ring.style.strokeDashoffset = 0;
+                    
+                    showToast('✓ Mining complete! +₦86,000 added to your wallet');
+                    
+                    // Save last mining time
+                    const lastMiningKey = `bankWallet_lastMining_${currentUser}`;
+                    localStorage.setItem(lastMiningKey, JSON.stringify({ timestamp: Date.now() }));
+                    
+                    // Check availability (will show cooldown)
+                    setTimeout(() => {
+                        checkMiningAvailability();
+                    }, 2000);
+                }
+            }, 1000);
+        }
+        
+        // Add mining reward to balance
+        function addMiningReward() {
+            // Update balance
+            currentBalance += MINING_REWARD;
+            
+            const miningKey = `bankWallet_mining_${currentUser}`;
+            const existingData = JSON.parse(localStorage.getItem(miningKey) || '{}');
+            const updatedData = {
+                ...existingData,
+                phone: currentUser,
+                balance: currentBalance,
+                lastMiningAmount: MINING_REWARD,
+                lastMiningTime: new Date().toISOString()
+            };
+            localStorage.setItem(miningKey, JSON.stringify(updatedData));
+            
+            // Update daily mined amount
+            dailyMinedAmount += MINING_REWARD;
+            saveDailyMiningData();
+            updateDailyDisplay();
+            
+            // Update balance display
+            document.getElementById('walletBalance').textContent = currentBalance.toLocaleString();
+        }
+        
+        // ========== NAVIGATION ==========
+        function goToDashboard() {
+            window.location.href = 'dashboard2.html';
+        }
+        
+        // ========== TOAST ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // ========== ON PAGE LOAD ==========
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d4aa">
+    <title>Investment Products - Flux Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #060d1a; --bg-secondary: #0a1228; --bg-card: #1a2332; --bg-card-hover: #1e293b;
+            --accent-green: #00d4aa; --accent-green-dark: #00a884; --accent-gold: #f59e0b;
+            --accent-gold-light: #fbbf24; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --border-color: rgba(0, 212, 170, 0.08); --glass-bg: rgba(10, 40, 32, 0.7);
+            --glass-border: rgba(0, 212, 170, 0.1); --transition-smooth: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0,212,170,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(245,158,11,0.03) 0%, transparent 60%);
+        }
+
+        #bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+        .header { position: sticky; top: 0; z-index: 100; background: rgba(6,13,26,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+        .back-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth); font-size: 14px; text-decoration: none; }
+        .back-btn:hover { background: var(--bg-card-hover); transform: translateX(-2px); }
+        .header h1 { font-family: 'Amaranth', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .main-content { position: relative; z-index: 1; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+        .page-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; }
+
+        .vip-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; transition: var(--transition-smooth); cursor: pointer; }
+        .vip-card:hover { transform: translateY(-4px); border-color: rgba(245,158,11,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 30px rgba(245,158,11,0.1); }
+        .vip-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-gold), transparent); opacity: 0.6; }
+        .vip-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .vip-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.2); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--accent-gold); }
+        .vip-info h3 { font-family: 'Amaranth', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 3px; }
+        .vip-info p { font-size: 12px; color: var(--text-secondary); }
+        .vip-info .return-rate { color: var(--accent-green); font-weight: 600; }
+        .vip-amount { font-family: 'Amaranth', sans-serif; font-size: 30px; font-weight: 700; color: var(--accent-gold); margin: 10px 0; }
+        .vip-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border-color); }
+        .vip-footer span { font-size: 12px; color: var(--text-muted); }
+        .vip-footer .return-amount { color: var(--accent-green); font-weight: 600; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: linear-gradient(135deg, rgba(26,35,50,0.95) 0%, rgba(17,24,39,0.98) 100%); border: 1px solid rgba(245,158,11,0.3); border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 400px; text-align: center; position: relative; overflow: hidden; transform: scale(0.9); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-content::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); }
+        .modal-icon { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 2px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; animation: pulse-warning 2s ease-in-out infinite; }
+        @keyframes pulse-warning { 0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.3); } 50% { box-shadow: 0 0 0 15px rgba(245,158,11,0); } }
+        .modal-title { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .modal-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+        .modal-amount { font-family: 'Amaranth', sans-serif; font-size: 34px; font-weight: 700; color: var(--accent-gold); margin-bottom: 20px; }
+        .modal-notice { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.2); border-radius: 14px; padding: 16px; margin-bottom: 24px; text-align: left; }
+        .modal-notice p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .modal-notice strong { color: var(--accent-gold); }
+        .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .modal-btn { padding: 14px; border-radius: 14px; border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); }
+        .modal-btn-cancel { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .modal-btn-cancel:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .modal-btn-proceed { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .modal-btn-proceed:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+
+        .payment-details { display: none; }
+        .payment-details.active { display: block; }
+        .payment-card { background: linear-gradient(135deg, rgba(26,35,50,0.9) 0%, rgba(17,24,39,0.95) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .payment-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); }
+        .payment-title { font-family: 'Amaranth', sans-serif; font-size: 17px; font-weight: 700; text-align: center; margin-bottom: 20px; color: var(--text-secondary); }
+        .bank-details { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .bank-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .bank-row:last-child { border-bottom: none; }
+        .bank-label { font-size: 12px; color: var(--text-muted); }
+        .bank-value { font-family: 'Amaranth', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+        .bank-value.amount { color: var(--accent-gold); font-size: 19px; }
+        .copy-btn { width: 100%; padding: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition-smooth); margin-bottom: 20px; }
+        .copy-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-gold); color: var(--accent-gold); }
+        .upload-section { margin-bottom: 20px; }
+        .upload-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; display: block; font-weight: 500; }
+        .upload-area { border: 2px dashed var(--border-color); border-radius: 16px; padding: 28px; text-align: center; cursor: pointer; transition: var(--transition-smooth); background: var(--bg-secondary); }
+        .upload-area:hover { border-color: var(--accent-gold); background: rgba(245,158,11,0.04); }
+        .upload-area i { font-size: 28px; color: var(--text-muted); margin-bottom: 8px; }
+        .upload-area p { font-size: 12px; color: var(--text-muted); }
+        .upload-preview { max-width: 100%; border-radius: 12px; margin-top: 12px; }
+        .payment-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .pay-btn { padding: 16px; border-radius: 14px; border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); }
+        .pay-btn-cancel { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .pay-btn-confirm { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: #fff; box-shadow: 0 4px 15px rgba(0,212,170,0.3); }
+        .pay-btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,212,170,0.4); }
+        .pay-btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* ===== LOADING SCREEN - ENHANCED ===== */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.5s ease; }
+        .loading-overlay.active { opacity: 1; visibility: visible; }
+        .loading-spinner { width: 56px; height: 56px; border: 4px solid rgba(245,158,11,0.1); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px; box-shadow: 0 0 20px rgba(245,158,11,0.2); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-family: 'Amaranth', sans-serif; font-size: 19px; font-weight: 700; color: var(--accent-gold); margin-bottom: 8px; transition: opacity 0.3s ease; }
+        .loading-subtext { font-size: 13px; color: var(--text-secondary); transition: opacity 0.3s ease; }
+        .loading-dots { display: flex; gap: 6px; margin-top: 20px; justify-content: center; }
+        .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(245,158,11,0.3); animation: dotBounce 1.4s ease-in-out infinite; }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dotBounce { 0%,80%,100% { transform: scale(0.6); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; background: var(--accent-gold); } }
+        .loading-progress-container { width: 200px; height: 4px; background: rgba(245,158,11,0.1); border-radius: 4px; margin-top: 24px; overflow: hidden; }
+        .loading-progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light)); border-radius: 4px; transition: width 0.1s linear; }
+
+        .success-page { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+        .success-page.active { display: flex; }
+        .success-card { background: linear-gradient(135deg, rgba(26,35,50,0.95) 0%, rgba(17,24,39,0.98) 100%); border: 1px solid rgba(0,212,170,0.3); border-radius: 24px; padding: 40px 24px; width: 100%; max-width: 400px; text-align: center; position: relative; overflow: hidden; }
+        .success-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark), var(--accent-green)); }
+        .success-icon { width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 34px; animation: success-pop 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); box-shadow: 0 0 40px rgba(0,212,170,0.4); }
+        @keyframes success-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .success-title { font-family: 'Amaranth', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+        .success-message { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+        .success-details { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+        .success-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+        .success-row span:first-child { color: var(--text-muted); }
+        .success-row span:last-child { font-weight: 700; color: var(--text-primary); }
+        .success-row .amount { color: var(--accent-gold); }
+        .success-row .return { color: var(--accent-green); }
+        .success-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: none; border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .success-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+
+        .rejected-page { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+        .rejected-page.active { display: flex; }
+        .rejected-card { background: linear-gradient(135deg, rgba(26,35,50,0.95) 0%, rgba(17,24,39,0.98) 100%); border: 1px solid rgba(245,158,11,0.3); border-radius: 24px; padding: 40px 24px; width: 100%; max-width: 400px; text-align: center; position: relative; overflow: hidden; }
+        .rejected-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light), var(--accent-gold)); }
+        .rejected-icon { width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 2px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 34px; animation: pulse-warning 2s ease-in-out infinite; }
+        .rejected-title { font-family: 'Amaranth', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 10px; color: var(--accent-gold); }
+        .rejected-message { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+        .rejected-note { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.2); border-radius: 14px; padding: 16px; margin-bottom: 24px; text-align: left; }
+        .rejected-note p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .rejected-note strong { color: var(--accent-gold); }
+        .rejected-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: none; border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .rejected-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,22,42,0.96); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 12px 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #fff; z-index: 3000; opacity: 0; transition: all 0.4s ease; box-shadow: 0 8px 12px rgba(0,0,0,0.4); max-width: 90vw; backdrop-filter: blur(10px); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { width: 22px; height: 22px; border-radius: 6px; background: rgba(0,212,170,0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 11px; flex-shrink: 0; }
+        .toast.error .toast-icon { background: rgba(255,71,87,0.15); color: #ff4757; }
+
+        .hidden { display: none !important; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+    <canvas id="bg-particles"></canvas>
+    <div class="toast" id="toast">
+        <div class="toast-icon">✅</div>
+        <span id="toastText">Message</span>
+    </div>
+
+    <!-- PAGE 1: Investment Products -->
+    <div id="productsPage">
+        <header class="header">
+            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+            <h1>Investment Products</h1>
+        </header>
+        <div class="main-content">
+            <p class="page-subtitle">Choose a plan and earn above 50% returns on your investment</p>
+            <div id="vipList"></div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: Payment Notice Modal -->
+    <div class="modal-overlay" id="paymentNoticeModal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h2 class="modal-title">Payment Notice</h2>
+            <p class="modal-subtitle">You are about to purchase <strong id="modalVipName">VIP</strong></p>
+            <div class="modal-amount" id="modalAmount">₦0</div>
+            <div class="modal-notice"><p>Please transfer the <strong>exact amount</strong> shown above to complete your investment. Ensure you upload your payment receipt for verification.</p></div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn modal-btn-proceed" onclick="proceedToPayment()">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: Payment Details -->
+    <div class="payment-details" id="paymentDetailsPage">
+        <header class="header">
+            <button class="back-btn" onclick="backToProducts()"><i class="fas fa-arrow-left"></i></button>
+            <h1>Payment Details</h1>
+        </header>
+        <div class="main-content">
+            <div class="payment-card">
+                <h2 class="payment-title">Transfer to the account below</h2>
+                <div class="bank-details">
+                    <div class="bank-row"><span class="bank-label">Bank</span><span class="bank-value">Moniepoint</span></div>
+                    <div class="bank-row"><span class="bank-label">Account Name</span><span class="bank-value">Folowosele Iyanuoluwa</span></div>
+                    <div class="bank-row"><span class="bank-label">Account Number</span><span class="bank-value" id="accountNumber">5170452597</span></div>
+                    <div class="bank-row"><span class="bank-label">Amount to Transfer</span><span class="bank-value amount" id="paymentAmount">₦0</span></div>
+                </div>
+                <button class="copy-btn" onclick="copyAccountNumber()"><i class="far fa-copy"></i> Copy Account Number</button>
+                <div class="upload-section">
+                    <label class="upload-label">Upload Payment Receipt (Required)</label>
+                    <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Tap to upload screenshot or photo</p>
+                        <img id="receiptPreview" class="upload-preview" style="display: none;">
+                    </div>
+                    <input type="file" id="receiptInput" style="display: none;" accept="image/*" onchange="handleReceiptUpload(event)">
+                </div>
+                <div class="payment-buttons">
+                    <button class="pay-btn pay-btn-cancel" onclick="backToProducts()">Cancel</button>
+                    <button class="pay-btn pay-btn-confirm" id="confirmPayBtn" onclick="confirmPayment()" disabled>I've Paid ✓</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: Loading Screen -->
+    <div class="loading-overlay" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Getting your account ready...</div>
+        <div class="loading-subtext" id="loadingSubtext">Please wait</div>
+        <div class="loading-progress-container">
+            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+        </div>
+        <div class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+        </div>
+    </div>
+
+    <!-- PAGE 5: Success -->
+    <div class="success-page" id="successPage">
+        <div class="success-card">
+            <div class="success-icon">✅</div>
+            <h2 class="success-title">Payment Submitted Successfully</h2>
+            <p class="success-message">Your investment request is pending admin approval and will activate automatically once approved.</p>
+            <div class="success-details">
+                <div class="success-row"><span>Product:</span><span id="successProduct">VIP</span></div>
+                <div class="success-row"><span>Amount:</span><span class="amount" id="successAmount">₦0</span></div>
+                <div class="success-row"><span>Expected Return:</span><span class="return" id="successReturn">₦0</span></div>
+            </div>
+            <button class="success-btn" onclick="backToProducts()">Back to Products</button>
+        </div>
+    </div>
+
+    <!-- PAGE 6: Rejected -->
+    <div class="rejected-page" id="rejectedPage">
+        <div class="rejected-card">
+            <div class="rejected-icon">⚠️</div>
+            <h2 class="rejected-title">Payment Under Review</h2>
+            <p class="rejected-message">Your account is currently being verified. This process ensures the security of all our investors.</p>
+            <div class="rejected-note"><p><strong>Note:</strong> Only approved accounts can make investments. If you believe this is an error, please contact our support team for assistance.</p></div>
+            <button class="rejected-btn" onclick="window.location.href='support.html'">Contact Support</button>
+        </div>
+    </div>
+
+    <script>
+    // ========== SUPABASE CONFIG ==========
+    const SUPABASE_URL = 'https://fjsealrjzhrmekcjqfeg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqc2VhbHJqemhybWVrY2pxZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMjkyODIsImV4cCI6MjA5NzgwNTI4Mn0.0yum3u4nTE_KTgnfBQY6ccuMSYQ3Lhplewo_SS9YZhU';
+
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase connected');
+    } catch (e) {
+        console.error('❌ Supabase connection failed:', e);
+    }
+
+    // ========== GLOBAL STATE ==========
+    let currentUser = null;
+    let userProfile = null;
+    let balance = 0;
+    let isUpgraded = false;
+    let selectedPlan = null;
+    let uploadedReceipt = null;
+
+    // ========== VIP PLANS ==========
+    var vipPlans = [
+        { id: 1, name: 'VIP', amount: 5000, return: 7750, returnRate: 55, duration: '24 hours', icon: 'fa-chart-line' },
+        { id: 2, name: 'VIP 2', amount: 10000, return: 15800, returnRate: 58, duration: '24 hours', icon: 'fa-chart-line' },
+        { id: 3, name: 'VIP 3', amount: 25000, return: 40000, returnRate: 60, duration: '48 hours', icon: 'fa-chart-line' },
+        { id: 4, name: 'VIP 4', amount: 50000, return: 82500, returnRate: 65, duration: '48 hours', icon: 'fa-chart-line' },
+        { id: 5, name: 'VIP 5', amount: 100000, return: 170000, returnRate: 70, duration: '72 hours', icon: 'fa-chart-line' },
+        { id: 6, name: 'VIP 6', amount: 150000, return: 262500, returnRate: 75, duration: '72 hours', icon: 'fa-chart-line' },
+        { id: 7, name: 'VIP 7', amount: 250000, return: 450000, returnRate: 80, duration: '7 days', icon: 'fa-chart-line' }
+    ];
+
+    // ========== AUTH CHECK ==========
+    async function checkAuth() {
+        if (!supabase) {
+            showToast('Connection error. Please refresh.', true);
+            return;
+        }
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = session.user;
+            console.log('Logged in as:', currentUser.email);
+            await loadUserProfile();
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'login.html';
+        }
+    }
+
+    // ========== LOAD USER PROFILE ==========
+    async function loadUserProfile() {
+        try {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error) {
+                console.error('Profile fetch error:', error);
+                await createProfile();
+                return;
+            }
+
+            userProfile = profile;
+            balance = profile.wallet_balance || 0;
+            isUpgraded = profile.is_upgraded || false;
+
+            console.log('Profile loaded, balance:', balance, 'upgraded:', isUpgraded);
+            renderVIPPlans();
+
+        } catch (e) {
+            console.error('Load profile error:', e);
+        }
+    }
+
+    // ========== CREATE PROFILE IF MISSING ==========
+    async function createProfile() {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .insert([{
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    referral_code: generateReferralCode(),
+                    wallet_balance: 0,
+                    referral_balance: 0,
+                    total_referrals: 0,
+                    welcome_bonus_claimed: false,
+                    last_claim_time: null,
+                    total_earned: 0,
+                    claim_count: 0,
+                    onboarding_seen: false,
+                    is_upgraded: false,
+                    upgrade_plan: null,
+                    upgrade_date: null
+                }])
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Create profile error:', error);
+                return;
+            }
+
+            userProfile = data;
+            balance = 0;
+            isUpgraded = false;
+            renderVIPPlans();
+
+        } catch (e) {
+            console.error('Create profile error:', e);
+        }
+    }
+
+    function generateReferralCode() {
+        return 'FLUX' + Math.floor(1000 + Math.random() * 9000);
+    }
+
+    // ========== CHECK WHITELISTED (from Supabase) ==========
+    async function checkWhitelisted() {
+        if (!currentUser) return false;
+        try {
+            const { data, error } = await supabase
+                .from('whitelisted_emails')
+                .select('*')
+                .eq('email', currentUser.email.toLowerCase())
+                .single();
+
+            if (error || !data) return false;
+            return true;
+        } catch (e) {
+            console.error('Whitelist check error:', e);
+            return false;
+        }
+    }
+
+    // ========== SAVE INVESTMENT TO DATABASE ==========
+    async function saveInvestmentToDB(plan, receiptBase64) {
+        if (!currentUser) return false;
+        try {
+            const { error } = await supabase
+                .from('investments')
+                .insert([{
+                    user_id: currentUser.id,
+                    email: currentUser.email,
+                    plan_name: plan.name,
+                    plan_amount: plan.amount,
+                    expected_return: plan.return,
+                    return_rate: plan.returnRate,
+                    duration: plan.duration,
+                    receipt_base64: receiptBase64,
+                    status: 'pending'
+                }]);
+
+            if (error) {
+                console.error('Save investment error:', error);
+                return false;
+            }
+            return true;
+        } catch (e) {
+            console.error('Save investment error:', e);
+            return false;
+        }
+    }
+
+    // ========== UPDATE BALANCE IN SUPABASE ==========
+    async function updateBalance(newBalance) {
+        if (!currentUser) return false;
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ wallet_balance: newBalance })
+                .eq('id', currentUser.id);
+
+            if (error) {
+                console.error('Update balance error:', error);
+                return false;
+            }
+            balance = newBalance;
+            return true;
+        } catch (e) {
+            console.error('Update balance error:', e);
+            return false;
+        }
+    }
+
+    // ========== LOG TRANSACTION ==========
+    async function logTransaction(type, amt, description, status, ref) {
+        if (!currentUser) return;
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .insert([{
+                    user_id: currentUser.id,
+                    type: type,
+                    amount: amt,
+                    description: description,
+                    status: status,
+                    reference: ref
+                }]);
+            if (error) console.error('Transaction log error:', error);
+        } catch (e) {
+            console.error('Log transaction error:', e);
+        }
+    }
+
+    // ========== FLOATING PARTICLES ==========
+    (function() {
+        var canvas = document.getElementById('bg-particles');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var particles = [], w, h;
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        function Particle() { this.reset(); }
+        Particle.prototype.reset = function() {
+            this.x = Math.random() * w; this.y = Math.random() * h;
+            this.size = Math.random() * 3 + 1.5; this.speedY = -(Math.random() * 0.35 + 0.1);
+            this.speedX = (Math.random() - 0.5) * 0.18; this.opacity = Math.random() * 0.4 + 0.2;
+            this.color = Math.random() > 0.5 ? '0, 212, 170' : '255, 215, 0'; this.life = Math.random() * 300 + 200;
+        };
+        Particle.prototype.update = function() {
+            this.y += this.speedY; this.x += this.speedX; this.life--;
+            if (this.y < -20 || this.life <= 0) { this.y = h + 20; this.x = Math.random() * w; this.life = Math.random() * 300 + 200; }
+            if (this.x < -20) this.x = w + 20; if (this.x > w + 20) this.x = -20;
+        };
+        Particle.prototype.draw = function() {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+            ctx.shadowColor = 'rgba(' + this.color + ', 0.3)'; ctx.shadowBlur = this.size * 2; ctx.fill(); ctx.shadowBlur = 0;
+        };
+        var count = window.innerWidth < 768 ? 25 : 40;
+        for (var i = 0; i < count; i++) { var p = new Particle(); p.y = Math.random() * h; particles.push(p); }
+        function animate() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); } requestAnimationFrame(animate); }
+        animate();
+    })();
+
+    // ========== FORMAT NUMBER ==========
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // ========== RENDER PLANS ==========
+    function renderVIPPlans() {
+        var html = '';
+        for (var i = 0; i < vipPlans.length; i++) {
+            var p = vipPlans[i];
+            html += '<div class="vip-card" onclick="selectPlan(' + p.id + ')">';
+            html += '<div class="vip-header"><div class="vip-icon"><i class="fas ' + p.icon + '"></i></div>';
+            html += '<div class="vip-info"><h3>' + p.name + '</h3><p>Return: <span class="return-rate">' + p.returnRate + '%</span> • ' + p.duration + '</p></div></div>';
+            html += '<div class="vip-amount">₦' + formatNumber(p.amount) + '</div>';
+            html += '<div class="vip-footer"><span>Investment: ₦' + formatNumber(p.amount) + '</span><span class="return-amount">Return: ₦' + formatNumber(p.return) + '</span></div></div>';
+        }
+        document.getElementById('vipList').innerHTML = html;
+    }
+
+    function selectPlan(planId) {
+        selectedPlan = vipPlans.find(function(p) { return p.id === planId; });
+        if (!selectedPlan) return;
+        document.getElementById('modalVipName').textContent = selectedPlan.name;
+        document.getElementById('modalAmount').textContent = '₦' + formatNumber(selectedPlan.amount);
+        document.getElementById('paymentNoticeModal').classList.add('active');
+    }
+
+    function closeModal() { document.getElementById('paymentNoticeModal').classList.remove('active'); }
+
+    function proceedToPayment() {
+        if (!selectedPlan) return;
+        document.getElementById('paymentNoticeModal').classList.remove('active');
+        document.getElementById('productsPage').classList.add('hidden');
+        document.getElementById('paymentDetailsPage').classList.add('active');
+        document.getElementById('paymentAmount').textContent = '₦' + formatNumber(selectedPlan.amount);
+        uploadedReceipt = null;
+        document.getElementById('confirmPayBtn').disabled = true;
+        var preview = document.getElementById('receiptPreview');
+        preview.style.display = 'none'; preview.src = '';
+        document.getElementById('receiptInput').value = '';
+    }
+
+    function backToProducts() {
+        document.getElementById('productsPage').classList.remove('hidden');
+        document.getElementById('paymentDetailsPage').classList.remove('active');
+        document.getElementById('successPage').classList.remove('active');
+        document.getElementById('rejectedPage').classList.remove('active');
+        document.getElementById('loadingScreen').classList.remove('active');
+        selectedPlan = null;
+        uploadedReceipt = null;
+    }
+
+    function copyAccountNumber() {
+        var acct = document.getElementById('accountNumber').textContent;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(acct).then(function() { showToast('Account number copied!'); });
+        } else {
+            var t = document.createElement('textarea'); t.value = acct; document.body.appendChild(t);
+            t.select(); document.execCommand('copy'); document.body.removeChild(t);
+            showToast('Account number copied!');
+        }
+    }
+
+    function handleReceiptUpload(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedReceipt = e.target.result;
+            var preview = document.getElementById('receiptPreview');
+            preview.src = uploadedReceipt;
+            preview.style.display = 'block';
+            document.getElementById('confirmPayBtn').disabled = false;
+            showToast('Receipt uploaded!');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ========== ENHANCED 8-SECOND LOADING WITH RANDOM MESSAGES ==========
+    async function confirmPayment() {
+        if (!selectedPlan) { showToast('Please select a plan first!', true); return; }
+        if (!uploadedReceipt) { showToast('Please upload your payment receipt!', true); return; }
+
+        document.getElementById('paymentDetailsPage').classList.remove('active');
+        document.getElementById('loadingScreen').classList.add('active');
+
+        var loadingMessages = [
+            { text: 'Getting your account ready...', subtext: 'Setting up your investment profile' },
+            { text: 'Updating your wallet...', subtext: 'Synchronizing with our secure servers' },
+            { text: 'Verifying your payment...', subtext: 'Checking uploaded receipt details' },
+            { text: 'Processing investment...', subtext: 'Confirming transaction details' },
+            { text: 'Activating your plan...', subtext: 'Setting up your returns schedule' },
+            { text: 'Finalizing...', subtext: 'Almost done — completing setup' },
+            { text: 'Connecting to blockchain...', subtext: 'Securing your transaction on-chain' },
+            { text: 'Allocating funds...', subtext: 'Distributing to high-yield assets' },
+            { text: 'Generating returns...', subtext: 'Calculating your expected profit' },
+            { text: 'Securing your account...', subtext: 'Applying multi-layer encryption' },
+            { text: 'Syncing with bank...', subtext: 'Confirming transfer details' },
+            { text: 'Building your portfolio...', subtext: 'Adding to your investment history' },
+            { text: 'Validating receipt...', subtext: 'Analyzing payment proof' },
+            { text: 'Updating records...', subtext: 'Logging to secure database' },
+            { text: 'Preparing dashboard...', subtext: 'Loading your new balance' }
+        ];
+
+        function shuffleArray(arr) {
+            var shuffled = arr.slice();
+            for (var i = shuffled.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = temp;
+            }
+            return shuffled;
+        }
+
+        var sessionMessages = shuffleArray(loadingMessages).slice(0, 5);
+        var firstMsg = loadingMessages.find(function(m) { return m.text.indexOf('Getting your account ready') !== -1; });
+        var lastMsg = loadingMessages.find(function(m) { return m.text.indexOf('Finalizing') !== -1; });
+        if (firstMsg) sessionMessages[0] = firstMsg;
+        if (lastMsg) sessionMessages[sessionMessages.length - 1] = lastMsg;
+
+        var msgIndex = 0;
+        var loadingText = document.getElementById('loadingText');
+        var loadingSubtext = document.getElementById('loadingSubtext');
+        var progressBar = document.getElementById('loadingProgressBar');
+
+        loadingText.textContent = sessionMessages[0].text;
+        loadingSubtext.textContent = sessionMessages[0].subtext;
+        progressBar.style.width = '0%';
+
+        var totalDuration = 8000;
+        var msgCount = sessionMessages.length;
+        var intervalTime = totalDuration / msgCount;
+        var progressStep = 100 / msgCount;
+
+        var msgInterval = setInterval(function() {
+            msgIndex++;
+            if (msgIndex < msgCount) {
+                loadingText.style.opacity = '0';
+                loadingSubtext.style.opacity = '0';
+                setTimeout(function() {
+                    loadingText.textContent = sessionMessages[msgIndex].text;
+                    loadingSubtext.textContent = sessionMessages[msgIndex].subtext;
+                    progressBar.style.width = (msgIndex * progressStep) + '%';
+                    loadingText.style.opacity = '1';
+                    loadingSubtext.style.opacity = '1';
+                }, 300);
+            }
+        }, intervalTime);
+
+        var progressInterval = setInterval(function() {
+            var currentWidth = parseFloat(progressBar.style.width) || 0;
+            if (currentWidth < 95) {
+                progressBar.style.width = (currentWidth + 1.2) + '%';
+            }
+        }, 100);
+
+        setTimeout(async function() {
+            clearInterval(msgInterval);
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            document.getElementById('loadingScreen').classList.remove('active');
+
+            // Check whitelist from Supabase
+            var isApproved = await checkWhitelisted();
+
+            if (!isApproved) {
+                document.getElementById('rejectedPage').classList.add('active');
+            } else {
+                // Save investment to database
+                var saved = await saveInvestmentToDB(selectedPlan, uploadedReceipt);
+                if (!saved) {
+                    showToast('Failed to save investment. Please try again.', true);
+                    backToProducts();
+                    return;
+                }
+
+                // Update balance
+                var newBalance = balance + selectedPlan.return;
+                await updateBalance(newBalance);
+
+                // Log transaction
+                var ref = 'FLX-INV-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+                await logTransaction('investment', selectedPlan.return, 'Investment in ' + selectedPlan.name, 'completed', ref);
+
+                document.getElementById('successProduct').textContent = selectedPlan.name;
+                document.getElementById('successAmount').textContent = '₦' + formatNumber(selectedPlan.amount);
+                document.getElementById('successReturn').textContent = '₦' + formatNumber(selectedPlan.return);
+                document.getElementById('successPage').classList.add('active');
+                showToast('Investment submitted!');
+            }
+        }, totalDuration);
+    }
+
+    function showToast(message, isError) {
+        var toast = document.getElementById('toast');
+        var toastText = document.getElementById('toastText');
+        toastText.textContent = message;
+        toast.classList.toggle('error', isError);
+        toast.classList.add('show');
+        setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+
+    // ========== INIT ==========
+    async function init() {
+        await checkAuth();
+    }
+
+    init();
+    console.log('🚀 Flux Pay Investment Products — Supabase Linked');
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
+</body>
+</html>

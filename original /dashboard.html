@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FairMonie Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #0f1a0f; color: white; overflow-x: hidden; min-height: 100vh; padding-bottom: 20px; }
+        .aurora-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .aurora-wave { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; opacity: 0.1; animation: aurora-rotate 25s linear infinite; }
+        .aurora-wave:nth-child(1) { background: radial-gradient(ellipse at 30% 50%, rgba(34, 197, 94, 0.08) 0%, transparent 60%); animation-duration: 30s; }
+        .aurora-wave:nth-child(2) { background: radial-gradient(ellipse at 70% 50%, rgba(74, 222, 128, 0.06) 0%, transparent 60%); animation-duration: 35s; animation-direction: reverse; }
+        .aurora-wave:nth-child(3) { background: radial-gradient(ellipse at 50% 80%, rgba(34, 197, 94, 0.05) 0%, transparent 50%); animation-duration: 40s; }
+        @keyframes aurora-rotate { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(1); } }
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .toast-notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(10, 30, 10, 0.95); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 16px; padding: 16px 24px; z-index: 1000; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(34, 197, 94, 0.1); backdrop-filter: blur(10px); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease; opacity: 0; max-width: 90%; width: auto; }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-notification.fade-out { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        .toast-icon { width: 28px; height: 28px; background: linear-gradient(145deg, #16a34a, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .toast-icon svg { width: 16px; height: 16px; color: white; }
+        .toast-content { display: flex; flex-direction: column; gap: 2px; }
+        .toast-title { font-size: 15px; font-weight: 700; color: #22c55e; }
+        .toast-message { font-size: 13px; color: rgba(255, 255, 255, 0.7); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .currency-modal { background: #0f1a0f; border: 1px solid rgba(34, 197, 94, 0.15); border-radius: 24px 24px 0 0; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+        .modal-overlay.active .currency-modal { transform: translateY(0); }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+        .modal-title-section { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .modal-icon { width: 48px; height: 48px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .modal-icon svg { width: 24px; height: 24px; color: #22c55e; }
+        .modal-title { font-size: 20px; font-weight: 700; color: white; }
+        .modal-subtitle { font-size: 14px; color: rgba(255, 255, 255, 0.5); margin-top: 4px; }
+        .modal-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(255, 255, 255, 0.6); font-size: 18px; transition: all 0.3s; }
+        .modal-close:hover { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .currency-list { padding: 16px 20px; }
+        .currency-item { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(255, 255, 255, 0.02); }
+        .currency-item:hover { background: rgba(34, 197, 94, 0.05); border-color: rgba(34, 197, 94, 0.15); }
+        .currency-item.selected { background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3); }
+        .currency-flag { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+        .currency-flag.ngn { background: linear-gradient(145deg, #1a5c1a, #0d3d0d); color: #22c55e; }
+        .currency-flag.usd { background: linear-gradient(145deg, #1a1a5c, #0d0d3d); color: #60a5fa; }
+        .currency-flag.ghs { background: linear-gradient(145deg, #5c1a5c, #3d0d3d); color: #c084fc; }
+        .currency-flag.eur { background: linear-gradient(145deg, #5c1a1a, #3d0d0d); color: #f87171; }
+        .currency-flag.gbp { background: linear-gradient(145deg, #3d1a3d, #2d0d2d); color: #f472b6; }
+        .currency-flag.kes { background: linear-gradient(145deg, #5c3d1a, #3d2d0d); color: #fbbf24; }
+        .currency-info { flex: 1; }
+        .currency-name { font-size: 16px; font-weight: 600; color: white; }
+        .currency-rate { font-size: 13px; color: rgba(255, 255, 255, 0.5); margin-top: 2px; }
+        .currency-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(34, 197, 94, 0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+        .currency-item.selected .currency-check { background: #22c55e; border-color: #22c55e; }
+        .currency-check svg { width: 14px; height: 14px; color: white; opacity: 0; transition: opacity 0.3s; }
+        .currency-item.selected .currency-check svg { opacity: 1; }
+        .modal-footer { padding: 16px 20px 24px; text-align: center; font-size: 13px; color: rgba(255, 255, 255, 0.4); }
+        .marquee-banner { position: relative; z-index: 2; background: linear-gradient(90deg, #0d3d0d, #1a5c1a, #0d3d0d); padding: 10px 0; overflow: hidden; white-space: nowrap; }
+        .marquee-text { display: inline-block; animation: marquee 20s linear infinite; font-size: 13px; font-weight: 600; color: #22c55e; padding-left: 100%; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .header { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(145deg, #1a5c1a, #0d3d0d); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(34, 197, 94, 0.3); box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); overflow: hidden; }
+        .logo-icon svg { width: 32px; height: 32px; }
+        .user-greeting h3 { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 400; margin-bottom: 2px; }
+        .user-greeting h2 { font-size: 18px; font-weight: 700; color: #22c55e; letter-spacing: -0.3px; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .header-icon-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: none; color: #22c55e; cursor: pointer; font-family: inherit; }
+        .header-icon-btn .icon-label { font-size: 11px; font-weight: 600; }
+        .header-icon-btn .icon-svg { width: 24px; height: 24px; }
+        .notification-btn { position: relative; background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; padding: 4px; }
+        .notification-btn svg { width: 24px; height: 24px; }
+        .notification-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #0f1a0f; }
+        .balance-card { position: relative; z-index: 2; margin: 8px 16px 16px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; backdrop-filter: blur(10px); }
+        .balance-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .secured-text { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #22c55e; font-weight: 600; }
+        .secured-text svg { width: 18px; height: 18px; }
+        .eye-toggle { background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 4px; }
+        .eye-toggle svg { width: 22px; height: 22px; }
+        .balance-label { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
+        .balance-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .balance-amount { font-size: 40px; font-weight: 800; color: #22c55e; letter-spacing: -1px; }
+        .currency-pill { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 20px; padding: 8px 14px; font-size: 13px; color: #22c55e; font-weight: 600; }
+        .balance-actions { display: flex; gap: 12px; margin-bottom: 20px; }
+        .balance-btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .balance-btn.topup { background: linear-gradient(145deg, #16a34a, #22c55e); color: white; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+        .balance-btn.topup:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4); }
+        .balance-btn.bonus { background: rgba(34, 197, 94, 0.1); color: white; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .balance-btn.bonus:hover { background: rgba(34, 197, 94, 0.15); }
+        .balance-stats { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px; }
+        .stat-left { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #22c55e; }
+        .stat-left svg { width: 16px; height: 16px; }
+        .stat-right { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: #22c55e; font-weight: 600; }
+        .stat-right svg { width: 14px; height: 14px; }
+        .earned-text { font-size: 15px; color: #22c55e; font-weight: 600; margin-top: 4px; }
+        .quick-row { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 16px; margin-bottom: 16px; }
+        .quick-item { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 4px; cursor: pointer; transition: all 0.3s ease; }
+        .quick-item:hover { transform: translateY(-2px); }
+        .quick-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .quick-icon svg { width: 26px; height: 26px; color: #22c55e; }
+        .quick-item:hover .quick-icon { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); }
+        .quick-label { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; text-align: center; }
+        .services-box { position: relative; z-index: 2; margin: 0 16px 16px; padding: 20px 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; backdrop-filter: blur(10px); }
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; }
+        .service-item { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 4px; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .service-item:hover { transform: translateY(-2px); }
+        .service-icon-wrap { width: 52px; height: 52px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; position: relative; }
+        .service-item:hover .service-icon-wrap { background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.15); }
+        .service-icon-wrap svg { width: 24px; height: 24px; color: #22c55e; }
+        .service-label { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; text-align: center; line-height: 1.3; }
+        .hot-tag { position: absolute; top: -6px; right: -4px; background: #dc2626; color: white; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; }
+        .more-arrow { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: -4px; }
+        .bottom-banner { position: relative; z-index: 2; margin: 0 16px 16px; border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #0d3d0d 0%, #1a5c1a 50%, #0d3d0d 100%); padding: 24px; display: flex; align-items: center; gap: 20px; }
+        .banner-phone { width: 80px; height: 140px; background: #0f1a0f; border: 2px solid rgba(34, 197, 94, 0.3); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; flex-shrink: 0; }
+        .banner-phone-header { font-size: 8px; color: #22c55e; font-weight: 700; margin-bottom: 8px; }
+        .banner-phone-line { width: 100%; height: 6px; background: rgba(34, 197, 94, 0.2); border-radius: 3px; margin-bottom: 6px; }
+        .banner-content { flex: 1; }
+        .banner-title { font-size: 18px; font-weight: 800; color: white; margin-bottom: 12px; }
+        .banner-list { list-style: none; padding: 0; }
+        .banner-list li { font-size: 13px; color: rgba(255,255,255,0.8); padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+        .banner-list li::before { content: ''; width: 6px; height: 6px; background: #22c55e; border-radius: 50%; flex-shrink: 0; }
+        .banner-chat { width: 48px; height: 48px; background: linear-gradient(145deg, #16a34a, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4); flex-shrink: 0; }
+        .banner-chat svg { width: 24px; height: 24px; color: white; }
+        .trust-badges { position: relative; z-index: 2; display: flex; justify-content: center; gap: 12px; padding: 0 16px 20px; }
+        .trust-badge { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 10px 18px; font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; }
+        .trust-badge svg { width: 16px; height: 16px; color: #22c55e; }
+        .chat-float { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background: linear-gradient(145deg, #16a34a, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4); cursor: pointer; z-index: 99; transition: all 0.3s; border: none; }
+        .chat-float:hover { transform: scale(1.1); }
+        .chat-float svg { width: 28px; height: 28px; color: white; }
+        @media (min-width: 768px) { .balance-card, .services-box, .bottom-banner, .trust-badges { max-width: 500px; margin-left: auto; margin-right: auto; } .quick-row { max-width: 500px; margin-left: auto; margin-right: auto; } }
+        .live-toast-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; pointer-events: none; display: flex; flex-direction: column; align-items: center; }
+        .live-toast { width: 94%; max-width: 500px; margin-top: 12px; display: flex; align-items: center; gap: 12px; background: rgba(10, 30, 10, 0.95); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 20px; padding: 14px 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 25px rgba(34,197,94,0.15); backdrop-filter: blur(12px); animation: toastBannerIn 1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards, toastBannerOut 1.2s ease-in forwards 3s; pointer-events: none; }
+        @keyframes toastBannerIn { 0% { opacity: 0; transform: translateY(-30px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toastBannerOut { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.98); } }
+        .live-toast-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(34, 197, 94, 0.4); flex-shrink: 0; }
+        .live-toast-content { flex: 1; min-width: 0; }
+        .live-toast-text { font-size: 13.5px; color: rgba(255,255,255,0.9); font-weight: 500; line-height: 1.4; white-space: normal; }
+        .live-toast-text strong { color: #22c55e; font-weight: 700; }
+        .live-toast-emoji { font-size: 18px; margin-left: 2px; }
+        .earn-toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(10, 30, 10, 0.95); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 16px; padding: 14px 20px; z-index: 9999; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(34, 197, 94, 0.2); backdrop-filter: blur(12px); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease; opacity: 0; max-width: 90%; pointer-events: none; }
+        .earn-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .earn-toast.fade-out { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        .earn-toast-icon { width: 36px; height: 36px; background: linear-gradient(145deg, #16a34a, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+        .earn-toast-content { display: flex; flex-direction: column; gap: 2px; }
+        .earn-toast-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); }
+        .earn-toast-amount { font-size: 18px; font-weight: 800; color: #4ade80; }
+        .testimonials-section { position: relative; z-index: 2; margin: 0 16px 16px; }
+        .testimonials-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .testimonials-header .live-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 8px #22c55e; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+        .testimonials-header h3 { color: #fff; font-size: 14px; font-weight: 600; letter-spacing: 0.3px; }
+        .testimonials-header .count { color: rgba(255,255,255,0.5); font-size: 12px; margin-left: auto; }
+        .carousel-wrapper { background: rgba(15, 26, 15, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(34, 197, 94, 0.15); border-radius: 20px; padding: 16px 0; overflow: hidden; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
+        .carousel-wrapper::before, .carousel-wrapper::after { content: ''; position: absolute; top: 0; width: 40px; height: 100%; z-index: 2; pointer-events: none; }
+        .carousel-wrapper::before { left: 0; background: linear-gradient(to right, rgba(15,26,15,0.9), transparent); }
+        .carousel-wrapper::after { right: 0; background: linear-gradient(to left, rgba(15,26,15,0.9), transparent); }
+        .carousel-track { display: flex; gap: 12px; animation: scroll 25s linear infinite; width: max-content; padding: 0 20px; }
+        .carousel-wrapper:hover .carousel-track { animation-play-state: paused; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .testimonial-card { flex-shrink: 0; width: 160px; background: rgba(255,255,255,0.04); border: 1px solid rgba(34, 197, 94, 0.1); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .testimonial-card:hover { background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3); transform: translateY(-2px); }
+        .testimonial-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(34, 197, 94, 0.4); }
+        .testimonial-text { color: #fff; font-size: 11px; text-align: center; line-height: 1.4; font-weight: 500; }
+        .testimonial-name { color: rgba(255,255,255,0.4); font-size: 10px; text-align: center; }
+        .testimonial-amount { color: #22c55e; font-size: 11px; font-weight: 700; background: rgba(34, 197, 94, 0.1); padding: 2px 8px; border-radius: 10px; }
+
+        /* ===== APOLOGY POPUP (ADDED) ===== */
+        .apology-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: apologyFadeIn 0.5s ease;
+        }
+        .apology-popup-overlay.hidden {
+            display: none;
+        }
+        @keyframes apologyFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .apology-popup-card {
+            max-width: 420px;
+            width: 100%;
+            background: linear-gradient(145deg, #0d2d0d 0%, #1a4a1a 100%);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 24px;
+            padding: 36px 28px 28px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .apology-popup-icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+        }
+        .apology-popup-title {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: #22c55e;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+        .apology-popup-message {
+            font-family: 'Amaranth', sans-serif;
+            font-size: 16px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+        .apology-popup-message .highlight {
+            color: #22c55e;
+            font-weight: 700;
+        }
+        .apology-popup-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(34,197,94,0.3);
+            letter-spacing: 0.5px;
+        }
+        .apology-popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34,197,94,0.4);
+        }
+        .apology-popup-footer {
+            margin-top: 14px;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== APOLOGY POPUP (ADDED) ===== -->
+    <div class="apology-popup-overlay" id="apologyPopup">
+        <div class="apology-popup-card">
+            <div class="apology-popup-icon">🙏</div>
+            <div class="apology-popup-title">We Apologize</div>
+            <div class="apology-popup-message">
+                We are sorry for any inconvenience we might have caused.<br><br>
+                We have made some <span class="highlight">improvements</span> to serve you better.<br><br>
+                Thank you for your patience! ❤️
+            </div>
+            <button class="apology-popup-btn" onclick="closeApologyPopup()">OKAY</button>
+            <div class="apology-popup-footer">This message will only appear once</div>
+        </div>
+    </div>
+
+    <div class="earn-toast" id="earnToast"><div class="earn-toast-icon" id="earnToastIcon">🎉</div><div class="earn-toast-content"><div class="earn-toast-title" id="earnToastTitle">Earning!</div><div class="earn-toast-amount" id="earnToastAmount">+₦500</div></div></div>
+    <div class="live-toast-container" id="liveToastContainer"></div>
+    <div class="toast-notification" id="toastNotification"><div class="toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="toast-content"><div class="toast-title" id="toastTitle">Success!</div><div class="toast-message" id="toastMessage">Operation completed</div></div></div>
+    <div class="modal-overlay" id="currencyModal"><div class="currency-modal"><div class="modal-header"><div class="modal-title-section"><div class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="modal-title">Select Currency</div><div class="modal-subtitle">Choose your preferred currency</div></div><button class="modal-close" onclick="closeCurrencyModal()">&times;</button></div><div class="currency-list" id="currencyList"><div class="currency-item selected" onclick="selectCurrency('NGN')"><div class="currency-flag ngn">₦</div><div class="currency-info"><div class="currency-name">Nigerian Naira</div><div class="currency-rate">NGN • 1 NGN ≈ 1.0000 NGN</div></div><div class="currency-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="currency-item" onclick="selectCurrency('USD')"><div class="currency-flag usd">$</div><div class="currency-info"><div class="currency-name">US Dollar</div><div class="currency-rate">USD • 1 NGN ≈ 0.000645 USD</div></div><div class="currency-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="currency-item" onclick="selectCurrency('GHS')"><div class="currency-flag ghs">¢</div><div class="currency-info"><div class="currency-name">Ghanaian Cedi</div><div class="currency-rate">GHS • 1 NGN ≈ 0.0100 GHS</div></div><div class="currency-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="currency-item" onclick="selectCurrency('EUR')"><div class="currency-flag eur">€</div><div class="currency-info"><div class="currency-name">Euro</div><div class="currency-rate">EUR • 1 NGN ≈ 0.000594 EUR</div></div><div class="currency-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="currency-item" onclick="selectCurrency('GBP')"><div class="currency-flag gbp">£</div><div class="currency-info"><div class="currency-name">British Pound</div><div class="currency-rate">GBP • 1 NGN ≈ 0.000510 GBP</div></div><div class="currency-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="currency-item" onclick="selectCurrency('KES')"><div class="currency-flag kes">Ksh</div><div class="currency-info"><div class="currency-name">Kenyan Shilling</div><div class="currency-rate">KES • 1 NGN ≈ 0.0832 KES</div></div><div class="currency-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div></div><div class="modal-footer">Exchange rates are approximate</div></div></div>
+    <div class="aurora-bg"><div class="aurora-wave"></div><div class="aurora-wave"></div><div class="aurora-wave"></div></div>
+    <canvas id="particles-canvas"></canvas>
+    <div class="marquee-banner"><div class="marquee-text">Welcome to JUNE 2026! New Month, New Blessings! FairMoniePay - Your Trusted Financial Partner &nbsp;&nbsp;&nbsp; Welcome to June 2026! New Month, New Blessings! FairMoniePay - Your Trusted Financial Partner</div></div>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-icon"><svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5 L90 20 L90 55 C90 85 50 115 50 115 C50 115 10 85 10 55 L10 20 Z" fill="url(#dashShieldGrad)" stroke="#22c55e" stroke-width="2"/><text x="50" y="62" text-anchor="middle" fill="#22c55e" font-size="38" font-weight="900" font-family="Arial, sans-serif">F</text><text x="50" y="85" text-anchor="middle" fill="#4ade80" font-size="18" font-weight="700" font-family="Arial, sans-serif">$</text><defs><linearGradient id="dashShieldGrad" x1="0" y1="0" x2="100" y2="120"><stop offset="0%" stop-color="#1a5c1a"/><stop offset="100%" stop-color="#0d3d0d"/></linearGradient></defs></svg></div>
+            <div class="user-greeting"><h3>Hi, <span id="userName">Daniel</span></h3><h2>FairMoniePay</h2></div>
+        </div>
+        <div class="header-right">
+            <button class="header-icon-btn" onclick="openHelp()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span class="icon-label">Help</span></button>
+            <button class="header-icon-btn" onclick="toggleFullscreen()"><svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+            <button class="notification-btn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notification-dot"></span></button>
+        </div>
+    </header>
+    <div class="balance-card">
+        <div class="balance-top"><div class="secured-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Secured</span></div><button class="eye-toggle" onclick="toggleBalance()" id="eyeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+        <div class="balance-label">Available Balance</div>
+        <div class="balance-row"><div class="balance-amount" id="balanceAmount">₦0</div><div class="currency-pill" onclick="openCurrencyModal()" style="cursor: pointer;"><span id="currencySymbol">₦</span><span id="currencyCode">NGN</span><span>&#8644;</span></div></div>
+        <div class="balance-actions">
+            <button class="balance-btn topup" onclick="topUp()"><span>+</span> Top Up</button>
+            <button class="balance-btn bonus" onclick="claimBonus()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 2.5 2.5v5"/><path d="M16.5 8v-2.5a2.5 2.5 0 0 1 5 0 2.5 2.5 0 0 1-2.5 2.5h-5"/></svg>Claim Bonus</button>
+        </div>
+        <div class="balance-stats"><div class="stat-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="inviteCount">0 Invites</span></div><div class="stat-right" id="checkInBtn" onclick="doCheckIn()" style="cursor: pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/></svg><span id="checkInCount">0 Check-ins</span><span>&#8226;</span><span>+₦500</span></div></div>
+        <div class="earned-text" id="earnedText">₦0 Earned</div>
+    </div>
+    <div class="quick-row">
+        <div class="quick-item" onclick="buyFaircode()"><div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="quick-label">Buy Faircode</div></div>
+        <div class="quick-item" onclick="openGroups()"><div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="quick-label">Groups</div></div>
+        <div class="quick-item" onclick="withdraw()"><div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="quick-label">Withdraw</div></div>
+        <div class="quick-item" onclick="topEarners()"><div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div><div class="quick-label">Top Earners</div></div>
+    </div>
+    <div class="services-box">
+        <div class="services-grid">
+            <div class="service-item" onclick="buyAirtime()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="service-label">Airtime</div></div>
+            <div class="service-item" onclick="buyData()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><div class="service-label">Data</div></div>
+            <div class="service-item" onclick="contactSupport()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="service-label">Support</div></div>
+            <div class="service-item" onclick="buyTV()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg></div><div class="service-label">TV</div></div>
+            <div class="service-item" onclick="betting()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="service-label">Betting</div></div>
+            <div class="service-item" onclick="getLoan()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="hot-tag">Hot</span></div><div class="service-label">Loan</div></div>
+            <div class="service-item" onclick="inviteFriends()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div><div class="service-label">Invite Friends</div></div>
+            <div class="service-item" onclick="moreServices()"><div class="service-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div><div class="service-label">More</div><div class="more-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+        </div>
+    </div>
+    <div class="bottom-banner"><div class="banner-phone"><div class="banner-phone-header">FairMonie</div><div class="banner-phone-line"></div><div class="banner-phone-line"></div><div class="banner-phone-line"></div><div class="banner-phone-line"></div></div><div class="banner-content"><div class="banner-title">Quick Loans</div><ul class="banner-list"><li>Airtime</li><li>Data</li><li>Cable TV</li><li>Internet</li></ul></div><div class="banner-chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div></div>
+    <div class="testimonials-section"><div class="testimonials-header"><div class="live-dot"></div><h3>Happy Users</h3><span class="count">2,847 celebrating</span></div><div class="carousel-wrapper"><div class="carousel-track" id="carouselTrack"></div></div></div>
+    <div class="trust-badges"><div class="trust-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>256-bit SSL</span></div><div class="trust-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>CBN Verified</span></div></div>
+    <button class="chat-float" onclick="openChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * canvas.width; this.y = canvas.height + Math.random() * 100; this.size = Math.random() * 3 + 1; this.speedY = Math.random() * 0.6 + 0.2; this.speedX = (Math.random() - 0.5) * 0.2; this.opacity = Math.random() * 0.5 + 0.3; this.glow = Math.random() * 20 + 15; this.pulseSpeed = Math.random() * 0.02 + 0.01; this.pulsePhase = Math.random() * Math.PI * 2; this.color = Math.random() > 0.5 ? '34, 197, 94' : '74, 222, 128'; }
+            update() { this.y -= this.speedY; this.x += this.speedX; this.pulsePhase += this.pulseSpeed; if (this.y < -50) this.reset(); }
+            draw() { const pulse = Math.sin(this.pulsePhase) * 0.3 + 0.7; const currentGlow = this.glow * pulse; const currentOpacity = this.opacity * pulse; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2); ctx.fillStyle = `rgba(${this.color}, ${currentOpacity * 0.15})`; ctx.shadowBlur = currentGlow; ctx.shadowColor = `rgba(${this.color}, 0.6)`; ctx.fill(); ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 1.5, 0, Math.PI * 2); ctx.fillStyle = `rgba(${this.color}, ${currentOpacity * 0.4})`; ctx.shadowBlur = currentGlow * 0.5; ctx.shadowColor = `rgba(${this.color}, 0.8)`; ctx.fill(); ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(${this.color}, ${currentOpacity})`; ctx.shadowBlur = currentGlow * 0.3; ctx.shadowColor = `rgba(${this.color}, 1)`; ctx.fill(); ctx.shadowBlur = 0; }
+        }
+        for (let i = 0; i < 60; i++) { const p = new Particle(); p.y = Math.random() * canvas.height; particles.push(p); }
+        function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+        animateParticles();
+        function getEmailKey(baseKey) { const email = localStorage.getItem('fairmonie_user_email') || 'default'; return 'fairmonie_' + email + '_' + baseKey; }
+        function loadData(key, fallback) { const val = localStorage.getItem(getEmailKey(key)); return val !== null ? val : fallback; }
+        function saveData(key, value) { localStorage.setItem(getEmailKey(key), value); }
+        const currentEmail = localStorage.getItem('fairmonie_user_email') || 'default';
+        let username = loadData('username', null);
+        if (!username) username = localStorage.getItem('fairmonie_username') || 'Daniel';
+        document.getElementById('userName').textContent = username;
+        let currentBalance = parseInt(loadData('balance', '0'));
+        let checkInCount = parseInt(loadData('checkins', '0'));
+        let earnedAmount = parseInt(loadData('earned', '0'));
+        let lastCheckIn = loadData('lastcheckin', '');
+        let currentCurrency = loadData('currency', 'NGN');
+        function refreshUI() {
+            document.getElementById('balanceAmount').textContent = '₦' + currentBalance.toLocaleString();
+            document.getElementById('earnedText').textContent = '₦' + earnedAmount.toLocaleString() + ' Earned';
+            document.getElementById('checkInCount').textContent = checkInCount + ' Check-ins';
+            document.getElementById('userName').textContent = username;
+            document.getElementById('inviteCount').textContent = (parseInt(loadData('referral_count', '0')) || 0) + ' Invites';
+        }
+        refreshUI();
+        function persistData() { saveData('balance', currentBalance.toString()); saveData('checkins', checkInCount.toString()); saveData('earned', earnedAmount.toString()); saveData('lastcheckin', lastCheckIn); saveData('currency', currentCurrency); saveData('username', username); }
+        let balanceVisible = true;
+        function toggleBalance() { const amount = document.getElementById('balanceAmount'); const eye = document.getElementById('eyeBtn'); balanceVisible = !balanceVisible; if (balanceVisible) { amount.style.color = '#22c55e'; amount.style.webkitTextStroke = 'none'; amount.textContent = '₦' + currentBalance.toLocaleString(); eye.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`; } else { amount.style.color = 'transparent'; amount.style.webkitTextStroke = '2px #22c55e'; amount.textContent = '****'; eye.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`; } }
+        const currencySymbols = { 'NGN': '₦', 'USD': '$', 'GHS': '¢', 'EUR': '€', 'GBP': '£', 'KES': 'Ksh' };
+        const exchangeRates = { 'NGN': 1, 'USD': 0.000645, 'GHS': 0.0100, 'EUR': 0.000594, 'GBP': 0.000510, 'KES': 0.0832 };
+        function showToast(title, message) { const toast = document.getElementById('toastNotification'); const toastTitle = document.getElementById('toastTitle'); const toastMessage = document.getElementById('toastMessage'); toastTitle.textContent = title; toastMessage.textContent = message; toast.classList.remove('fade-out'); toast.classList.add('show'); playSuccessSound(); setTimeout(() => { toast.classList.remove('show'); toast.classList.add('fade-out'); }, 4000); }
+        function playSuccessSound() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const notes = [523, 659, 784, 1047]; const gain = ctx.createGain(); gain.connect(ctx.destination); gain.gain.setValueAtTime(0.12, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8); notes.forEach((freq, i) => { const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now + i * 0.12); osc.connect(gain); osc.start(now + i * 0.12); osc.stop(now + i * 0.12 + 0.4); }); const bass = ctx.createOscillator(); bass.type = 'triangle'; bass.frequency.setValueAtTime(130, now); bass.connect(gain); bass.start(now); bass.stop(now + 0.9); } catch (e) {} }
+        function showEarnToast(title, amount, emoji) { const toast = document.getElementById('earnToast'); const toastIcon = document.getElementById('earnToastIcon'); const toastTitle = document.getElementById('earnToastTitle'); const toastAmount = document.getElementById('earnToastAmount'); toastIcon.textContent = emoji || '🎉'; toastTitle.textContent = title; toastAmount.textContent = amount; toast.classList.remove('fade-out'); toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); toast.classList.add('fade-out'); }, 4000); }
+        function saveNotification(type, title, message, amount) { const notifications = JSON.parse(loadData('notifications', '[]')); const notif = { id: Date.now(), type, title, message, amount, amountType: amount.startsWith('+') ? 'credit' : 'debit', time: new Date().toISOString(), read: false }; notifications.unshift(notif); saveData('notifications', JSON.stringify(notifications)); }
+        function recordActivity(type, title, message, amount, emoji) { showEarnToast(title, amount, emoji); saveNotification(type, title, message, amount); }
+        function doCheckIn() { const now = new Date(); const today = now.toDateString(); if (lastCheckIn === today) { showToast('Already Checked In!', 'Come back tomorrow for another reward.'); return; } lastCheckIn = today; checkInCount++; earnedAmount += 500; currentBalance += 500; persistData(); refreshUI(); recordActivity('checkin', 'Daily Check-in!', 'You checked in and earned your daily reward.', '+₦500', '✅'); }
+        function claimBonus() { window.location.href = 'claim_bonus.html'; }
+        function openCurrencyModal() { document.getElementById('currencyModal').classList.add('active'); }
+        function closeCurrencyModal() { document.getElementById('currencyModal').classList.remove('active'); }
+        function selectCurrency(currency) { currentCurrency = currency; const items = document.querySelectorAll('.currency-item'); items.forEach(item => item.classList.remove('selected')); event.currentTarget.classList.add('selected'); document.getElementById('currencySymbol').textContent = currencySymbols[currency]; document.getElementById('currencyCode').textContent = currency; persistData(); const rate = exchangeRates[currency]; const convertedBalance = Math.round(currentBalance * rate * 10000) / 10000; document.getElementById('balanceAmount').textContent = currencySymbols[currency] + convertedBalance.toLocaleString(); setTimeout(closeCurrencyModal, 300); }
+        document.getElementById('currencyModal').addEventListener('click', function(e) { if (e.target === this) closeCurrencyModal(); });
+        function topUp() { window.location.href = 'fund_wallet.html'; }
+        function buyFaircode() { window.location.href = 'buy_faircode.html'; }
+        function withdraw() { window.location.href = 'withdrawal.html'; }
+        function openGroups() { alert('Feature not available yet!'); }
+        function topEarners() { window.location.href = 'top_earners.html'; }
+        function buyAirtime() { window.location.href = 'buy_airtime.html'; }
+        function buyData() { window.location.href = 'buy_data.html'; }
+        function contactSupport() { window.location.href = 'support.html'; }
+        function buyTV() { window.location.href = 'tv_recharge.html'; }
+        function betting() { window.location.href = 'betting.html'; }
+        function getLoan() { window.location.href = 'loan.html'; }
+        function inviteFriends() { window.location.href = 'invite.html'; }
+        function moreServices() { window.location.href = 'more.html'; }
+        function openChat() { alert('Feature not available yet!'); }
+        function openHelp() { alert('Help center coming soon!'); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        function openNotifications() { window.location.href = 'notifications.html'; }
+        window.addEventListener('beforeunload', () => { persistData(); if (soundInterval) clearInterval(soundInterval); if (bannerToastInterval) clearInterval(bannerToastInterval); });
+        let soundInterval;
+        function playDashboardSound() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime; const notes = [523, 659, 784, 1047]; const gain = ctx.createGain(); gain.connect(ctx.destination); gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2); notes.forEach((freq, i) => { const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now + i * 0.15); osc.connect(gain); osc.start(now + i * 0.15); osc.stop(now + i * 0.15 + 0.5); }); const bass = ctx.createOscillator(); bass.type = 'triangle'; bass.frequency.setValueAtTime(130, now); bass.connect(gain); bass.start(now); bass.stop(now + 1.3); } catch (e) { console.log('Audio blocked'); } }
+        setTimeout(() => { playDashboardSound(); soundInterval = setInterval(playDashboardSound, 30000); }, 2000);
+        document.addEventListener('visibilitychange', () => { if (document.hidden) { if (soundInterval) clearInterval(soundInterval); } else { soundInterval = setInterval(playDashboardSound, 30000); } });
+        const toastMessages = [ { name: "Chioma O.", action: "just received a ₦50,000 loan disbursement", emoji: "🎉" }, { name: "Abdul K.", action: "claimed his daily ₦500 bonus", emoji: "💰" }, { name: "Kemi A.", action: "referred 3 new members and earned ₦11,400", emoji: "👥" }, { name: "Tosin B.", action: "topped up his wallet with ₦25,000", emoji: "⚡" }, { name: "John D.", action: "has earned over ₦12,000 today", emoji: "🔥" }, { name: "Mary E.", action: "completely paid off her instant loan", emoji: "✅" }, { name: "Ibrahim S.", action: "just purchased an airtime bundle", emoji: "📱" }, { name: "Ngozi F.", action: "checked in and got +₦500", emoji: "✨" }, { name: "David G.", action: "withdrew ₦30,000 to his bank account", emoji: "💸" }, { name: "Blessing H.", action: "just joined FairMonie Pay – welcome!", emoji: "🆕" }, { name: "Emeka J.", action: "subscribed to a monthly data plan", emoji: "📡" }, { name: "Zainab L.", action: "redeemed a ₦3,800 referral bonus", emoji: "🎁" }, { name: "Chinedu M.", action: "paid his cable TV subscription instantly", emoji: "📺" }, { name: "Folake N.", action: "won ₦15,000 from the betting bonus", emoji: "🏆" }, { name: "Tunde P.", action: "secured a ₦100,000 quick loan", emoji: "🛡️" }, { name: "Amina R.", action: "sent money to her family safely", emoji: "❤️" }, { name: "Oluwatobi S.", action: "just crossed ₦250,000 in savings", emoji: "🚀" }, { name: "Grace T.", action: "bought Faircode to protect her wallet", emoji: "🔐" }, { name: "Peter U.", action: "earned ₦5,000 in interest this month", emoji: "📈" }, { name: "Ruth V.", action: "verified her account successfully", emoji: "✅" } ];
+        let usedToastIndices = [];
+        let bannerToastInterval = null;
+        let currentToast = null;
+        function getRandomToast() { if (usedToastIndices.length >= toastMessages.length) usedToastIndices = []; let idx; do { idx = Math.floor(Math.random() * toastMessages.length); } while (usedToastIndices.includes(idx)); usedToastIndices.push(idx); return toastMessages[idx]; }
+        function showLiveToast() { const container = document.getElementById('liveToastContainer'); if (currentToast && currentToast.parentNode) { currentToast.parentNode.removeChild(currentToast); currentToast = null; } const msg = getRandomToast(); const avatarUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(msg.name) + '&background=16a34a&color=fff&size=100&bold=true'; const toast = document.createElement('div'); toast.className = 'live-toast'; toast.innerHTML = '<img class="live-toast-avatar" src="' + avatarUrl + '" alt="' + msg.name + '" loading="lazy">' + '<div class="live-toast-content">' + '<div class="live-toast-text"><strong>' + msg.name + '</strong> ' + msg.action + ' <span class="live-toast-emoji">' + msg.emoji + '</span></div>' + '</div>'; container.appendChild(toast); currentToast = toast; setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); if (currentToast === toast) currentToast = null; }, 4500); }
+        setTimeout(function() { showLiveToast(); bannerToastInterval = setInterval(showLiveToast, 8000); }, 2000);
+        const testimonials = [ { name: "Chinedu O.", text: "Thank you FairMonie! 🙏", amount: "₦50,000 loan" }, { name: "Amina K.", text: "Best app ever! 💚", amount: "Cashed out ₦120k" }, { name: "Tunde B.", text: "Loan in 2 minutes! ⚡", amount: "₦75,000 approved" }, { name: "Ngozi E.", text: "God bless FairMonie 🙌", amount: "Paid my bills" }, { name: "Ibrahim S.", text: "Finally, a trusted app! ✅", amount: "₦200,000 earned" }, { name: "Folake M.", text: "My salary came early 😭", amount: "₦85,000 received" }, { name: "Emeka J.", text: "Referral bonus is real! 🔥", amount: "₦15,000 bonus" }, { name: "Zainab A.", text: "No hidden charges! 👏", amount: "Airtime loan" }, { name: "David O.", text: "FairMonie saved me! 💯", amount: "₦30,000 quick loan" }, { name: "Blessing T.", text: "I'm telling everyone! 📢", amount: "₦95,000 profit" } ];
+        function getAvatar(name) { return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=16a34a&color=fff&size=128&bold=true'; }
+        function createCard(t) { return '<div class="testimonial-card"><img class="testimonial-avatar" src="' + getAvatar(t.name) + '" alt="' + t.name + '" loading="lazy"><div class="testimonial-text">' + t.text + '</div><div class="testimonial-amount">' + t.amount + '</div><div class="testimonial-name">' + t.name + '</div></div>'; }
+        const track = document.getElementById('carouselTrack');
+        if (track) { var cardsHTML = ''; for (var i = 0; i < testimonials.length; i++) { cardsHTML += createCard(testimonials[i]); } track.innerHTML = cardsHTML + cardsHTML; }
+
+        // ===== APOLOGY POPUP LOGIC (ADDED) =====
+        function closeApologyPopup() {
+            document.getElementById('apologyPopup').classList.add('hidden');
+            // Save that user has seen it
+            localStorage.setItem('fairmonie_apology_seen_' + (localStorage.getItem('fairmonie_user_email') || 'default'), 'true');
+        }
+
+        // Check if popup should show
+        (function checkApologyPopup() {
+            var deploymentTime = 1781643564000; // CHANGE THIS to your deployment timestamp
+            var currentTime = Date.now();
+            var fourHours = 4 * 60 * 60 * 1000;
+            var userEmail = localStorage.getItem('fairmonie_user_email') || 'default';
+            var hasSeen = localStorage.getItem('fairmonie_apology_seen_' + userEmail);
+
+            // If user has NOT seen it AND within 4 hours of deployment
+            if (!hasSeen && (currentTime - deploymentTime) < fourHours) {
+                // Show popup (it's already visible by default)
+            } else {
+                // Hide popup
+                document.getElementById('apologyPopup').classList.add('hidden');
+            }
+        })();
+    </script>
+</body>
+</html>

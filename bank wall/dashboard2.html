@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bank Wallet - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #16a34a;
+            --primary-dark: #15803d;
+            --primary-light: #22c55e;
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #6b7280;
+            --card-bg: #16a34a;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Amaranth', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== PAGE TRANSITIONS ===== */
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            background: var(--bg);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(100%);
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(0);
+        }
+
+        .page.exit {
+            transform: translateX(-30%);
+            opacity: 0.5;
+        }
+
+        /* ===== MARQUEE ===== */
+        .marquee-container {
+            background: var(--bg);
+            padding: 12px 0;
+            overflow: hidden;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .marquee-track {
+            display: flex;
+            animation: marquee 15s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 20px;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .marquee-santa {
+            font-size: 20px;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ===== HOME PAGE ===== */
+        .home-content {
+            padding: 20px 16px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Wallet Card */
+        .wallet-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 180px;
+            height: 180px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+
+        .wallet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wallet-label {
+            font-size: 16px;
+            font-weight: 700;
+            opacity: 0.95;
+        }
+
+        .history-link {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: underline;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .balance {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .balance-currency {
+            font-size: 32px;
+        }
+
+        .user-info {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-info strong {
+            font-weight: 700;
+        }
+
+        /* Buy Miner Section */
+        .buy-section {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-buy {
+            flex: 1;
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-buy:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .btn-icon-small {
+            width: 50px;
+            height: 50px;
+            background: #000000;
+            border: none;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-icon-small:active {
+            transform: scale(0.95);
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 30px 0;
+        }
+
+        .btn-action {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-family: 'Amaranth', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-action:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-action svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Video Link */
+        .video-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 20px 0;
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .video-icon {
+            width: 36px;
+            height: 36px;
+            background: #fee2e2;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #dc2626;
+        }
+
+        /* Bank Icon */
+        .bank-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 40px auto;
+            color: white;
+            font-size: 48px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #1a1a2e;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 2000;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            font-family: 'Amaranth', sans-serif;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HOME PAGE ===== -->
+    <div class="page active" id="homePage">
+        <!-- Marquee -->
+        <div class="marquee-container">
+            <div class="marquee-track">
+                <div class="marquee-item">
+                    <span class="marquee-santa">🎅</span>
+                    Special Promo: Double mining bonus this season!
+                </div>
+                <div class="marquee-item">
+                    <span class="marquee-santa">🎅</span>
+                    Special Promo: Double mining bonus this season!
+                </div>
+                <div class="marquee-item">
+                    <span class="marquee-santa">🎅</span>
+                    Special Promo: Double mining bonus this season!
+                </div>
+                <div class="marquee-item">
+                    <span class="marquee-santa">🎅</span>
+                    Special Promo: Double mining bonus this season!
+                </div>
+            </div>
+        </div>
+
+        <div class="home-content">
+            <!-- Wallet Card -->
+            <div class="wallet-card">
+                <div class="wallet-header">
+                    <span class="wallet-label">Wallet Balance</span>
+                    <a href="#" class="history-link" onclick="viewHistory()">Transaction history ></a>
+                </div>
+                <div class="balance">
+                    <span class="balance-currency">₦</span><span id="walletBalance">0</span>
+                </div>
+                <div class="user-info" id="userInfo">
+                    NAME: <strong id="userName">Loading...</strong> &nbsp;&nbsp; Account: <strong id="userAccount">Loading...</strong>
+                    <div>Current miner: <strong id="userMiner">Free Miner</strong></div>
+                </div>
+                <div class="buy-section">
+                    <button class="btn-buy" onclick="goToBuyMiner()">BUY MINER</button>
+                    <button class="btn-icon-small" onclick="shareApp()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions">
+                <button class="btn-action mine" id="mineBtn" onclick="goToMining()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <path d="M2 10h20"/>
+                    </svg>
+                    Mine
+                </button>
+                <button class="btn-action withdraw" id="withdrawBtn" onclick="goToWithdraw()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                    Withdraw
+                </button>
+            </div>
+
+            <!-- Video Link -->
+            <div class="video-link" onclick="showHowItWorks()">
+                <div class="video-icon">▶️</div>
+                <span>How it works</span>
+            </div>
+
+            <!-- Bank Icon -->
+            <div class="bank-icon">🏛️</div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let currentUser = null;
+        let currentBalance = 0;
+
+        // ========== GET CURRENT USER ==========
+        function getCurrentUser() {
+            const user = localStorage.getItem('bankWallet_currentUser');
+            if (!user) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            return user;
+        }
+
+        // ========== LOAD USER DATA AND BALANCE ==========
+        function loadUserData() {
+            currentUser = getCurrentUser();
+            if (!currentUser) return false;
+
+            const userKey = `bankWallet_user_${currentUser}`;
+            const userData = JSON.parse(localStorage.getItem(userKey) || '{}');
+
+            if (userData.accountName) {
+                document.getElementById('userName').textContent = userData.accountName;
+            } else {
+                document.getElementById('userName').textContent = 'User';
+            }
+
+            document.getElementById('userAccount').textContent = currentUser;
+            loadBalance();
+            
+            return true;
+        }
+
+        // ========== LOAD BALANCE ==========
+        function loadBalance() {
+            if (!currentUser) return;
+            
+            const miningKey = `bankWallet_mining_${currentUser}`;
+            const miningData = JSON.parse(localStorage.getItem(miningKey) || '{}');
+            
+            currentBalance = miningData.balance || 0;
+            document.getElementById('walletBalance').textContent = currentBalance.toLocaleString();
+        }
+
+        // ========== CHECK MINING BUTTON STATUS ==========
+        function checkMiningButtonStatus() {
+            if (!currentUser) return false;
+            
+            const lastMiningKey = `bankWallet_lastMining_${currentUser}`;
+            const lastMiningData = JSON.parse(localStorage.getItem(lastMiningKey) || '{}');
+            const lastMiningTime = lastMiningData.timestamp || 0;
+            const timeSinceLastMining = Date.now() - lastMiningTime;
+            const COOLDOWN_MINUTES = 30;
+            const cooldownMs = COOLDOWN_MINUTES * 60 * 1000;
+            
+            const dailyKey = `bankWallet_daily_${currentUser}`;
+            const today = new Date().toDateString();
+            const dailyData = JSON.parse(localStorage.getItem(dailyKey) || '{}');
+            const dailyMinedAmount = dailyData.date === today ? (dailyData.amount || 0) : 0;
+            const DAILY_LIMIT = 86000;
+            
+            const isOnCooldown = timeSinceLastMining < cooldownMs;
+            const dailyLimitReached = dailyMinedAmount >= DAILY_LIMIT;
+            
+            const mineBtn = document.getElementById('mineBtn');
+            if (mineBtn) {
+                if (isOnCooldown || dailyLimitReached) {
+                    mineBtn.disabled = true;
+                    mineBtn.style.opacity = '0.5';
+                    mineBtn.style.cursor = 'not-allowed';
+                    
+                    if (isOnCooldown) {
+                        const remainingMinutes = Math.ceil((cooldownMs - timeSinceLastMining) / 60000);
+                        mineBtn.title = `Mining on cooldown. Available in ${remainingMinutes} minutes`;
+                    } else if (dailyLimitReached) {
+                        mineBtn.title = 'Daily limit of ₦86,000 reached. Come back tomorrow!';
+                    }
+                } else {
+                    mineBtn.disabled = false;
+                    mineBtn.style.opacity = '1';
+                    mineBtn.style.cursor = 'pointer';
+                    mineBtn.title = '';
+                }
+            }
+            
+            return { isOnCooldown, dailyLimitReached };
+        }
+
+        // ========== RE-ENABLE MINING BUTTON ==========
+        function reenableMiningButton() {
+            checkMiningButtonStatus();
+        }
+
+        window.reenableMiningButton = reenableMiningButton;
+
+        // ========== NAVIGATION FUNCTIONS ==========
+        function viewHistory() {
+            window.location.href = 'history.html';
+        }
+
+        function goToBuyMiner() {
+            window.location.href = 'buy-miner.html';
+        }
+
+        function goToMining() {
+            const mineBtn = document.getElementById('mineBtn');
+            if (mineBtn.disabled) {
+                showToast(mineBtn.title || 'Mining not available right now');
+                return;
+            }
+            window.location.href = 'mining.html';
+        }
+
+        // ========== WITHDRAW FUNCTION - FIXED ==========
+        function goToWithdraw() {
+            // Refresh balance first
+            loadBalance();
+            
+            // Check if balance is enough
+            if (currentBalance < 86000) {
+                showToast('Insufficient balance! You need ₦86,000 to withdraw.');
+                return;
+            }
+            
+            // Go to withdraw page
+            window.location.href = 'withdraw.html';
+        }
+
+        function shareApp() {
+            showToast('Share feature coming soon!');
+        }
+
+        function showHowItWorks() {
+            window.location.href = 'how-it-works.html';
+        }
+
+        // ========== TOAST ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ========== INITIALIZE ==========
+        function init() {
+            if (loadUserData()) {
+                checkMiningButtonStatus();
+            }
+        }
+
+        // Run on page load
+        init();
+    </script>
+
+</body>
+</html>

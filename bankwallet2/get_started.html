@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Start Earning - Bank Wallet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000000;
+            color: white;
+            min-height: 100vh;
+            padding: 20px 16px;
+            overflow-x: hidden;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 90px;
+            height: 90px;
+            background: #22c55e;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+        }
+
+        .logo-icon svg {
+            width: 45px;
+            height: 45px;
+            color: white;
+        }
+
+        .logo-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #22c55e;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 18px;
+            background: transparent;
+            border: 1px solid #22c55e;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: #4ade80;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 6px;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 18px;
+            background: #22c55e;
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(34, 197, 94, 0.4);
+        }
+
+        .start-btn:active {
+            transform: scale(0.98);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #22c55e;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-section">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11m16-11v11M8 14v3m4-3v3m4-3v3"/>
+            </svg>
+        </div>
+        <div class="logo-title">Bank Wallet</div>
+    </div>
+
+    <form id="signupForm" onsubmit="return handleSignup(event)">
+        <div class="form-group">
+            <label class="form-label">Phone number</label>
+            <input type="tel" class="form-input" id="phoneNumber" placeholder="Enter phone number" maxlength="11" oninput="updateCounter('phoneNumber', 'phoneCounter', 11)">
+            <div class="char-counter"><span id="phoneCounter">0</span>/11</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Account Name</label>
+            <input type="text" class="form-input" id="accountName" placeholder="Enter account name">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Account number</label>
+            <input type="tel" class="form-input" id="accountNumber" placeholder="Enter account number" maxlength="10" oninput="updateCounter('accountNumber', 'accountCounter', 10)">
+            <div class="char-counter"><span id="accountCounter">0</span>/10</div>
+        </div>
+
+        <button type="submit" class="start-btn">START EARNING</button>
+    </form>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Check if already signed up - redirect to dashboard
+        if (localStorage.getItem('bankwallet_signed_up') === 'true') {
+            window.location.replace('dashboard.html');
+        }
+
+        function updateCounter(inputId, counterId, maxLen) {
+            var input = document.getElementById(inputId);
+            var counter = document.getElementById(counterId);
+            counter.textContent = input.value.length;
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+
+            var phone = document.getElementById('phoneNumber').value.trim();
+            var name = document.getElementById('accountName').value.trim();
+            var account = document.getElementById('accountNumber').value.trim();
+
+            if (!phone || phone.length < 11) {
+                showToast('Please enter a valid 11-digit phone number');
+                return false;
+            }
+            if (!name) {
+                showToast('Please enter your account name');
+                return false;
+            }
+            if (!account || account.length < 10) {
+                showToast('Please enter a valid 10-digit account number');
+                return false;
+            }
+
+            // Save user data to localStorage
+            localStorage.setItem('bankwallet_phone', phone);
+            localStorage.setItem('bankwallet_name', name);
+            localStorage.setItem('bankwallet_account', account);
+            localStorage.setItem('bankwallet_balance', '0');
+            localStorage.setItem('bankwallet_signed_up', 'true');
+            localStorage.setItem('bankwallet_logged_in', 'true');
+
+            showToast('Account created successfully!');
+
+            setTimeout(function() {
+                window.location.href = 'loading.html';
+            }, 1500);
+
+            return false;
+        }
+    </script>
+</body>
+</html>
